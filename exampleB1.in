@@ -1,0 +1,12 @@
+# Macro file for example B1 test
+/run/initialize
+
+/gun/particle opticalphoton
+/gun/energy 1.87 eV
+/gun/polarization 0. 1. 0.
+#/gun/position 0. 0. 0.
+#/gun/ene/type Mono
+#/gun/ene/mono 2 eV
+
+/run/printProgress 100
+/run/beamOn 10000
