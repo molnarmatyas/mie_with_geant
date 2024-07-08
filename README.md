@@ -20,3 +20,5 @@ Futtat:
 `./exampleB1 run2.mac`
 
 --- HISTO ---
+
+`root.exe -b -q 'make_histogram.C("build/output100M.root", 100, "xtitle", "pngname")'`
