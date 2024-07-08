@@ -1,3 +1,4 @@
+// root.exe -b -q 'make_histogram.C("build/output100M.root", 100, "#theta", "thetadist.png")'
 void make_histogram(const char* filename, int column_number, const char* xtitle, const char* pngname, double xmin=-999, double xmax=-999) {
     TCanvas *c1 = new TCanvas("c1","A Simple Graph Example",200,10,700,500);
     //c1->SetFillColor(42);
@@ -7,57 +8,42 @@ void make_histogram(const char* filename, int column_number, const char* xtitle,
 
     TFile* file = new TFile(filename);
     TTree *tree = (TTree*)file->Get("Hits");
-
     double value;
     tree->SetBranchAddress("fTheta",&value);
 
-    double thisxmin = tree->GetMinimum("fTheta");
-    double thisxmax = tree->GetMaximum("fTheta");
-    if(xmin!=-999) thisxmin=xmin;
-    if(xmax!=-999) thisxmax=xmax;
-    TH1D *histo = new TH1D("theta",Form("%s distribution",xtitle),1000,xmin,xmax);
-    for (int i=0; i<tree->GetEntries(); i++) {
-        tree->GetEntry(i);
-        histo->Fill(value);
-    }
+    int Nbins = 200;
+    TH1F *histo = new TH1F("statistics",Form("%s distribution",xtitle),Nbins,xmin,xmax);
     histo->GetXaxis()->SetTitle(xtitle);
     histo->GetYaxis()->SetTitle("N [a.u.]");
-    double smallAngleMin = 0.02635;
-    double smallAngleMax = 0.1068;
-    double smallAngleiPhotonCount = histo->Integral(histo->FindBin(smallAngleMin), histo->FindBin(smallAngleMax));
 
-    double bigAngleMin = 0.2016;
-    double bigAngleMax = 0.2815;
-    double bigAnglePhotonCount = histo->Integral(histo->FindBin(bigAngleMin), histo->FindBin(bigAngleMax));
+    for (int i=0; i<tree->GetEntries(); i++) 
+    {
+        tree->GetEntry(i);
+        histo->Fill(value);
+        cout<<i<<endl;
+    }
 
-    std::cout << "Small (1.12°,6.51°) angle photon count: " << smallAngleiPhotonCount << "\t big (11.55°,16.13°) angle photon count: " << bigAnglePhotonCount << std::endl; 
-
-    histo->SetMarkerStyle(24);
-    histo->SetMarkerSize(0.5);
-
-//    histo->Draw("EP");
-//    histo->Print("all");
     c1->SetLogy(1);
-
-    TF1* oneoversin = new TF1("oneoversin","1/sin(x)");
-    double dtheta = (xmax-xmin)/1000;
-    double jbe = 100000000/1.;
-    //double jbe = 10000/25.;
-    histo->Multiply(oneoversin);
-    histo->Scale(1/((2*M_PI)*dtheta*jbe));
-    histo->SetTitle("d#sigma/d#Omega");
-    histo->GetYaxis()->SetTitle("d#sigma/d#Omega [mm^2]");
-    histo->SetBinContent(1, 0.0);
+    histo->GetYaxis()->SetTitle("d#sigma/d#Omega [cm^{2}]");
+    histo->SetMarkerStyle(6);
     gStyle->SetOptStat(0);
     histo->Draw("HIST P");
-    /*
-       TGraph* dsigmadOmega_refraction = new TGraph("dsdOtrue.txt"); 
-       dsigmadOmega_refraction->SetLineColor(kRed);
-       dsigmadOmega_refraction->SetLineWidth(2);
-       dsigmadOmega_refraction->Draw("L");
-     */
-    TLegend *leg = new TLegend(0.52,0.65,0.88,0.88);
-    leg->AddEntry(histo,"GEANT4 simulation","EP");
-    leg->Draw();
-    c1->Print("figs/crosssection.png");
+    c1->Print("figs/original.png");
+
+
+    if(strcmp(xtitle,"#theta")==0)
+    {
+      TF1* oneoversin = new TF1("oneoversin","1/sin(x)");
+      double dtheta = (xmax-xmin)/100;
+      double jbe = 100000000/0.001;
+      histo->Multiply(oneoversin);
+      histo->Scale(1/((2*M_PI)*dtheta*jbe));
+      histo->SetTitle("d#sigma/d#Omega");
+      histo->GetYaxis()->SetTitle("d#sigma/d#Omega [cm^{2}]");
+      histo->SetMarkerStyle(6);
+      gStyle->SetOptStat(0);
+      histo->Draw("HIST P");
+      c1->Print("figs/crosssection.png");
+    }
+    
 }
