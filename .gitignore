@@ -1,5 +1,3 @@
-# I HAVE NO IDEA WHAT SHOULD COME HERE, I CHOSE THE C++ .gitignore TEMPLATE
-
 # Prerequisites
 *.d
 
@@ -31,6 +29,10 @@
 # Executables
 *.exe
 *.app
+
+# Folders
+build/
+figs/
 
 # Compiled source #
 ###################
