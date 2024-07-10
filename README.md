@@ -6,14 +6,12 @@ Most csinálok ilyet először, szóval lesz itt ám minden...
 ## --- GEANT ---
 
 Compile:
-
-`mkdir build`
-
-`cd build`
-
-`cmake -DGeant4_DIR=/opt/Geant4 ... # a Geant4 install directory helye`
-
-`make -j8 # elerheto CPU magok szama`
+```
+mkdir build
+cd build
+cmake -DGeant4_DIR=/opt/Geant4 .. # a Geant4 install directory helye
+make -j8 # elerheto CPU magok szama
+```
 
 Futtat:
 
