@@ -23,48 +23,58 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: mieNormaEventAction.hh 75216 2013-10-29 16:08:11Z gcosmo $
+// $Id: B1DetectorConstruction.hh 69565 2013-05-08 12:35:31Z gcosmo $
 //
-/// \file mieNormaEventAction.hh
-/// \brief Definition of the mieNormaEventAction class
+/// \file B1DetectorConstruction.hh
+/// \brief Definition of the B1DetectorConstruction class
 
-#ifndef mieNormaEventAction_h
-#define mieNormaEventAction_h 1
+#ifndef B1DetectorConstruction_h
+#define B1DetectorConstruction_h 1
 
-#include "G4UserEventAction.hh"
+#include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
-#include <vector>
+#include "G4GenericMessenger.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4Orb.hh"
+#include "G4Box.hh"
+#include "G4OpticalSurface.hh"
+#include "G4Material.hh"
 
-/// Event action class
-///
+class G4VPhysicalVolume;
+class G4LogicalVolume;
 
-class mieNormaEventAction : public G4UserEventAction
+/// Detector construction class to define materials and geometry.
+
+class B1DetectorConstruction : public G4VUserDetectorConstruction
 {
   public:
-    mieNormaEventAction();
-    virtual ~mieNormaEventAction();
-    
-    virtual void BeginOfEventAction(const G4Event* event);
-    virtual void EndOfEventAction(const G4Event* event);
+    B1DetectorConstruction();
+    virtual ~B1DetectorConstruction();
 
-    void SaveAngles(G4double thismag, G4double thisphi, G4double thistheta) { fMag = thismag; fPhi = thisphi; fTheta = thistheta; }
-    void AddRayleigh() { ++fRayleigh; }
-    void AddAbsorption() { ++fAbsorption; }
-    void AddMie() { ++fMie; }
-    void AddBoundary() { ++fBoundary; }
-  
+    virtual G4VPhysicalVolume* Construct();
+    
+    G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
+    void SetRadius(G4double val);
+
   private:
-    G4int fRayleigh = 0;
-    G4int fAbsorption = 0;
-    G4int fMie = 0;
-    G4int fBoundary = 0;
-    G4double fMag;
-    G4double fPhi;
-    G4double fTheta;
+    G4LogicalVolume*  fScoringVolume;
+    G4double fRadius = 3*micrometer;
+    G4GenericMessenger* fMessenger;
+    G4Orb* solidShape1;
+    G4LogicalVolume* logicShape1;
+    G4VPhysicalVolume* physShape1;
+    G4Material* shape1_mat;
+    G4ThreeVector pos1;
+    G4LogicalVolume* logicEnv;
+    G4Box* solidEnv;
+    G4VPhysicalVolume* physEnv;
+    G4bool checkOverlaps;
+    G4OpticalSurface* Shape1Wrap;
+    void DefineCommands();
+    void UpdateSphere();
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
 
-    

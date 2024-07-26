@@ -23,22 +23,21 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: mieNorma.cc 86065 2014-11-07 08:51:15Z gcosmo $
+// $Id: exampleB1.cc 86065 2014-11-07 08:51:15Z gcosmo $
 //
-/// \file mieNorma.cc
-/// \brief Main program of the mieNorma 
+/// \file exampleB1.cc
+/// \brief Main program of the B1 example
 
-#include "mieNormaDetectorConstruction.hh"
-#include "mieNormaActionInitialization.hh"
-//#include "mieNormaPhysicsList.hh"
+#include "B1DetectorConstruction.hh"
+#include "B1ActionInitialization.hh"
+//#include "B1PhysicsList.hh"
 
 #include "FTFP_BERT.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4EmStandardPhysics_option4.hh"
 
-// Multithread
-#include "G4RunManager.hh"
 //#include "G4RunManagerFactory.hh"
+#include "G4RunManager.hh"
 
 #include "G4UImanager.hh"
 #include "QBBC.hh"
@@ -64,26 +63,23 @@ int main(int argc,char** argv)
   
   // Construct the default run manager
   //
-  // Multithread
-  G4RunManager* runManager = new G4RunManager;
   //auto runManager = G4RunManagerFactory::CreateRunManager();
-  //#ifdef G4MULTITHREADED
-  //    runManager->SetNumberOfThreads(7);
-  //#endif
+  //runManager->SetNumberOfThreads(12);
+  G4RunManager* runManager = new G4RunManager;
 
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new mieNormaDetectorConstruction());
+  runManager->SetUserInitialization(new B1DetectorConstruction());
   // Physics list
   G4VModularPhysicsList* physicsList = new FTFP_BERT;
   physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
   auto opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
   runManager->SetUserInitialization(physicsList);
-  //runManager-> SetUserInitialization(new mieNormaPhysicsList());
+  //runManager-> SetUserInitialization(new B1PhysicsList());
   // User action initialization
-  runManager->SetUserInitialization(new mieNormaActionInitialization());
+  runManager->SetUserInitialization(new B1ActionInitialization());
   
   // Initialize visualization
   //

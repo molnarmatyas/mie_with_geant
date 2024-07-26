@@ -23,19 +23,19 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: mieNormaRunAction.hh 69565 2013-05-08 12:35:31Z gcosmo $
+// $Id: B1RunAction.hh 69565 2013-05-08 12:35:31Z gcosmo $
 //
-/// \file mieNormaRunAction.hh
-/// \brief Definition of the mieNormaRunAction class
+/// \file B1RunAction.hh
+/// \brief Definition of the B1RunAction class
 
-#ifndef mieNormaRunAction_h
-#define mieNormaRunAction_h 1
+#ifndef B1RunAction_h
+#define B1RunAction_h 1
 
 #include "G4UserRunAction.hh"
 #include "globals.hh"
 
 class G4Run;
-class mieNormaRun;
+class B1Run;
 class G4LogicalVolume;
 
 /// Run action class
@@ -44,17 +44,17 @@ class G4LogicalVolume;
 /// from the energy deposit accumulated via stepping and event actions.
 /// The computed dose is then printed on the screen.
 
-class mieNormaRunAction : public G4UserRunAction
+class B1RunAction : public G4UserRunAction
 {
   public:
-    mieNormaRunAction();
-    virtual ~mieNormaRunAction();
+    B1RunAction();
+    virtual ~B1RunAction();
 
     virtual G4Run* GenerateRun();
     virtual void BeginOfRunAction(const G4Run*);
     virtual void   EndOfRunAction(const G4Run*);
   private:
-    mieNormaRun* fRun = nullptr;
+    B1Run* fRun = nullptr;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -23,42 +23,82 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// $Id: B1Run.hh 66536 2012-12-19 14:32:36Z ihrivnac $
 //
-//
-// 
+/// \file B1Run.hh
+/// \brief Definition of the B1Run class
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#ifndef B1Run_h
+#define B1Run_h 1
 
-#ifndef mieNormaPhysicsListMessenger_h
-#define mieNormaPhysicsListMessenger_h 1
-
+#include "G4Run.hh"
 #include "globals.hh"
-#include "G4UImessenger.hh"
+#include "G4AnalysisManager.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4UnitsTable.hh"
+#include <vector>
 
-class mieNormaPhysicsList;
-class G4UIdirectory;
-class G4UIcmdWithAnInteger;
+class G4Event;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+/// Run class
+///
 
-class mieNormaPhysicsListMessenger: public G4UImessenger
+class B1Run : public G4Run
 {
   public:
-    mieNormaPhysicsListMessenger(mieNormaPhysicsList* );
-    virtual ~mieNormaPhysicsListMessenger();
- 
-    virtual void SetNewValue(G4UIcommand*, G4String);
- 
-  private:
-    mieNormaPhysicsList*  fPhysicsList;
- 
-    G4UIdirectory*        fmieNormaDir;
-    G4UIdirectory*        fPhysDir;
-    G4UIcmdWithAnInteger* fVerboseCmd;
-    G4UIcmdWithAnInteger* fCerenkovCmd;
+    B1Run();
+    virtual ~B1Run();
+
+    // method from the base class
+    virtual void Merge(const G4Run*);
+    void SetPrimary(G4ParticleDefinition* particle, G4double energy);
+    
+    void SaveAnglesToVector (G4double thismag, G4double thisphi, G4double thistheta); 
+
+    // final methods
+    void PrintAngles() const;
+    void AddRayleigh(G4double n)
+    {
+      fRayleighCounter += n;
+      fRayleigh2 += n * n;
+    };
+    void AddAbsorption(G4double n)
+    {
+      fAbsorptionCounter += n;
+      fAbsorption2 += n * n;
+    };
+    void AddMie(G4double n)
+    {
+      fMieCounter += n;
+      fMie2 += n * n;
+    };
+    void AddBoundary(G4double n)
+    {
+      fBoundaryCounter += n;
+      fBoundary2 += n * n;
+    };
+  
+    void EndOfRun();
+  
+   private:
+    G4ParticleDefinition* fParticle = nullptr;
+  
+    G4double fRayleighCounter = 0.;
+    G4double fRayleigh2 = 0.;
+    G4double fAbsorptionCounter = 0.;
+    G4double fAbsorption2 = 0.;
+    G4double fMieCounter = 0.;
+    G4double fMie2 = 0.;
+    G4double fBoundaryCounter = 0.;
+    G4double fBoundary2 = 0.;
+    G4double fEnergy = -1.;
+
+    std::vector<G4double> magvector;
+    std::vector<G4double> phivector;
+    std::vector<G4double> thetavector;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
+

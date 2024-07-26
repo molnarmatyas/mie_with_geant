@@ -23,14 +23,14 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: mieNormaSteppingAction.cc 74483 2013-10-09 13:37:06Z gcosmo $
+// $Id: B1SteppingAction.cc 74483 2013-10-09 13:37:06Z gcosmo $
 //
-/// \file mieNormaSteppingAction.cc
-/// \brief Implementation of the mieNormaSteppingAction class
+/// \file B1SteppingAction.cc
+/// \brief Implementation of the B1SteppingAction class
 
-#include "mieNormaSteppingAction.hh"
-#include "mieNormaDetectorConstruction.hh"
-#include "mieNormaEventAction.hh"
+#include "B1SteppingAction.hh"
+#include "B1DetectorConstruction.hh"
+#include "B1EventAction.hh"
 
 #include "G4Event.hh"
 #include "G4LogicalVolume.hh"
@@ -39,18 +39,18 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mieNormaSteppingAction::mieNormaSteppingAction(mieNormaEventAction *eventAction)
+B1SteppingAction::B1SteppingAction(B1EventAction *eventAction)
     : G4UserSteppingAction(), fEventAction(eventAction)
 // fScoringVolume(0)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mieNormaSteppingAction::~mieNormaSteppingAction() {}
+B1SteppingAction::~B1SteppingAction() {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void mieNormaSteppingAction::UserSteppingAction(const G4Step *step) {
+void B1SteppingAction::UserSteppingAction(const G4Step *step) {
   static G4ParticleDefinition *opticalphoton =
       G4OpticalPhoton::OpticalPhotonDefinition();
 
@@ -102,8 +102,8 @@ void mieNormaSteppingAction::UserSteppingAction(const G4Step *step) {
   /*
     // prepare for scoring volume check
     if (!fScoringVolume) {
-      const mieNormaDetectorConstruction* detectorConstruction
-        = static_cast<const mieNormaDetectorConstruction*>
+      const B1DetectorConstruction* detectorConstruction
+        = static_cast<const B1DetectorConstruction*>
           (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
       fScoringVolume = detectorConstruction->GetScoringVolume();
     }

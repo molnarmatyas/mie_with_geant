@@ -23,26 +23,44 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: mieNormaActionInitialization.hh 68058 2013-03-13 14:47:43Z gcosmo $
+// $Id: B1EventAction.hh 75216 2013-10-29 16:08:11Z gcosmo $
 //
-/// \file mieNormaActionInitialization.hh
-/// \brief Definition of the mieNormaActionInitialization class
+/// \file B1EventAction.hh
+/// \brief Definition of the B1EventAction class
 
-#ifndef mieNormaActionInitialization_h
-#define mieNormaActionInitialization_h 1
+#ifndef B1EventAction_h
+#define B1EventAction_h 1
 
-#include "G4VUserActionInitialization.hh"
+#include "G4UserEventAction.hh"
+#include "globals.hh"
+#include <vector>
 
-/// Action initialization class.
+/// Event action class
+///
 
-class mieNormaActionInitialization : public G4VUserActionInitialization
+class B1EventAction : public G4UserEventAction
 {
   public:
-    mieNormaActionInitialization();
-    virtual ~mieNormaActionInitialization();
+    B1EventAction();
+    virtual ~B1EventAction();
+    
+    virtual void BeginOfEventAction(const G4Event* event);
+    virtual void EndOfEventAction(const G4Event* event);
 
-    virtual void BuildForMaster() const;
-    virtual void Build() const;
+    void SaveAngles(G4double thismag, G4double thisphi, G4double thistheta) { fMag = thismag; fPhi = thisphi; fTheta = thistheta; }
+    void AddRayleigh() { ++fRayleigh; }
+    void AddAbsorption() { ++fAbsorption; }
+    void AddMie() { ++fMie; }
+    void AddBoundary() { ++fBoundary; }
+  
+  private:
+    G4int fRayleigh = 0;
+    G4int fAbsorption = 0;
+    G4int fMie = 0;
+    G4int fBoundary = 0;
+    G4double fMag;
+    G4double fPhi;
+    G4double fTheta;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

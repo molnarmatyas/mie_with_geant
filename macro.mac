@@ -1,0 +1,3 @@
+/run/initialize
+/sphere/radius 10
+/run/beamOn 100
