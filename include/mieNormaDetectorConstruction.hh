@@ -33,6 +33,12 @@
 
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"
+#include "G4GenericMessenger.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4Orb.hh"
+#include "G4Box.hh"
+#include "G4OpticalSurface.hh"
+#include "G4Material.hh"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -48,9 +54,24 @@ class mieNormaDetectorConstruction : public G4VUserDetectorConstruction
     virtual G4VPhysicalVolume* Construct();
     
     G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
+    void SetRadius(G4double val);
 
   protected:
     G4LogicalVolume*  fScoringVolume;
+    G4double fRadius = 3*micrometer;
+    G4GenericMessenger* fMessenger;
+    G4Orb* solidShape1;
+    G4LogicalVolume* logicShape1;
+    G4VPhysicalVolume* physShape1;
+    G4Material* shape1_mat;
+    G4ThreeVector pos1;
+    G4LogicalVolume* logicEnv;
+    G4Box* solidEnv;
+    G4VPhysicalVolume* physEnv;
+    G4bool checkOverlaps;
+    G4OpticalSurface* Shape1Wrap;
+    void DefineCommands();
+    void UpdateSphere();
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
