@@ -23,15 +23,15 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1RunAction.cc 87359 2014-12-01 16:04:27Z gcosmo $
+// $Id: mieNormaRunAction.cc 87359 2014-12-01 16:04:27Z gcosmo $
 //
-/// \file B1RunAction.cc
-/// \brief Implementation of the B1RunAction class
+/// \file mieNormaRunAction.cc
+/// \brief Implementation of the mieNormaRunAction class
 
-#include "B1RunAction.hh"
-#include "B1PrimaryGeneratorAction.hh"
-#include "B1DetectorConstruction.hh"
-#include "B1Run.hh"
+#include "mieNormaRunAction.hh"
+#include "mieNormaPrimaryGeneratorAction.hh"
+#include "mieNormaDetectorConstruction.hh"
+#include "mieNormaRun.hh"
 
 #include "G4RunManager.hh"
 #include "G4LogicalVolumeStore.hh"
@@ -41,7 +41,7 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1RunAction::B1RunAction()
+mieNormaRunAction::mieNormaRunAction()
 : G4UserRunAction()
 { 
   // add new units for dose
@@ -66,20 +66,20 @@ B1RunAction::B1RunAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1RunAction::~B1RunAction()
+mieNormaRunAction::~mieNormaRunAction()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4Run* B1RunAction::GenerateRun()
+G4Run* mieNormaRunAction::GenerateRun()
 {
-  fRun = new B1Run();
+  fRun = new mieNormaRun();
   return fRun; 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B1RunAction::BeginOfRunAction(const G4Run* run)
+void mieNormaRunAction::BeginOfRunAction(const G4Run* run)
 { 
   //inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
@@ -94,27 +94,27 @@ void B1RunAction::BeginOfRunAction(const G4Run* run)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B1RunAction::EndOfRunAction(const G4Run* run)
+void mieNormaRunAction::EndOfRunAction(const G4Run* run)
 {
   G4int nofEvents = run->GetNumberOfEvent();
   if (nofEvents == 0) return;
   
-  const B1Run* b1Run = static_cast<const B1Run*>(run);
+  const mieNormaRun* b1Run = static_cast<const mieNormaRun*>(run);
 
   // Print final photon angles
-  G4cout << "Calling PrintAngles from B1RunAction::EndOfRunAction..." << G4endl;
+  G4cout << "Calling PrintAngles from mieNormaRunAction::EndOfRunAction..." << G4endl;
   fRun->PrintAngles();
   auto man = G4AnalysisManager::Instance();
   man->Write();
   man->CloseFile();
 
-  //const B1DetectorConstruction* detectorConstruction = static_cast<const B1DetectorConstruction*> (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+  //const mieNormaDetectorConstruction* detectorConstruction = static_cast<const mieNormaDetectorConstruction*> (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
 
   // Run conditions
   //  note: There is no primary generator action object for "master"
   //        run manager for multi-threaded mode.
-  const B1PrimaryGeneratorAction* generatorAction
-   = static_cast<const B1PrimaryGeneratorAction*>
+  const mieNormaPrimaryGeneratorAction* generatorAction
+   = static_cast<const mieNormaPrimaryGeneratorAction*>
      (G4RunManager::GetRunManager()->GetUserPrimaryGeneratorAction());
   G4String runCondition;
   if (generatorAction)

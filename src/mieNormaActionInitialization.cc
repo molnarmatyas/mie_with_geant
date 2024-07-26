@@ -23,46 +23,46 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1ActionInitialization.cc 68058 2013-03-13 14:47:43Z gcosmo $
+// $Id: mieNormaActionInitialization.cc 68058 2013-03-13 14:47:43Z gcosmo $
 //
-/// \file B1ActionInitialization.cc
-/// \brief Implementation of the B1ActionInitialization class
+/// \file mieNormaActionInitialization.cc
+/// \brief Implementation of the mieNormaActionInitialization class
 
-#include "B1ActionInitialization.hh"
-#include "B1PrimaryGeneratorAction.hh"
-#include "B1RunAction.hh"
-#include "B1EventAction.hh"
-#include "B1SteppingAction.hh"
+#include "mieNormaActionInitialization.hh"
+#include "mieNormaPrimaryGeneratorAction.hh"
+#include "mieNormaRunAction.hh"
+#include "mieNormaEventAction.hh"
+#include "mieNormaSteppingAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1ActionInitialization::B1ActionInitialization()
+mieNormaActionInitialization::mieNormaActionInitialization()
  : G4VUserActionInitialization()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1ActionInitialization::~B1ActionInitialization()
+mieNormaActionInitialization::~mieNormaActionInitialization()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B1ActionInitialization::BuildForMaster() const
+void mieNormaActionInitialization::BuildForMaster() const
 {
-  SetUserAction(new B1RunAction);
+  SetUserAction(new mieNormaRunAction);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B1ActionInitialization::Build() const
+void mieNormaActionInitialization::Build() const
 {
-  SetUserAction(new B1PrimaryGeneratorAction);
-  SetUserAction(new B1RunAction);
+  SetUserAction(new mieNormaPrimaryGeneratorAction);
+  SetUserAction(new mieNormaRunAction);
   
-  B1EventAction* eventAction = new B1EventAction;
+  mieNormaEventAction* eventAction = new mieNormaEventAction;
   SetUserAction(eventAction);
   
-  SetUserAction(new B1SteppingAction(eventAction));
+  SetUserAction(new mieNormaSteppingAction(eventAction));
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

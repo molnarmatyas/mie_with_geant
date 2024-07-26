@@ -23,12 +23,12 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1DetectorConstruction.cc 75117 2013-10-28 09:38:37Z gcosmo $
+// $Id: mieNormaDetectorConstruction.cc 75117 2013-10-28 09:38:37Z gcosmo $
 //
-/// \file B1DetectorConstruction.cc
-/// \brief Implementation of the B1DetectorConstruction class
+/// \file mieNormaDetectorConstruction.cc
+/// \brief Implementation of the mieNormaDetectorConstruction class
 
-#include "B1DetectorConstruction.hh"
+#include "mieNormaDetectorConstruction.hh"
 
 #include "G4RunManager.hh"
 #include "G4NistManager.hh"
@@ -46,23 +46,19 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1DetectorConstruction::B1DetectorConstruction()
+mieNormaDetectorConstruction::mieNormaDetectorConstruction()
 : G4VUserDetectorConstruction(),
   fScoringVolume(0)
-{ 
-    DefineCommands();
-}
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1DetectorConstruction::~B1DetectorConstruction()
-{
-  
-}
+mieNormaDetectorConstruction::~mieNormaDetectorConstruction()
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4VPhysicalVolume* B1DetectorConstruction::Construct()
+G4VPhysicalVolume* mieNormaDetectorConstruction::Construct()
 {  
   // Get nist material manager
   G4NistManager* nist = G4NistManager::Instance();
@@ -74,7 +70,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
    
   // Option to switch on/off checking of volumes overlaps
   //
-  checkOverlaps = true;
+  G4bool checkOverlaps = true;
 
   // ------------ Generate & Add Material Properties Table ------------
   G4double photonEnergy[] ={0.01 * eV, 0.1 * eV, 1. * eV, 10. * eV};
@@ -132,16 +128,16 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   //     
   // Envelope
   //  
-  solidEnv =    
+  G4Box* solidEnv =    
     new G4Box("Envelope",                    //its name
         0.5*env_sizeXY, 0.5*env_sizeXY, 0.5*env_sizeZ); //its size
       
-  logicEnv =                         
+  G4LogicalVolume* logicEnv =                         
     new G4LogicalVolume(solidEnv,            //its solid
                         env_mat,             //its material
                         "Envelope");         //its name
 
-   physEnv = 
+   G4VPhysicalVolume* physEnv = 
     new G4PVPlacement(0,                     //no rotation
                       G4ThreeVector(),       //at (0,0,0)
                       logicEnv,              //its logical volume
@@ -219,36 +215,35 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
 
   // Shape 1
   //G4Material* shape1_mat = nist->FindOrBuildMaterial("G4_A-150_TISSUE");
-  shape1_mat = nist->FindOrBuildMaterial("G4_WATER");
+  G4Material* shape1_mat = nist->FindOrBuildMaterial("G4_WATER");
   shape1_mat->SetMaterialPropertiesTable(myMPT1);
   water->SetMaterialPropertiesTable(myMPT1);
   //G4ThreeVector pos1 = G4ThreeVector(0.1*micrometer, 0.1*micrometer, 0.1*micrometer);
-  pos1 = G4ThreeVector(0, 0, 5*cm);
+  G4ThreeVector pos1 = G4ThreeVector(0, 0, 5*cm);
 
         
   // Sphere shape
-  //G4double shape1_radius = 3*micrometer;
+  G4double shape1_radius = 3*micrometer;
   //G4double shape1_radius = 0.5*micrometer;
- 
-  solidShape1 = new G4Orb("Shape1", fRadius);
+  G4Orb* solidShape1 = new G4Orb("Shape1", shape1_radius);
+                      
+  G4LogicalVolume* logicShape1 =                         
+    new G4LogicalVolume(solidShape1,         //its solid
+                        shape1_mat,          //its material
+                        "Shape1");           //its name
 
-  logicShape1 =
-      new G4LogicalVolume(solidShape1,         //its solid
-          shape1_mat,          //its material
-          "Shape1");           //its name
+  G4VPhysicalVolume* physShape1 =               
+    new G4PVPlacement(0,                     //no rotation
+                      pos1,                  //at position
+                      logicShape1,           //its logical volume
+                      "Shape1",              //its name
+                      logicEnv,              //its mother  volume
+                      false,                 //no boolean operation
+                      0,                     //copy number
+                      checkOverlaps);        //overlaps checking
 
-  physShape1 =
-      new G4PVPlacement(0,                     //no rotation
-          pos1,                  //at position
-          logicShape1,           //its logical volume
-          "Shape1",              //its name
-          logicEnv,              //its mother  volume
-          false,                 //no boolean operation
-          0,                     //copy number
-          checkOverlaps);        //overlaps checking
-
-  Shape1Wrap = new G4OpticalSurface("Shape1Wrap");
-  new G4LogicalBorderSurface("Shape1Wrap", physShape1, physEnv, Shape1Wrap);
+  G4OpticalSurface* Shape1Wrap = new G4OpticalSurface("Shape1Wrap");
+  new G4LogicalBorderSurface("Shape1Wrap",physShape1,physEnv,Shape1Wrap);
 
   // Set Shape1 as scoring volume
   //
@@ -257,62 +252,7 @@ G4VPhysicalVolume* B1DetectorConstruction::Construct()
   //
   //always return the physical World
   //
-
   return physWorld;
-}
-
-void B1DetectorConstruction::UpdateSphere()
-{
-    if (logicShape1) {
-        // Remove the old physical volume of the sphere
-        delete physShape1;
-        delete logicShape1;
-        delete solidShape1;
-
-        // Recreate the sphere with the new radius
-        solidShape1 = new G4Orb("Shape1", fRadius);
-
-        logicShape1 =
-            new G4LogicalVolume(solidShape1,         //its solid
-                shape1_mat,          //its material
-                "Shape1");           //its name
-
-        physShape1 =
-            new G4PVPlacement(0,                     //no rotation
-                pos1,                  //at position
-                logicShape1,           //its logical volume
-                "Shape1",              //its name
-                logicEnv,              //its mother  volume
-                false,                 //no boolean operation
-                0,                     //copy number
-                checkOverlaps);        //overlaps checking
-        
-        new G4LogicalBorderSurface("Shape1Wrap", physShape1, physEnv, Shape1Wrap);
-    }
-}
-
-void B1DetectorConstruction::SetRadius(G4double value)
-{
-    fRadius = value;
-    UpdateSphere();
-    G4RunManager::GetRunManager()->ReinitializeGeometry();
-}
-
-
-void B1DetectorConstruction::DefineCommands()
-{
-    // Define /B5/detector command directory using generic messenger class
-    fMessenger = new G4GenericMessenger(this,
-        "/sphere/",
-        "Radius of the sphere.");
-
-    // radius command
-    auto& radiusCmd
-        = fMessenger->DeclareMethodWithUnit("radius", "micrometer",
-            &B1DetectorConstruction::SetRadius,
-            "Set radius of the sphere.");
-    radiusCmd.SetParameterName("radius", true);
-    radiusCmd.SetRange("radius>=0.");
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

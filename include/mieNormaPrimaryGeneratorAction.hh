@@ -23,41 +23,46 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1SteppingAction.hh 74483 2013-10-09 13:37:06Z gcosmo $
+// $Id: mieNormaPrimaryGeneratorAction.hh 69565 2013-05-08 12:35:31Z gcosmo $
 //
-/// \file B1SteppingAction.hh
-/// \brief Definition of the B1SteppingAction class
+/// \file mieNormaPrimaryGeneratorAction.hh
+/// \brief Definition of the mieNormaPrimaryGeneratorAction class
 
-#ifndef B1SteppingAction_h
-#define B1SteppingAction_h 1
+#ifndef mieNormaPrimaryGeneratorAction_h
+#define mieNormaPrimaryGeneratorAction_h 1
 
-#include "G4UserSteppingAction.hh"
+#include "G4VUserPrimaryGeneratorAction.hh"
+#include "G4ParticleGun.hh"
 #include "globals.hh"
 
-#include "G4OpticalPhoton.hh"
-#include "G4OpBoundaryProcess.hh"
+class G4ParticleGun;
+class G4Event;
+class G4Box;
 
-class B1EventAction;
+/// The primary generator action class with particle gun.
+///
+/// The default kinematic is a 6 MeV gamma, randomly distribued 
+/// in front of the phantom across 80% of the (X,Y) phantom size.
 
-class G4LogicalVolume;
-
-/// Stepping action class
-/// 
-
-class B1SteppingAction : public G4UserSteppingAction
+class mieNormaPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
   public:
-    B1SteppingAction(B1EventAction* eventAction);
-    virtual ~B1SteppingAction();
+    mieNormaPrimaryGeneratorAction();    
+    virtual ~mieNormaPrimaryGeneratorAction();
 
     // method from the base class
-    virtual void UserSteppingAction(const G4Step*);
-
+    virtual void GeneratePrimaries(G4Event*);         
+  
+    // method to access particle gun
+    const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
+  
   private:
-    B1EventAction*  fEventAction;
-    //G4LogicalVolume* fScoringVolume;
+    G4ParticleGun*  fParticleGun; // pointer a to G4 gun class
+    G4Box* fEnvelopeBox;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
+
+

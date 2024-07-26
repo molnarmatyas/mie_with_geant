@@ -23,30 +23,82 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1ActionInitialization.hh 68058 2013-03-13 14:47:43Z gcosmo $
+// $Id: mieNormaRun.hh 66536 2012-12-19 14:32:36Z ihrivnac $
 //
-/// \file B1ActionInitialization.hh
-/// \brief Definition of the B1ActionInitialization class
+/// \file mieNormaRun.hh
+/// \brief Definition of the mieNormaRun class
 
-#ifndef B1ActionInitialization_h
-#define B1ActionInitialization_h 1
+#ifndef mieNormaRun_h
+#define mieNormaRun_h 1
 
-#include "G4VUserActionInitialization.hh"
+#include "G4Run.hh"
+#include "globals.hh"
+#include "G4AnalysisManager.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4UnitsTable.hh"
+#include <vector>
 
-/// Action initialization class.
+class G4Event;
 
-class B1ActionInitialization : public G4VUserActionInitialization
+/// Run class
+///
+
+class mieNormaRun : public G4Run
 {
   public:
-    B1ActionInitialization();
-    virtual ~B1ActionInitialization();
+    mieNormaRun();
+    virtual ~mieNormaRun();
 
-    virtual void BuildForMaster() const;
-    virtual void Build() const;
+    // method from the base class
+    virtual void Merge(const G4Run*);
+    void SetPrimary(G4ParticleDefinition* particle, G4double energy);
+    
+    void SaveAnglesToVector (G4double thismag, G4double thisphi, G4double thistheta); 
+
+    // final methods
+    void PrintAngles() const;
+    void AddRayleigh(G4double n)
+    {
+      fRayleighCounter += n;
+      fRayleigh2 += n * n;
+    };
+    void AddAbsorption(G4double n)
+    {
+      fAbsorptionCounter += n;
+      fAbsorption2 += n * n;
+    };
+    void AddMie(G4double n)
+    {
+      fMieCounter += n;
+      fMie2 += n * n;
+    };
+    void AddBoundary(G4double n)
+    {
+      fBoundaryCounter += n;
+      fBoundary2 += n * n;
+    };
+  
+    void EndOfRun();
+  
+   private:
+    G4ParticleDefinition* fParticle = nullptr;
+  
+    G4double fRayleighCounter = 0.;
+    G4double fRayleigh2 = 0.;
+    G4double fAbsorptionCounter = 0.;
+    G4double fAbsorption2 = 0.;
+    G4double fMieCounter = 0.;
+    G4double fMie2 = 0.;
+    G4double fBoundaryCounter = 0.;
+    G4double fBoundary2 = 0.;
+    G4double fEnergy = -1.;
+
+    std::vector<G4double> magvector;
+    std::vector<G4double> phivector;
+    std::vector<G4double> thetavector;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
 
-    

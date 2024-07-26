@@ -23,25 +23,25 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1Run.cc 66536 2012-12-19 14:32:36Z ihrivnac $
+// $Id: mieNormaRun.cc 66536 2012-12-19 14:32:36Z ihrivnac $
 //
-/// \file B1Run.cc
-/// \brief Implementation of the B1Run class
+/// \file mieNormaRun.cc
+/// \brief Implementation of the mieNormaRun class
 
-#include "B1Run.hh"
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-B1Run::B1Run() : G4Run() {}
+#include "mieNormaRun.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1Run::~B1Run() {}
+mieNormaRun::mieNormaRun() : G4Run() {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B1Run::Merge(const G4Run *run) {
-  const B1Run *localRun = static_cast<const B1Run *>(run);
+mieNormaRun::~mieNormaRun() {}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void mieNormaRun::Merge(const G4Run *run) {
+  const mieNormaRun *localRun = static_cast<const mieNormaRun *>(run);
   magvector.insert(magvector.end(), localRun->magvector.begin(),
                    localRun->magvector.end());
   phivector.insert(phivector.end(), localRun->phivector.begin(),
@@ -65,19 +65,19 @@ void B1Run::Merge(const G4Run *run) {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B1Run::SaveAnglesToVector(G4double thismag, G4double thisphi,
+void mieNormaRun::SaveAnglesToVector(G4double thismag, G4double thisphi,
                                G4double thistheta) {
   magvector.push_back(thismag);
   phivector.push_back(thisphi);
   thetavector.push_back(thistheta);
 }
 
-void B1Run::PrintAngles() const {
+void mieNormaRun::PrintAngles() const {
   auto man = G4AnalysisManager::Instance();
   G4cout << "Printing angles list" << G4endl;
   for (unsigned int ientry = 0; ientry < phivector.size(); ientry++) {
-    /*G4cout << "mag,phi,theta:\t" << magvector.at(ientry) << "\t"
-           << phivector.at(ientry) << "\t" << thetavector.at(ientry) << G4endl;*/
+    G4cout << "mag,phi,theta:\t" << magvector.at(ientry) << "\t"
+           << phivector.at(ientry) << "\t" << thetavector.at(ientry) << G4endl;
     man->FillNtupleIColumn(0, 1);
     man->FillNtupleDColumn(1, magvector.at(ientry));
     man->FillNtupleDColumn(2, phivector.at(ientry));
@@ -85,7 +85,7 @@ void B1Run::PrintAngles() const {
     man->AddNtupleRow(0);
   }
 }
-void B1Run::EndOfRun() {
+void mieNormaRun::EndOfRun() {
   if (numberOfEvent == 0)
     return;
   auto TotNbofEvents = G4double(numberOfEvent);

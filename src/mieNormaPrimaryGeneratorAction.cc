@@ -23,12 +23,12 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: B1PrimaryGeneratorAction.cc 69565 2013-05-08 12:35:31Z gcosmo $
+// $Id: mieNormaPrimaryGeneratorAction.cc 69565 2013-05-08 12:35:31Z gcosmo $
 //
-/// \file B1PrimaryGeneratorAction.cc
-/// \brief Implementation of the B1PrimaryGeneratorAction class
+/// \file mieNormaPrimaryGeneratorAction.cc
+/// \brief Implementation of the mieNormaPrimaryGeneratorAction class
 
-#include "B1PrimaryGeneratorAction.hh"
+#include "mieNormaPrimaryGeneratorAction.hh"
 
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
@@ -39,11 +39,10 @@
 #include "G4ParticleDefinition.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
-#include <cmath>
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
+mieNormaPrimaryGeneratorAction::mieNormaPrimaryGeneratorAction()
 : G4VUserPrimaryGeneratorAction(),
   fParticleGun(0), 
   fEnvelopeBox(0)
@@ -63,14 +62,14 @@ B1PrimaryGeneratorAction::B1PrimaryGeneratorAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-B1PrimaryGeneratorAction::~B1PrimaryGeneratorAction()
+mieNormaPrimaryGeneratorAction::~mieNormaPrimaryGeneratorAction()
 {
   delete fParticleGun;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+void mieNormaPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   //this function is called at the begining of ecah event
   //
@@ -98,15 +97,21 @@ void B1PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     msg << "Envelope volume of box shape not found.\n"; 
     msg << "Perhaps you have changed geometry.\n";
     msg << "The gun will be place at the center.";
-    G4Exception("B1PrimaryGeneratorAction::GeneratePrimaries()",
+    G4Exception("mieNormaPrimaryGeneratorAction::GeneratePrimaries()",
      "MyCode0002",JustWarning,msg);
   }
 
-  G4double x0 = std::sqrt(0.1)/2 * (2*G4UniformRand() - 1);
-  G4double y0 = std::sqrt(0.1)/2 * (2*G4UniformRand() - 1);
+  //G4double x0 = 2.5 * (2*G4UniformRand() - 1); // for square source
+  //G4double x0 = 2.5 * (2*G4UniformRand() - 1);
+  //G4double y0 = std::sqrt(0.1)/2 * (2*G4UniformRand() - 1); // square source, 0.1 um^2 IF : *micrometer
+  //G4double y0 = std::sqrt(0.1)/2 * (2*G4UniformRand() - 1);
+  G4double t = 2*CLHEP::pi  * G4UniformRand();
+  G4double r = std::sqrt(0.1/CLHEP::pi) * (G4UniformRand());
+  G4double x0 = r * std::cos(t);
+  G4double y0 = r * std::sin(t);
   G4double z0 = 0;
   //G4cout << "Gun from" << x0 << ", " << y0 << ", " << z0 << G4endl; 
-  fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0)*micrometer);
+  fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0)*millimeter); // so then 0.1 mm^2 is the source
   //fParticleGun->SetParticlePosition(G4ThreeVector(0,0,0));
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
