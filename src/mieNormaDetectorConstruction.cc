@@ -302,7 +302,7 @@ void mieNormaDetectorConstruction::DefineCommands()
     // radius command
     auto& radiusCmd
         = fMessenger->DeclareMethodWithUnit("radius", "micrometer",
-            &B1DetectorConstruction::SetRadius,
+            &mieNormaDetectorConstruction::SetRadius,
             "Set radius of the sphere.");
     radiusCmd.SetParameterName("radius", true);
     radiusCmd.SetRange("radius>=0.");
