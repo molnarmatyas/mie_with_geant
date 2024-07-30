@@ -254,7 +254,7 @@ G4VPhysicalVolume* mieNormaDetectorConstruction::Construct()
   return physWorld;
 }
 
-void B1DetectorConstruction::UpdateSphere()
+void mieNormaDetectorConstruction::UpdateSphere()
 {
     if (logicShape1) {
         // Remove the old physical volume of the sphere
@@ -284,7 +284,7 @@ void B1DetectorConstruction::UpdateSphere()
     }
 }
 
-void B1DetectorConstruction::SetRadius(G4double value)
+void mieNormaDetectorConstruction::SetRadius(G4double value)
 {
     fRadius = value;
     UpdateSphere();
@@ -292,7 +292,7 @@ void B1DetectorConstruction::SetRadius(G4double value)
 }
 
 
-void B1DetectorConstruction::DefineCommands()
+void mieNormaDetectorConstruction::DefineCommands()
 {
     // Define /B5/detector command directory using generic messenger class
     fMessenger = new G4GenericMessenger(this,
