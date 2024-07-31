@@ -83,13 +83,14 @@ void mieNormaRunAction::BeginOfRunAction(const G4Run* run)
 { 
   //inform the runManager to save random number seed
   G4RunManager::GetRunManager()->SetRandomNumberStore(false);
-  auto man = G4AnalysisManager::Instance();
-
-  G4int runID = run->GetRunID();
-  std::stringstream strRunID;
-  strRunID << runID;
-
-  man->OpenFile("output" + strRunID.str() + ".root");
+  if (IsMaster())
+  {
+    auto man = G4AnalysisManager::Instance();
+    G4int runID = run->GetRunID();
+    std::stringstream strRunID;
+    strRunID << runID;
+    man->OpenFile("output" + strRunID.str() + ".root");
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -101,12 +102,15 @@ void mieNormaRunAction::EndOfRunAction(const G4Run* run)
   
   const mieNormaRun* b1Run = static_cast<const mieNormaRun*>(run);
 
-  // Print final photon angles
-  G4cout << "Calling PrintAngles from mieNormaRunAction::EndOfRunAction..." << G4endl;
-  fRun->PrintAngles();
-  auto man = G4AnalysisManager::Instance();
-  man->Write();
-  man->CloseFile();
+  if (IsMaster())
+  {
+    // Print final photon angles
+    G4cout << "Calling PrintAngles from mieNormaRunAction::EndOfRunAction..." << G4endl;
+    fRun->PrintAngles();
+    auto man = G4AnalysisManager::Instance();
+    man->Write();
+    man->CloseFile();
+  }
 
   //const mieNormaDetectorConstruction* detectorConstruction = static_cast<const mieNormaDetectorConstruction*> (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
 
