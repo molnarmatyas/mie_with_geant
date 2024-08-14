@@ -33,6 +33,8 @@
 
 #include "G4UserSteppingAction.hh"
 #include "globals.hh"
+#include <vector>
+#include <random>
 
 #include "G4OpticalPhoton.hh"
 #include "G4OpBoundaryProcess.hh"
@@ -52,9 +54,15 @@ class mieNormaSteppingAction : public G4UserSteppingAction
 
     // method from the base class
     virtual void UserSteppingAction(const G4Step*);
-
+		void setXSect(const char*);
+		std::mt19937 fGen;
+		std::discrete_distribution<int> fDist;
+		double generate(std::vector<double>&);
   private:
     mieNormaEventAction*  fEventAction;
+		std::vector<double> fMieXSect;
+		std::vector<double> fTheta;
+		std::vector<double> fWeights;
     //G4LogicalVolume* fScoringVolume;
 };
 

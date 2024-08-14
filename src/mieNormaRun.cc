@@ -76,8 +76,6 @@ void mieNormaRun::PrintAngles() const {
   auto man = G4AnalysisManager::Instance();
   G4cout << "Printing angles list" << G4endl;
   for (unsigned int ientry = 0; ientry < phivector.size(); ientry++) {
-    G4cout << "mag,phi,theta:\t" << magvector.at(ientry) << "\t"
-           << phivector.at(ientry) << "\t" << thetavector.at(ientry) << G4endl;
     man->FillNtupleIColumn(0, 1);
     man->FillNtupleDColumn(1, magvector.at(ientry));
     man->FillNtupleDColumn(2, phivector.at(ientry));

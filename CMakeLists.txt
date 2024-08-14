@@ -50,6 +50,7 @@ set(MIENORMA_SCRIPTS
   run1.mac
   run2.mac
   vis.mac
+  diff_cross_0-180_10000pt.txt
   )
 
 foreach(_script ${MIENORMA_SCRIPTS})
