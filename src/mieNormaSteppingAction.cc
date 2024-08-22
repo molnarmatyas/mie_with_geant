@@ -116,8 +116,7 @@ void mieNormaSteppingAction::UserSteppingAction(const G4Step *step) {
       }
     }
   }
-  if (step->IsLastStepInVolume() &&
-      step->GetTrack()->GetVolume()->GetName() == "Shape1") {
+  if (step->IsLastStepInVolume() && step->GetTrack()->GetVolume()->GetName() == "Shape1") {
     // G4cout << "Step is the last step in the volume" << G4endl;
     //G4cout << "Generated: " << fTheta[fDist(fGen)] << G4endl;
     //G4cout << "Generated 2: " << generate(fTheta) << G4endl;
