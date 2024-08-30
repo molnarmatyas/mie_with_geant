@@ -31,6 +31,7 @@
 #include "mieNormaSteppingAction.hh"
 #include "mieNormaDetectorConstruction.hh"
 #include "mieNormaEventAction.hh"
+#include "mieNormaNumericReader.hh"
 
 #include "G4Event.hh"
 #include "G4LogicalVolume.hh"
@@ -45,29 +46,8 @@ mieNormaSteppingAction::mieNormaSteppingAction(mieNormaEventAction *eventAction)
 // fScoringVolume(0)
 {
   G4cout << "Stepping created" << G4endl;
-  setXSect("diff_cross_0-180_10000pt.txt");
-	int rowNum = 1;
-  for (int i = 0; i < 10000; i++) {
-    fWeights.push_back(fMieXSect[rowNum + (10) * i]);
-  }
-	//std::random_device rd;
-  fGen = std::mt19937(time(0));
-  fDist = std::discrete_distribution<>(fWeights.begin(), fWeights.end());
-  fGen.seed(time(0)); // if you want different results from different runs
-	/*
-  std::discrete_distribution<int> dist(std::begin(fWeights),
-                                       std::end(fWeights));
-  std::mt19937 gen;
-  gen.seed(time(0)); // if you want different
-  results from different runs int N = 10000;
-  std::vector<double> samples(N);
-  for (auto &i : samples)
-    i = fTheta[dist(gen)];
-  // Print the generated random numbers
-  for (const auto &num : samples) {
-    G4cout << num << " ";
-  }
-	*/
+  mieNormaNumericReader* fNumericReader = new mieNormaNumericReader;
+  G4cout << "Numeric Reader created" << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -123,54 +103,9 @@ void mieNormaSteppingAction::UserSteppingAction(const G4Step *step) {
     const G4StepPoint *endPoint = step->GetPostStepPoint();
     double finalmag = endPoint->GetMomentum().mag();
     double finalphi = endPoint->GetMomentumDirection().phi();
-    double finaltheta = generate(fTheta);/*endPoint->GetMomentumDirection().theta();*/
+    double finaltheta = fNumericReader->generate(fNumericReader->fTheta);/*endPoint->GetMomentumDirection().theta();*/
     fEventAction->SaveAngles(finalmag, finalphi, finaltheta);
   }
   return;
-
-  /*
-    // prepare for scoring volume check
-    if (!fScoringVolume) {
-      const mieNormaDetectorConstruction* detectorConstruction
-        = static_cast<const mieNormaDetectorConstruction*>
-          (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
-      fScoringVolume = detectorConstruction->GetScoringVolume();
-    }
-    // get volume of the current step
-    G4LogicalVolume* volume
-      = step->GetPreStepPoint()->GetTouchableHandle()
-        ->GetVolume()->GetLogicalVolume();
-
-    // check if we are in scoring volume
-    if (volume != fScoringVolume) return;
-  */
 }
-
-void mieNormaSteppingAction::setXSect(const char *filename) {
-  int column_number = 11;
-  // Create arrays to hold the data for each column
-  double theta;
-  double values; // Assuming column_number includes the angle column
-
-  std::ifstream file(filename);
-  std::string line;
-  while (getline(file, line)) {
-    std::stringstream ss(line);
-
-    // Read the first column as the angle
-    ss >> theta;
-    fTheta.push_back(theta);
-
-    // Read the rest of the columns as values
-    for (int i = 0; i < column_number - 1; i++) {
-      ss >> values;
-      fMieXSect.push_back(values);
-    }
-  }
-}
-
-double mieNormaSteppingAction::generate(std::vector<double> &values) {
-  return values[fDist(fGen)]; // Draw a number from the values vector
-}
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

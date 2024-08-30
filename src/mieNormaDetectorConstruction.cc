@@ -217,7 +217,7 @@ G4VPhysicalVolume* mieNormaDetectorConstruction::Construct()
 
   // Shape 1
   //G4Material* shape1_mat = nist->FindOrBuildMaterial("G4_A-150_TISSUE");
-  G4Material* shape1_mat = nist->FindOrBuildMaterial("G4_WATER");
+  shape1_mat = nist->FindOrBuildMaterial("G4_WATER");
   shape1_mat->SetMaterialPropertiesTable(myMPT1);
   water->SetMaterialPropertiesTable(myMPT1);
   //G4ThreeVector pos1 = G4ThreeVector(0.1*micrometer, 0.1*micrometer, 0.1*micrometer);
@@ -289,6 +289,10 @@ void mieNormaDetectorConstruction::SetRadius(G4double value)
     fRadius = value;
     UpdateSphere();
     G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+G4double mieNormaDetectorConstruction::GetRadius() const
+{
+    return fRadius;
 }
 
 

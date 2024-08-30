@@ -55,6 +55,7 @@ class mieNormaDetectorConstruction : public G4VUserDetectorConstruction
     
     G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
     void SetRadius(G4double val);
+    G4double GetRadius() const;
 
   protected:
     G4LogicalVolume*  fScoringVolume;

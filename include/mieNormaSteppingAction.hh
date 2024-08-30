@@ -28,6 +28,7 @@
 /// \file mieNormaSteppingAction.hh
 /// \brief Definition of the mieNormaSteppingAction class
 
+#include "mieNormaNumericReader.hh"
 #ifndef mieNormaSteppingAction_h
 #define mieNormaSteppingAction_h 1
 
@@ -54,15 +55,9 @@ class mieNormaSteppingAction : public G4UserSteppingAction
 
     // method from the base class
     virtual void UserSteppingAction(const G4Step*);
-		void setXSect(const char*);
-		std::mt19937 fGen;
-		std::discrete_distribution<int> fDist;
-		double generate(std::vector<double>&);
   private:
     mieNormaEventAction*  fEventAction;
-		std::vector<double> fMieXSect;
-		std::vector<double> fTheta;
-		std::vector<double> fWeights;
+    mieNormaNumericReader* fNumericReader;
     //G4LogicalVolume* fScoringVolume;
 };
 
