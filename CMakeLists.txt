@@ -44,8 +44,6 @@ target_link_libraries(mieNorma ${Geant4_LIBRARIES})
 # relies on these scripts being in the current working directory.
 #
 set(MIENORMA_SCRIPTS
-  mieNorma.in
-  mieNorma.out
   init_vis.mac
   run1.mac
   run2.mac
