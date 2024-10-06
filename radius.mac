@@ -1,0 +1,3 @@
+/sphere/radius 3
+/run/initialize
+/run/beamOn 10000000

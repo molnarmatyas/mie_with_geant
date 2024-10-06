@@ -3,7 +3,11 @@
 # GNUmakefile for examples module.  Gabriele Cosmo, 06/04/98.
 # --------------------------------------------------------------
 
+<<<<<<< HEAD
 name := exampleB1
+=======
+name := mieNorma
+>>>>>>> macro
 G4TARGET := $(name)
 G4EXLIB := true
 
