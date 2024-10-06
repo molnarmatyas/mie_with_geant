@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-# Macro file for example B1
-# 
-# To be run preferably in batch, without graphics:
-# % exampleB1 run2.mac
-=======
 # Macro file for MieNorma
 # 
 # To be run preferably in batch, without graphics:
 # % mieNorma run2.mac
->>>>>>> macro
 #
 #/run/numberOfWorkers 4
 /process/optical/processActivation OpBoundary true
@@ -29,10 +22,5 @@
 #/gun/energy 500000 eV
 /gun/polarization 0. 1. 0.
 #
-<<<<<<< HEAD
-/run/printProgress 100
-/run/beamOn 100000000
-=======
 /run/printProgress 100000
 /run/beamOn 1000000000
->>>>>>> macro

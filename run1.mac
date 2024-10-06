@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# Macro file for example B1
-=======
 # Macro file for MieNorma
->>>>>>> macro
 # 
 # Can be run in batch, without graphic
 # or interactively: Idle> /control/execute run1.mac
