@@ -46,7 +46,7 @@ mieNormaSteppingAction::mieNormaSteppingAction(mieNormaEventAction *eventAction)
 // fScoringVolume(0)
 {
   G4cout << "Stepping created" << G4endl;
-  mieNormaNumericReader* fNumericReader = new mieNormaNumericReader;
+  fNumericReader = new mieNormaNumericReader;
   G4cout << "Numeric Reader created" << G4endl;
 }
 
@@ -98,11 +98,12 @@ void mieNormaSteppingAction::UserSteppingAction(const G4Step *step) {
   }
   if (step->IsLastStepInVolume() && step->GetTrack()->GetVolume()->GetName() == "Shape1") {
     // G4cout << "Step is the last step in the volume" << G4endl;
-    //G4cout << "Generated: " << fTheta[fDist(fGen)] << G4endl;
-    //G4cout << "Generated 2: " << generate(fTheta) << G4endl;
+    //G4cout << "Generated: " << fNumericReader->fTheta[fDist(fGen)] << G4endl;
+    //G4cout << "Generated 2: " << fNumericReader->generate(fTheta) << G4endl;
     const G4StepPoint *endPoint = step->GetPostStepPoint();
     double finalmag = endPoint->GetMomentum().mag();
     double finalphi = endPoint->GetMomentumDirection().phi();
+    //G4cout << fNumericReader->fDist.max() << G4endl;
     double finaltheta = fNumericReader->generate(fNumericReader->fTheta);/*endPoint->GetMomentumDirection().theta();*/
     fEventAction->SaveAngles(finalmag, finalphi, finaltheta);
   }

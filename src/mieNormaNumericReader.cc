@@ -30,6 +30,11 @@ mieNormaNumericReader::mieNormaNumericReader()
   }
 	//std::random_device rd;
   fGen = std::mt19937(time(0));
+  if (fWeights.empty()) {
+    G4cerr << "Error: fWeights vector is empty!" << G4endl;
+    return;
+  }
+
   fDist = std::discrete_distribution<>(fWeights.begin(), fWeights.end());
   fGen.seed(time(0)); // if you want different results from different runs
 }
@@ -64,7 +69,19 @@ void mieNormaNumericReader::setXSect(const char *filename) {
 }
 
 double mieNormaNumericReader::generate(std::vector<double> &values) {
-  return values[fDist(fGen)]; // Draw a number from the values vector
+  if (values.empty()) {
+    G4cerr << "Error: Values vector is empty!" << G4endl;
+    return -1;
+  }
+
+  int index = fDist(fGen);
+  if (index < 0 || index >= values.size()) {
+    G4cerr << "Error: Generated index out of bounds!" << G4endl;
+    return -1;
+  }
+
+  return values[index];
 }
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
