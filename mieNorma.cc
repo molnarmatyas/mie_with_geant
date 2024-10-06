@@ -37,8 +37,8 @@
 #include "G4EmStandardPhysics_option4.hh"
 
 // Multithread
-#include "G4RunManager.hh"
-//#include "G4RunManagerFactory.hh"
+//#include "G4RunManager.hh"
+#include "G4RunManagerFactory.hh"
 
 #include "G4UImanager.hh"
 #include "QBBC.hh"
@@ -65,11 +65,11 @@ int main(int argc,char** argv)
   // Construct the default run manager
   //
   // Multithread
-  G4RunManager* runManager = new G4RunManager;
-  //auto runManager = G4RunManagerFactory::CreateRunManager();
-  //#ifdef G4MULTITHREADED
-  //    runManager->SetNumberOfThreads(7);
-  //#endif
+  //G4RunManager* runManager = new G4RunManager;
+  auto runManager = G4RunManagerFactory::CreateRunManager();
+  #ifdef G4MULTITHREADED
+      runManager->SetNumberOfThreads(4);
+  #endif
 
   // Set mandatory initialization classes
   //
