@@ -65,6 +65,7 @@ void PrintUsage()
 	G4cerr << " Usage: " << G4endl;
 	G4cerr << " Norma  [-m macro ] [-u UIsession] [-t nThreads] [-r seed] " << G4endl;
 	G4cerr << "   note: -t option is available only for multi-threaded mode." << G4endl;
+	G4cerr << "   advanced note: CELL_RADIUS_UM and -b must be the same number." << G4endl;
 }
 } // namespace
 
@@ -153,7 +154,7 @@ int main(int argc, char **argv)
 			myseed = atoi(argv[i + 1]);
 		// parancssori argumentumból lehet változtatni a radiust pl itt és így:
 		else if (G4String(argv[i]) == "-b")
-			p.bubbleRadius = atof(argv[i + 1]) * CLHEP::nm;
+			p.bubbleRadius = atof(argv[i + 1]) * CLHEP::um;
 		else if (G4String(argv[i]) == "-g")
 			p.g = atof(argv[i + 1]) / 1000;
 		else if (G4String(argv[i]) == "-p")
@@ -170,6 +171,11 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	}
+  if(p.bubbleRadius != std::stof(std::getenv("CELL_RADIUS_UM")) * CLHEP::um) {
+    G4cerr << "Radius variables must match" << G4endl;
+		PrintUsage();
+    return 1;
+  }
 
 	std::string filename = "output" + std::to_string((int)(p.bubbleRadius * 1000000)) + "_" +
 						   std::to_string((int)(p.g * 1000)) + "_" + std::to_string((int)(p.p)) + ".txt";
@@ -230,12 +236,6 @@ int main(int argc, char **argv)
 	else // Define UI session for interactive mode
 	{
 		UImanager->ApplyCommand("/control/execute vis.mac");
-		if (ui->IsGUI())
-		{
-			std::cout << "Applying GUI.mac..." << std::endl;
-			UImanager->ApplyCommand("/control/execute gui.mac");
-		}
-
 		ui->SessionStart();
 		delete ui;
 	}
