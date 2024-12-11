@@ -169,12 +169,14 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 		genTheta = ((G4OpMieHG *)pds)->radThetaGen;
 	}
 
+  /*
 	std::cout << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID() << " " << prevolume->GetName() << " "
 			  << postvolume->GetName() << " momdir: " << momentumdirection.x() << " " << momentumdirection.y() << " "
 			  << momentumdirection.z() << " "
 			  << " " << theta2 << " " << phi2 << " Pre " << preX / CLHEP::um << " " << preY / CLHEP::um << " "
 			  << preZ / CLHEP::um << " Post " << postX / CLHEP::um << " " << postY / CLHEP::um << " "
 			  << postZ / CLHEP::um << " " << procname << " " << material->GetName() << std::endl; // 0 world Bubble Air
+  */
 
 	if (fEventAction->isFilled == 0 && prevolume->GetName() == "world" && postvolume->GetName() == "Bubble")
 	{

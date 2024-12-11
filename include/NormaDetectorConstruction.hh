@@ -38,6 +38,8 @@
 #include "G4NistManager.hh"
 #include "G4Polycone.hh"
 
+#include "NormaSensor.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class NormaDetectorMessenger;
@@ -84,6 +86,9 @@ private:
   G4double mieFg = 0.99;
   G4int isPolycone = 0;
   G4bool fVerbose = false;
+
+  G4LogicalVolume *logicDetector;     // For sensitive detector array and field (EM etc.)
+  virtual void ConstructSDandField();
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

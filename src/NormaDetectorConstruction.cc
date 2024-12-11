@@ -316,6 +316,52 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	G4VPhysicalVolume *screenD_phys = new G4PVPlacement(nullptr, G4ThreeVector(0.0 * mm, -19.0 * mm, 0.0 * mm),
 														screenD_log, "ScreenD", world_log, false, 0);
 
+  //   -----  DETECTOR ARRAY  -----
+  //
+
+  // SENSITIVE DETECTOR MATERIAL PROPERTIES
+  G4Material* detectorMaterial = nist->FindOrBuildMaterial("G4_Si");
+  G4MaterialPropertiesTable* mptDetector = new G4MaterialPropertiesTable();
+
+  // Define absorption length for optical photons
+  const G4int detNumEntries = 2;
+  G4double detPhotonEnergy[detNumEntries] = {1.5*eV, 2.0*eV}; // Photon energies
+  G4double detAbsorptionLength[detNumEntries] = {.00001*mm, .00001*mm}; // Absorption length at those energies
+
+  // Assign the material properties table to the detector material
+  detectorMaterial->SetMaterialPropertiesTable(mptDetector);
+  //mptDetector->AddProperty("ABSLENGTH", detPhotonEnergy, absorptionLength, detNumEntries);
+  
+  // SENSITIVE DETECTOR CONSTRUCTION
+  G4double fullDetectorWidth = 1*mm;   // Width of the full detector
+  G4double fullDetectorHeight = 1*mm;  // Height of the full detector
+  G4double fullDetectorThickness = 0.1*mm; // Thickness of the detector
+  // Number of pixels in X and Y directions
+  G4int nPixelsZ = 10;
+  G4int nPixelsY = 10;
+  // Therefore, the pixel dimensions:
+  G4double pixelWidth = fullDetectorWidth / nPixelsZ;
+  G4double pixelHeight = fullDetectorHeight / nPixelsY;
+  G4double pixelThickness = fullDetectorThickness;  // Same thickness for each pixe
+
+  // Single pixel definition
+  G4Box *solidDetector = new G4Box("solidDetector", fullDetectorWidth/(2*nPixelsZ), fullDetectorHeight/(2*nPixelsY), fullDetectorThickness/2);
+  logicDetector = new G4LogicalVolume(solidDetector, detectorMaterial, "logicDetector");
+  // Creating individual physical pixel instances
+  for(G4int iz=0; iz<nPixelsZ; iz++)
+  {
+    for(G4int iy=0; iy<nPixelsY; iy++)
+    {
+      // X, Y, and Z position of the pixel
+      G4double posX = 5*CLHEP::mm; // so far the whole plane at the same Z pos.
+      G4double posY = -fullDetectorHeight/2 + pixelWidth*(iy +0.5);
+      G4double posZ = -fullDetectorWidth/2 + pixelWidth*(iz +0.5);
+      // Pixel placement
+      G4VPhysicalVolume * physDetector = new G4PVPlacement(0, G4ThreeVector(posX, posY, posZ),
+                                                           logicDetector, "physDetector", world_log, false, iz+iy*nPixelsZ, true); // or logicWorld???
+    }
+  }
+
 	// ------------- Surfaces --------------
 
 	// Water Tank
@@ -458,4 +504,12 @@ void NormaDetectorConstruction::SetParameters(Parameters p)
 	std::cout << "mie forward " << mieFg << std::endl;
 	isPolycone = p.p;
 	std::cout << "is Polycone " << mieFg << std::endl;
+}
+
+
+void NormaDetectorConstruction::ConstructSDandField()
+{
+    G4cout << "ConstructSDandField called, setting sensitive detector..." << G4endl;
+    PhotoSensitiveDetector *sensDet = new PhotoSensitiveDetector("SensitiveDetector");
+    logicDetector->SetSensitiveDetector(sensDet);
 }

@@ -54,7 +54,7 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 
 	fParticleGun->SetParticleDefinition(particle);
 	fParticleGun->SetParticleTime(0.0 * ns);
-
+  /*
 	// G4double y = (G4UniformRand()-0.5) * LEDSize;
 	G4double y = (0.0 - (1.5 * CLHEP::um));
 	// std::cout<<"startpos photon "<<y/CLHEP::um<<std::endl;
@@ -62,8 +62,12 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 	G4double dy = (G4UniformRand() - 0.5) * 0.1;
 	G4double dz = (G4UniformRand() - 0.5) * 0.1;
 	// fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., dy, dz));
+  */
 	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., 0, 0));
-	fParticleGun->SetParticleEnergy(1.8 * eV);
+	fParticleGun->SetParticleEnergy(1.884 * eV);
+
+  //fParticleGun->SetParticlePosition(G4ThreeVector(0,0,0));
+  //fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -76,6 +80,13 @@ NormaPrimaryGeneratorAction::~NormaPrimaryGeneratorAction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void NormaPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
 {
+  G4double t = 2*CLHEP::pi  * G4UniformRand();
+  G4double r = std::sqrt(0.1/CLHEP::pi) * (G4UniformRand());
+  G4double x0 = -17 * CLHEP::um;
+  G4double y0 = r * std::cos(t);
+  G4double z0 = r * std::sin(t);
+  //G4cerr << "Gun from " << x0 << ", " << y0 << ", " << z0 << G4endl; 
+  fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0)*CLHEP::mm); // so then 0.1 mm^2 is the source
 	fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
