@@ -38,7 +38,7 @@
 #include "G4NistManager.hh"
 #include "G4Polycone.hh"
 
-#include "NormaSensor.hh"
+//#include "NormaSensor.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -62,13 +62,13 @@ private:
 
   NormaDetectorMessenger *fDetectorMessenger = nullptr;
 
-  G4double fWorld_x = 20 * CLHEP::mm;
-  G4double fWorld_y = 20 * CLHEP::mm;
-  G4double fWorld_z = 20 * CLHEP::mm;
+  G4double fWorld_x = 10 * CLHEP::mm;
+  G4double fWorld_y = 10 * CLHEP::mm;
+  G4double fWorld_z = 10 * CLHEP::mm;
 
-  G4double fScreen_x = 1 * CLHEP::mm;
-  G4double fScreen_y = 20 * CLHEP::mm;
-  G4double fScreen_z = 20 * CLHEP::mm;
+  G4double fScreen_x = 0.5 * CLHEP::mm;
+  G4double fScreen_y = 10 * CLHEP::mm;
+  G4double fScreen_z = 10 * CLHEP::mm;
 
   G4VPhysicalVolume *bubble_phys;
 
@@ -88,7 +88,7 @@ private:
   G4bool fVerbose = false;
 
   G4LogicalVolume *logicDetector;     // For sensitive detector array and field (EM etc.)
-  virtual void ConstructSDandField();
+  //virtual void ConstructSDandField();
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
