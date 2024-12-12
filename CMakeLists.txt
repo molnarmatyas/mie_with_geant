@@ -51,6 +51,8 @@ set(Norma_SCRIPTS
     optPhoton.mac
     gui.mac
     vis.mac
+    run2.mac
+    diff_cross_0-180_10000pt.txt
   )
 
 foreach(_script ${Norma_SCRIPTS})
