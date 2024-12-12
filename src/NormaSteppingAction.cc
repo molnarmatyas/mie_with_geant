@@ -201,10 +201,12 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	{
 		ss.str("");
 		double theta3 = asin(sqrt(postY * postY + postZ * postZ) / sqrt(postX * postX + postY * postY + postZ * postZ));
-		G4cout << "Zero point based theta and phi: " << theta3 << " | " << theta3 << G4endl;
+    double r = sqrt(postY * postY + postZ * postZ);
+//    G4cout << "Zero point based theta and phi: " << theta3 << " | " << theta3 << G4endl;
+		//G4cout << "Zero point based r, x, y, z: " << r << " | " << postX << " | " << postY << " | " << postZ << G4endl;
 		if (((G4OpMieHG *)pds)->generated)
 		{
-			ss << theta3 << ", " << genTheta;
+			ss << theta3 << ", " << genTheta << ", " << r << ", " << postX << ", " << postY << ", " << postZ;
 			if (writer)
 				writer->write(ss.str());
 		}
