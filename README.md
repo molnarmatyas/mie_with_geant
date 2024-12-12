@@ -94,7 +94,7 @@ make -j8
 ## Using the simulation
 After a successful build of Geant4 and simulation you must need the numeric simulation's result file. Set `NUMERIC_MIE_FPATH` environment variable to the file path which you want to use, then run the software:
 ```
-NUMERIC_MIE_FPATH=diff_cross_0-180_10000pt.txt ./Norma
+NUMERIC_MIE_FPATH=diff_cross_0-180_10000pt.txt CELL_RADIUS_UM=3.0 ./Norma
 ```
 
 If `NUMERIC_MIE_FPATH` is not set, it will use the original `OPMieHG` process.
