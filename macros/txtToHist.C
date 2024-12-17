@@ -6,13 +6,17 @@
 
 void txtToHist() {
     // Input text file path
-    std::string filename = "../build/output3000_990_0_0.txt";
+    std::string filename = "../build/output3500_990_0_6.txt";
     
-    // Create a 2D histogram (you may want to adjust binning)
-    TH2D* hist = new TH2D("hist", "Histogram from Text File", 
-                           10000, -0.2, 0.2, // x-axis bins, min, max 
-                           10000, -0.2, 0.2  // y-axis bins, min, max
-    );
+    TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
+    TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi());
+    TH1D* dhXSect = new TH1D("dhXSect", "dhXSect", 1000, 0, TMath::Pi());
+    TH1D* dhR = new TH1D("dhR", "dhR", 1000, 0, 9 * 200);
+    TH1D* dhPosX = new TH1D("dhPosX", "dhPosX", 1000, 0, 9);
+    TH1D* dhPosY = new TH1D("dhPosY", "dhPosY", 1000, 0, 9);
+    TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 9);
+    TH2D* dh2D_yz = new TH2D("dh2D_yz", "dh2D_yz", 1000, -5, 5, 1000, -5, 5);
+    TH2D* dhR_alpha = new TH2D("dhR_alpha", "dhR_alpha", 1000, 0, TMath::Pi(), 1000, 0, 9 * 200);
     
     // Open the input file
     std::ifstream infile(filename);
@@ -31,26 +35,50 @@ void txtToHist() {
 
         // Parse the line
         std::istringstream iss(line);
-        double val1, val2, val3, val4, val5, val6;
+        double theta3, genTheta, R, postX, postY, postZ;
         
         // Read all 6 columns
-        if (!(iss >> val1 >> val2 >> val3 >> val4 >> val5 >> val6)) {
+        if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ)) {
             std::cerr << "Error parsing line: " << line << std::endl;
             continue;
         }
         
         // Fill the histogram with the last two columns
-        hist->Fill(val5, val6);
+        dhTheta->Fill(theta3);
+        dhGenTheta->Fill(genTheta);
+        dhR->Fill(R * 200.0);
+        dhPosX->Fill(postX);
+        dhPosY->Fill(postY);
+        dhPosZ->Fill(postZ);
+        dhXSect->Fill(theta3 / std::sin(theta3));
+        dhR_alpha->Fill(theta3, R * 200.0);
+        dh2D_yz->Fill(postY, postZ);
     }
+//    dh2D_yz->GetZaxis()->SetRangeUser(0,10);
     
     // Create a ROOT output file to save the histogram
     TFile* outfile = new TFile("output.root", "RECREATE");
-    hist->Write();
-    outfile->Close();
     
     // Optional: draw and save as image
-    TCanvas* c1 = new TCanvas("c1", "Histogram", 1920, 1080);
+    TCanvas* c1 = new TCanvas("c1", "", 800, 800);
+    gStyle->SetCanvasDefH(550);
+    gStyle->SetCanvasDefW(650);
     c1->SetLogz(1);
-    hist->Draw("COLZ");
-    c1->SaveAs("output3000_um_pointsource.pdf");
+    dh2D_yz->Draw("COLZ");
+    c1->SaveAs("dh2D_yz_output3500_um_pointsource_lowstat_pld_fixed_10_1592.png");
+
+
+
+
+
+    dhTheta->Write();
+    dhGenTheta->Write();
+    dhXSect->Write();
+    dhR->Write();
+    dhPosX->Write();
+    dhPosY->Write();
+    dhPosZ->Write();
+    dh2D_yz->Write();
+    dhR_alpha->Write();
+    outfile->Close();
 }
