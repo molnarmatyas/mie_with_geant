@@ -6,6 +6,7 @@ project(Norma)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
+add_compile_options(-Wall)
 
 #add_definitions(-DGEANT4_USE_GDML)
 add_compile_definitions(GEANT4_USE_GDML)
@@ -53,6 +54,7 @@ set(Norma_SCRIPTS
     vis.mac
     run2.mac
     diff_cross_0-180_10000pt.txt
+    dhkm_7_1592_1.txt
   )
 
 foreach(_script ${Norma_SCRIPTS})
