@@ -1,7 +1,7 @@
-diff --git a/geant4-11.2.0/source/processes/optical/include/G4OpBoundaryProcess.hh b/../geant4-11.2.0/source/processes/optical/include/G4OpBoundaryProcess.hh
+diff --git a/source/processes/optical/include/G4OpBoundaryProcess.hh b/source/processes/optical/include/G4OpBoundaryProcess.hh
 index 4fa036d..44ce742 100644
---- a/geant4-11.2.0/source/processes/optical/include/G4OpBoundaryProcess.hh
-+++ b/../geant4-11.2.0/source/processes/optical/include/G4OpBoundaryProcess.hh
+--- a/source/processes/optical/include/G4OpBoundaryProcess.hh
++++ b/source/processes/optical/include/G4OpBoundaryProcess.hh
 @@ -71,190 +71,190 @@
  
  enum G4OpBoundaryProcessStatus
@@ -494,10 +494,10 @@ index 4fa036d..44ce742 100644
  }
  
  #endif /* G4OpBoundaryProcess_h */
-diff --git a/geant4-11.2.0/source/processes/optical/include/G4OpMieHG.hh b/../geant4-11.2.0/source/processes/optical/include/G4OpMieHG.hh
+diff --git a/source/processes/optical/include/G4OpMieHG.hh b/source/processes/optical/include/G4OpMieHG.hh
 index 92003a8..278b49a 100644
---- a/geant4-11.2.0/source/processes/optical/include/G4OpMieHG.hh
-+++ b/../geant4-11.2.0/source/processes/optical/include/G4OpMieHG.hh
+--- a/source/processes/optical/include/G4OpMieHG.hh
++++ b/source/processes/optical/include/G4OpMieHG.hh
 @@ -42,41 +42,98 @@
  
  #include "G4VDiscreteProcess.hh"
@@ -619,11 +619,11 @@ index 92003a8..278b49a 100644
  }
  
  #endif /* G4OpMieHG_h */
-diff --git a/../geant4-11.2.0/source/processes/optical/include/ThreadSafeWriter.hh b/../geant4-11.2.0/source/processes/optical/include/ThreadSafeWriter.hh
+diff --git a/source/processes/optical/include/ThreadSafeWriter.hh b/source/processes/optical/include/ThreadSafeWriter.hh
 new file mode 100644
 index 0000000..dbe934f
 --- /dev/null
-+++ b/../geant4-11.2.0/source/processes/optical/include/ThreadSafeWriter.hh
++++ b/source/processes/optical/include/ThreadSafeWriter.hh
 @@ -0,0 +1,23 @@
 +#ifndef __THREAD_SAFE_WRITER_HH_
 +#define __THREAD_SAFE_WRITER_HH_
@@ -648,10 +648,10 @@ index 0000000..dbe934f
 +};
 +
 +#endif /* __THREAD_SAFE_WRITER_HH_ */
-diff --git a/geant4-11.2.0/source/processes/optical/sources.cmake b/../geant4-11.2.0/source/processes/optical/sources.cmake
+diff --git a/source/processes/optical/sources.cmake b/source/processes/optical/sources.cmake
 index abcaafe..41b28b7 100644
---- a/geant4-11.2.0/source/processes/optical/sources.cmake
-+++ b/../geant4-11.2.0/source/processes/optical/sources.cmake
+--- a/source/processes/optical/sources.cmake
++++ b/source/processes/optical/sources.cmake
 @@ -13,6 +13,7 @@ geant4_add_module(G4optical
      G4VWLSTimeGeneratorProfile.hh
      G4WLSTimeGeneratorProfileDelta.hh
@@ -670,10 +670,10 @@ index abcaafe..41b28b7 100644
  
  geant4_module_link_libraries(G4optical
    PUBLIC
-diff --git a/geant4-11.2.0/source/processes/optical/src/G4OpBoundaryProcess.cc b/../geant4-11.2.0/source/processes/optical/src/G4OpBoundaryProcess.cc
+diff --git a/source/processes/optical/src/G4OpBoundaryProcess.cc b/source/processes/optical/src/G4OpBoundaryProcess.cc
 index 640b585..aa1878a 100644
---- a/geant4-11.2.0/source/processes/optical/src/G4OpBoundaryProcess.cc
-+++ b/../geant4-11.2.0/source/processes/optical/src/G4OpBoundaryProcess.cc
+--- a/source/processes/optical/src/G4OpBoundaryProcess.cc
++++ b/source/processes/optical/src/G4OpBoundaryProcess.cc
 @@ -88,1016 +88,1041 @@
  #include "G4VSensitiveDetector.hh"
  
@@ -4042,10 +4042,10 @@ index 640b585..aa1878a 100644
 +
 +	return real(Reflectivity);
  }
-diff --git a/geant4-11.2.0/source/processes/optical/src/G4OpMieHG.cc b/../geant4-11.2.0/source/processes/optical/src/G4OpMieHG.cc
+diff --git a/source/processes/optical/src/G4OpMieHG.cc b/source/processes/optical/src/G4OpMieHG.cc
 index f16e9d5..5134340 100644
---- a/geant4-11.2.0/source/processes/optical/src/G4OpMieHG.cc
-+++ b/../geant4-11.2.0/source/processes/optical/src/G4OpMieHG.cc
+--- a/source/processes/optical/src/G4OpMieHG.cc
++++ b/source/processes/optical/src/G4OpMieHG.cc
 @@ -43,149 +43,540 @@
  #include "G4OpticalParameters.hh"
  #include "G4OpProcessSubType.hh"
@@ -4691,11 +4691,11 @@ index f16e9d5..5134340 100644
 +	verboseLevel = verbose;
 +	G4OpticalParameters::Instance()->SetMieVerboseLevel(verboseLevel);
  }
-diff --git a/../geant4-11.2.0/source/processes/optical/src/ThreadSafeWriter.cc b/../geant4-11.2.0/source/processes/optical/src/ThreadSafeWriter.cc
+diff --git a/source/processes/optical/src/ThreadSafeWriter.cc b/source/processes/optical/src/ThreadSafeWriter.cc
 new file mode 100644
 index 0000000..7626b89
 --- /dev/null
-+++ b/../geant4-11.2.0/source/processes/optical/src/ThreadSafeWriter.cc
++++ b/source/processes/optical/src/ThreadSafeWriter.cc
 @@ -0,0 +1,24 @@
 +#include "ThreadSafeWriter.hh"
 +
