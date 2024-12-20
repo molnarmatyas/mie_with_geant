@@ -43,6 +43,10 @@
 #include "G4ThreeVector.hh"
 #include <G4Orb.hh>
 
+
+#include "G4VisAttributes.hh"
+#include "G4Tubs.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 NormaDetectorConstruction::NormaDetectorConstruction() : G4VUserDetectorConstruction()
 {
@@ -191,6 +195,27 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 	air->SetMaterialPropertiesTable(myMPT0);
 
+
+  // Lense
+  auto lenseMaterial = nist->FindOrBuildMaterial("G4_Al");
+  
+  G4MaterialPropertiesTable* myMPT3 = new G4MaterialPropertiesTable();
+  std::vector<G4double> photonEnergyLense = {1.884*eV, 1.884*eV, 1.884*eV, 1.884*eV };
+  
+  // Refractive index
+  std::vector<G4double> rindexLense = {2.95, 2.95, 2.95, 2.95};
+  myMPT3->AddProperty("RINDEX", photonEnergyLense, rindexLense, nEntries);
+  
+  // Absorption length
+  std::vector<G4double> absLength = {10.0*mm, 10.0*mm, 10.0*mm, 10.0*mm};  
+  myMPT3->AddProperty("ABSLENGTH", photonEnergyLense, absLength, false, false);
+  
+  // Rayleigh scattering length
+  std::vector<G4double> rayleigh = {1.0*mm, 1.0*mm, 1.0*mm, 1.0*mm };  
+  myMPT3->AddProperty("RAYLEIGH", photonEnergyLense, rayleigh, false, false);
+  
+  lenseMaterial->SetMaterialPropertiesTable(myMPT3);
+
 	// ------------- Volumes --------------
 	//
 	// The world
@@ -278,6 +303,47 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	G4VPhysicalVolume *screenD_phys = new G4PVPlacement(nullptr, G4ThreeVector(0.0 * mm, -box_position * mm, 0.0 * mm),
 														screenD_log, "ScreenD", world_log, false, 0);
 
+
+  //Lense
+  
+  G4double radius = 1.0*mm;
+  G4double thickness = 0.1*mm;
+  G4Tubs* mirror = new G4Tubs("FlatMirror",
+                           0.*mm,                // Inner radius = 0 for solid disk
+                           radius,         // Outer radius
+                           thickness/2,    // Half-thickness (G4Tubs uses half-height)
+                           0.*deg,              // Start angle
+                           360.*deg);           // Spanning angle for full circle
+
+  G4LogicalVolume* mirrorLog = new G4LogicalVolume(mirror, lenseMaterial, "SphericalMirror");
+  
+  // Create optical surface
+  G4OpticalSurface* opticalSurfaceLense = new G4OpticalSurface("MirrorSurface");
+  opticalSurfaceLense->SetType(dielectric_dielectric);
+  opticalSurfaceLense->SetFinish(polished);  // For specular reflection
+  opticalSurfaceLense->SetModel(unified);
+  
+  // Create surface properties
+  G4MaterialPropertiesTable* surfaceProperties = new G4MaterialPropertiesTable();
+  
+  // Define reflection and transmission properties
+  std::vector<G4double> reflectivity = {0.95, 0.95, 0.95, 0.95};
+  //std::vector<G4double> transmittance = {0.05, 0.05, 0.05, 0.05};
+  
+  surfaceProperties->AddProperty("REFLECTIVITY", photonEnergyLense, reflectivity, nEntries);
+  //surfaceProperties->AddProperty("TRANSMITTANCE", photonEnergyLense, transmittance, nEntries);
+  opticalSurfaceLense->SetMaterialPropertiesTable(surfaceProperties);
+  
+  // Place in world
+  G4ThreeVector lensPosition(5*mm, 0, 0);
+  G4RotationMatrix* rotation = new G4RotationMatrix();
+  rotation->rotateY(45.*deg);
+
+  new G4PVPlacement(rotation, lensPosition, mirrorLog, "mirror", world_log, false, 0);
+  G4VisAttributes* mirrorVisAtt = new G4VisAttributes(G4Colour(0.7, 0.7, 0.7));
+  mirrorVisAtt->SetForceSolid(true);
+  mirrorLog->SetVisAttributes(mirrorVisAtt);
+
   /*
   //   -----  DETECTOR ARRAY  -----
   //
@@ -358,11 +424,11 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	*/
 	// Generate & Add Material Properties Table attached to the optical surfaces
 	//
-	std::vector<G4double> ephoton = {2.034 * eV, 4.136 * eV};
+	//std::vector<G4double> ephoton = {2.034 * eV, 4.136 * eV};
 
 	// OpticalAirSurface
-	std::vector<G4double> reflectivity = {0.3, 0.5};
-	std::vector<G4double> efficiency = {0.8, 1.0};
+	//std::vector<G4double> reflectivity = {0.3, 0.5};
+	//std::vector<G4double> efficiency = {0.8, 1.0};
 
 	/*
 	auto myST2 = new G4MaterialPropertiesTable();

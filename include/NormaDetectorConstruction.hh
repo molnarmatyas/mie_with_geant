@@ -37,6 +37,7 @@
 #include "ParametersStruct.hh"
 #include "G4NistManager.hh"
 #include "G4Polycone.hh"
+#include "G4Ellipsoid.hh"
 
 //#include "NormaSensor.hh"
 
