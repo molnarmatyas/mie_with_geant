@@ -115,9 +115,10 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	preZ = 0.0;
 
 	// post step porsition
-	G4double postX = step->GetPostStepPoint()->GetPosition().x();
-	G4double postY = step->GetPostStepPoint()->GetPosition().y();
-	G4double postZ = step->GetPostStepPoint()->GetPosition().z();
+  G4ThreeVector postPos = step->GetPostStepPoint()->GetPosition();
+	G4double postX = postPos.x();
+	G4double postY = postPos.y();
+	G4double postZ = postPos.z();
 
 	G4VPhysicalVolume *prevolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
 	G4VPhysicalVolume *postvolume = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
@@ -126,6 +127,21 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	G4ThreeVector momentumdirection = track->GetMomentumDirection();
 	G4double theta = momentumdirection.theta();
 	G4double phi = momentumdirection.phi();
+
+  G4double gunPosX = 0.0;
+  G4double gunPosY = 0.0;
+  G4double gunPosZ = 0.0;
+
+  //Threevectors related to gun
+  G4ThreeVector gunPosition = G4RunManager::GetRunManager()->GetCurrentEvent()->GetPrimaryVertex()->GetPosition();
+  G4ThreeVector momdir = G4ThreeVector(1, 0., 0.); 
+  gunPosX = gunPosition.x();
+  gunPosY = gunPosition.y();
+  gunPosZ = gunPosition.z();
+
+  G4double alpha = momdir.angle(momentumdirection);
+
+  G4cout << "PrimVertex from " << gunPosX << ", " << gunPosY << ", " << gunPosZ << G4endl; 
 
 	G4cout << "MomentumDirTheta Phi: " << theta << " | " << phi << G4endl;
 
@@ -168,7 +184,6 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	{
 		genTheta = ((G4OpMieHG *)pds)->radThetaGen;
 	}
-
   /*
 	std::cout << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID() << " " << prevolume->GetName() << " "
 			  << postvolume->GetName() << " momdir: " << momentumdirection.x() << " " << momentumdirection.y() << " "
@@ -193,20 +208,46 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 			G4cout << "Mie counter explicitly reset to zero" << G4endl;
 		}
 	}
+  G4ThreeVector Vn = G4ThreeVector(1, 1, 1);
+
+  //calculating angle after the track exits the bubble, should be equal to theta...
+	if (prevolume->GetName() == "Bubble_dis_bnd_proc" && postvolume->GetName() == "world")
+	{
+    G4ThreeVector posAfterBubble = postPos;
+    G4ThreeVector momAfterBubble = momentumdirection;
+    /*
+	  std::cout << "Getting direction for alpha" << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID() << " " << prevolume->GetName() << " "
+			  << postvolume->GetName() << " posdir: " << momAfterBubble.x() << " " << momAfterBubble.y() << " "
+			  << momAfterBubble.z() << std::endl;
+    */
+    angleMan = acos((momdir).dot( (momAfterBubble / momAfterBubble.mag() ) ) );
+    G4ThreeVector cross = momdir.cross(momAfterBubble);
+    if (Vn.dot(cross) < 0) { // Or > 0
+      angleMan = -angleMan;
+    }
+    //G4cout << "momdir angle: " << angleMan << " | cross: " << cross << G4endl; 
+  }
+
 
 	if (prevolume->GetName() == "world" &&
-		((postvolume->GetName() == "Screen") || (postvolume->GetName() == "ScreenB") ||
+		((postvolume->GetName() == "Screen")/* || (postvolume->GetName() == "ScreenB") ||
 		 (postvolume->GetName() == "ScreenL") || (postvolume->GetName() == "ScreenR") ||
-		 (postvolume->GetName() == "ScreenU") || (postvolume->GetName() == "ScreenD")))
+		 (postvolume->GetName() == "ScreenU") || (postvolume->GetName() == "ScreenD")*/))
 	{
 		ss.str("");
 		double theta3 = asin(sqrt(postY * postY + postZ * postZ) / sqrt(postX * postX + postY * postY + postZ * postZ));
     double r = sqrt(postY * postY + postZ * postZ);
 //    G4cout << "Zero point based theta and phi: " << theta3 << " | " << theta3 << G4endl;
-		//G4cout << "Zero point based r, x, y, z: " << r << " | " << postX << " | " << postY << " | " << postZ << G4endl;
+		G4cout << "Zero point based x, y, z: " << postX << " | " << postY << " | " << postZ << G4endl;
+		G4cout << "Prim vertex based x, y, z: " << gunPosX << " | " << gunPosY << " | " << gunPosZ << G4endl;
+    //G4cout << "Angle between prim vertex and mie: " << gunPosition.angle(posAfterBubble) * 180 / CLHEP::pi <<G4endl;
+    //G4cout << "Angle between momdir prim vertex and mie: " << momdir.angle(momentumdirection) * 180 / CLHEP::pi <<G4endl;
+    //G4cout << "Angle between prim vertex and mie manual 2: " << angleMan <<G4endl;
+    //G4cout << "Angle Theta: " << theta3 * 180 / CLHEP::pi <<G4endl;
+
 		if (((G4OpMieHG *)pds)->generated)
 		{
-			ss << theta3 << ", " << genTheta << ", " << r << ", " << postX << ", " << postY << ", " << postZ;
+			ss << theta3 << ", " << genTheta << ", " << r << ", " << postX << ", " << postY << ", " << postZ << ", " << alpha << ", " << angleMan;
 			if (writer)
 				writer->write(ss.str());
 		}
@@ -289,4 +330,7 @@ void NormaSteppingAction::SetWriter(ThreadSafeWriter *writer)
 	this->writer = writer;
 }
 
+G4ThreeVector NormaSteppingAction::GetGunPosition() {
+    return G4ThreeVector(0,0,0);
+}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

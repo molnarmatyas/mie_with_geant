@@ -46,6 +46,7 @@ class NormaSteppingAction : public G4UserSteppingAction
   void UserSteppingAction(const G4Step*) override;
 
   void SetWriter(ThreadSafeWriter *writer);
+  G4ThreeVector GetGunPosition();
 
  private:
   ThreadSafeWriter *writer;
@@ -54,6 +55,7 @@ class NormaSteppingAction : public G4UserSteppingAction
   std::stringstream ss;
 
   double genTheta = 0.0;
+  double angleMan = 0.0;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
