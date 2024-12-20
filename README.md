@@ -38,6 +38,10 @@ or, if in this directory (make sure geant4-* is in the .gitignore):
 ```
 git apply ../patch/numeric_mie.patch
 ```
+Or, rather this one works REALLY, after copying it in the geant4-11.2.0 directory:
+```
+patch -p1 --fuzz=3 --ignore-whitespace --merge --verbose < numeric_mie.patch
+```
 
 
 
