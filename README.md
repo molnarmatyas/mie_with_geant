@@ -38,7 +38,7 @@ or, if in this directory (make sure geant4-* is in the .gitignore):
 ```
 git apply ../patch/numeric_mie.patch
 ```
-Or, rather this one works REALLY, after copying it in the geant4-11.2.0 directory:
+Or, rather this one works REALLY, after copying it in the geant4-11.2.0 directory (and *maybe* performing `cp src/ThreadSafeWriter.cc geant4-11.2.0/source/processes/optical/src/`, `cp include/ThreadSafeWriter.hh geant4-11.2.0/source/processes/optical/include/` and `cp patch/numeric_mie_v2.patch geant4-11.2.0/`, in `cd geant4-11.2.0`):
 ```
 patch -p1 --fuzz=3 --ignore-whitespace --merge --verbose < numeric_mie.patch
 ```
