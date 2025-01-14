@@ -171,11 +171,13 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	}
+  /*
   if(p.bubbleRadius != std::stof(std::getenv("CELL_RADIUS_UM")) * CLHEP::um) {
     G4cerr << "Radius variables must match" << G4endl;
 		PrintUsage();
     return 1;
   }
+  */
 
 	std::string filename = "output" + std::to_string((int)(p.bubbleRadius * 1000000)) + "_" +
 						   std::to_string((int)(p.g * 1000)) + "_" + std::to_string((int)(p.p)) + ".txt";
