@@ -147,19 +147,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 		2278.907 * 0.001 * nm, 1959.588 * 0.001 * nm, 1675.064 * 0.001 * nm, 1422.710 * 0.001 * nm,
 		1200.004 * 0.001 * nm, 1004.528 * 0.001 * nm, 833.9666 * 0.001 * nm, 686.1063 * 0.001 * nm};
 
-	// std::vector<G4double> mie_water = {
-	// 	1670.244 * nm, 1587.267 * nm, 1507.42 * nm, 1430.625 * nm, 1356.802 * nm,
-	// 	1285.874 * nm, 1217.763 * nm, 1152.395 * nm, 1089.69 * nm, 1029.588 * nm,
-	// 	972.0035 * nm, 916.8686 * nm, 864.1133 * nm, 813.6679 * nm, 765.4642 * nm,
-	// 	71943.46 * nm, 67551.29 * nm, 63363.36 * nm, 59373.25 * nm, 55574.61 * nm,
-	// 	51961.24 * nm, 48527.00 * nm, 45265.87 * nm, 42171.94 * nm, 39239.39 * nm,
-	// 	36462.50 * nm, 33835.68 * nm, 31353.41 * nm, 29010.30 * nm, 26801.03 * nm,
-	// 	24720.42 * nm, 22763.36 * nm, 20924.88 * nm, 19200.07 * nm, 17584.16 * nm,
-	// 	16072.45 * nm, 14660.38 * nm, 13343.46 * nm, 12117.33 * nm, 10977.70 * nm,
-	// 	9920.416 * nm, 8941.407 * nm, 8036.711 * nm, 7202.470 * nm, 6434.927 * nm,
-	// 	5730.429 * nm, 5085.425 * nm, 4496.467 * nm, 3960.210 * nm, 3473.413 * nm,
-	// 	3032.937 * nm, 2635.746 * nm, 2278.907 * nm, 1959.588 * nm, 1675.064 * nm,
-	// 	1422.710 * nm, 1200.004 * nm, 1004.528 * nm, 833.9666 * nm, 686.1063 * nm};
 
 	// Mie: gforward, gbackward, forward backward ratio
 	G4double mie_water_const[3] = {mieFg, 0.99, 0.99};
@@ -216,6 +203,21 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   
   lenseMaterial->SetMaterialPropertiesTable(myMPT3);
 
+  // Shielding
+  auto shieldMaterial = new G4Material("BlackPlastic", 0.94*g/cm3, 1);
+  shieldMaterial->AddMaterial(nist->FindOrBuildMaterial("G4_POLYETHYLENE"), 1.0);
+  G4MaterialPropertiesTable* myMPT4 = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexShield = {1.5, 1.5, 1.5, 1.5};
+  myMPT4->AddProperty("RINDEX", photonEnergyLense, rindexShield, nEntries);
+
+  std::vector<G4double> absLengthShield = {1.0*mm, 1.0*mm, 1.0*mm, 1.0*mm};
+  myMPT4->AddProperty("ABSLENGTH", photonEnergyLense, absLengthShield, false, false);
+
+
+  shieldMaterial->SetMaterialPropertiesTable(myMPT4);
+
+
 	// ------------- Volumes --------------
 	//
 	// The world
@@ -223,23 +225,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	auto world_log = new G4LogicalVolume(world_box, air, "World");
 	G4VPhysicalVolume *world_phys =
 		new G4PVPlacement(nullptr, G4ThreeVector(), world_log, "world", nullptr, false, 0, checkOverlaps);
-
-	// The experimental Hall
-	/*
-	auto expHall_box = new G4Box("expHall", fExpHall_x, fExpHall_y, fExpHall_z);
-	auto expHall_log = new G4LogicalVolume(expHall_box, air, "expHall");
-	G4VPhysicalVolume *expHall_phys = new G4PVPlacement(
-	nullptr, G4ThreeVector(), expHall_log, "expHall", world_log, false, 0);
-	*/
-
-	// The Water Tank
-	/*
-	auto waterTank_box = new G4Box("Tank", fTank_x, fTank_y, fTank_z);
-	auto waterTank_log = new G4LogicalVolume(waterTank_box, water, "Tank");
-	G4VPhysicalVolume *waterTank_phys = new G4PVPlacement(
-	nullptr, G4ThreeVector(), waterTank_log, "Tank", expHall_log,
-	false, 0);
-	*/
 
 	// The Bubble
 
@@ -327,7 +312,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4MaterialPropertiesTable* surfaceProperties = new G4MaterialPropertiesTable();
   
   // Define reflection and transmission properties
-  std::vector<G4double> reflectivity = {0.95, 0.95, 0.95, 0.95};
+  std::vector<G4double> reflectivity = {1.0, 1.0, 1.0, 1.0};
   //std::vector<G4double> transmittance = {0.05, 0.05, 0.05, 0.05};
   
   surfaceProperties->AddProperty("REFLECTIVITY", photonEnergyLense, reflectivity, nEntries);
@@ -335,14 +320,31 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   opticalSurfaceLense->SetMaterialPropertiesTable(surfaceProperties);
   
   // Place in world
-  G4ThreeVector lensPosition(5*mm, 0, 0);
-  G4RotationMatrix* rotation = new G4RotationMatrix();
-  rotation->rotateY(45.*deg);
+  G4ThreeVector lensPosition(5*mm, 0, -5*mm);
+  G4RotationMatrix* rotation_1 = new G4RotationMatrix();
+  rotation_1->rotateY(45.*deg);
 
-  new G4PVPlacement(rotation, lensPosition, mirrorLog, "mirror", world_log, false, 0);
+  //new G4PVPlacement(rotation_1, lensPosition, mirrorLog, "mirror1", world_log, false, 0);
+
+  lensPosition = G4ThreeVector(5*mm, 0, 0);
+  G4RotationMatrix* rotation_2 = new G4RotationMatrix();
+  rotation_2->rotateY(-45.*deg);
+  //new G4PVPlacement(rotation_2, lensPosition, mirrorLog, "mirror2", world_log, false, 1);
+
   G4VisAttributes* mirrorVisAtt = new G4VisAttributes(G4Colour(0.7, 0.7, 0.7));
   mirrorVisAtt->SetForceSolid(true);
   mirrorLog->SetVisAttributes(mirrorVisAtt);
+
+  //shielding
+  G4Box* shieldSolid = new G4Box("solid-shield", 2*mm, 2*mm, 0.2*mm);
+  G4LogicalVolume* shieldLogical = new G4LogicalVolume(shieldSolid, shieldMaterial, "logic-shield");
+  G4VPhysicalVolume* shieldPhysical = new G4PVPlacement(nullptr,
+                                                      G4ThreeVector(5*mm, 0, 0*mm),
+                                                      shieldLogical,
+                                                      "Target",
+                                                      world_log,
+                                                      false,
+                                                      0);
 
   /*
   //   -----  DETECTOR ARRAY  -----
@@ -407,41 +409,15 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	if (opticalSurface)
 		opticalSurface->DumpInfo();
 
-	// Air Bubble
-	/*
-	auto opAirSurface = new G4OpticalSurface("AirSurface");
-	opAirSurface->SetType(dielectric_dielectric);
-	opAirSurface->SetFinish(polished);
-	opAirSurface->SetModel(glisur);
+  // Lense
+  //FIXME
+	G4LogicalBorderSurface lenseSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
 
-	auto airSurface =
-	new G4LogicalSkinSurface("AirSurface", bubbleAir_log, opAirSurface);
+  // Shield
 
-	opticalSurface = dynamic_cast<G4OpticalSurface *>(
-	airSurface->GetSurface(bubbleAir_log)->GetSurfaceProperty());
-	if (opticalSurface)
-	opticalSurface->DumpInfo();
-	*/
-	// Generate & Add Material Properties Table attached to the optical surfaces
-	//
-	//std::vector<G4double> ephoton = {2.034 * eV, 4.136 * eV};
+	G4LogicalBorderSurface shieldSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
 
-	// OpticalAirSurface
-	//std::vector<G4double> reflectivity = {0.3, 0.5};
-	//std::vector<G4double> efficiency = {0.8, 1.0};
 
-	/*
-	auto myST2 = new G4MaterialPropertiesTable();
-
-	myST2->AddProperty("REFLECTIVITY", ephoton, reflectivity);
-	myST2->AddProperty("EFFICIENCY", ephoton, efficiency);
-	if (fVerbose)
-	{
-	G4cout << "Air Surface G4MaterialPropertiesTable:" << G4endl;
-	myST2->DumpTable();
-}
-opAirSurface->SetMaterialPropertiesTable(myST2);
-*/
 
 	////////////////////////////////////////////////////////////////////////////
 	// test user-defined properties
