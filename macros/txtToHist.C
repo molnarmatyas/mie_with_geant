@@ -6,7 +6,8 @@
 
 void txtToHist() {
     // Input text file path
-    std::string filename = "../build/output3500_990_0_68.txt";
+    std::string filename = "../build/output3500_990_0_149.txt";
+    std::string outputprefix = "shield_02mm";
     
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi());
@@ -16,7 +17,7 @@ void txtToHist() {
     TH1D* dhPosY = new TH1D("dhPosY", "dhPosY", 1000, 0, 10);
     TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 10);
     TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 1000, -5, 5, 1000, -5, 5);
-    TH2D* dhR_alpha = new TH2D("dhR_alpha", "R vs #alpha; #alpha; R [pixel]", 1000, 0, TMath::Pi(), 1000, 0, 15 * 200);
+    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [pixel]", 1000, 0, TMath::Pi()/2.0, 1000, 0, 15 * 200);
     TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
     
@@ -55,7 +56,7 @@ void txtToHist() {
         dhXSect->Fill(theta3);
         dhR_alpha->Fill(alpha, R * 200.0);
         dhtheta_alpha->Fill(theta3, alpha);
-        dh2D_yz->Fill(postY, postZ);
+        dh2D_yz->Fill(postZ, postY);
         dh2D_rx_tantheta->Fill(R / postX, std::tan(theta3));
     }
 //  dh2D_yz->GetZaxis()->SetRangeUser(0,10);
@@ -63,6 +64,8 @@ void txtToHist() {
     dhXSect->Multiply(oneoversin);
 
     TF1* Ltanalpha = new TF1("Ltanalpha","9.0*tan(x) * 200");
+    Ltanalpha->SetLineWidth(1);
+    Ltanalpha->SetLineColorAlpha(kRed,0.75);
     //setup for cross section
     /*
     int inpNevent = 1000000;
@@ -77,14 +80,14 @@ void txtToHist() {
     */
     
     // Create a ROOT output file to save the histogram
-    TFile* outfile = new TFile("alpha_output.root", "RECREATE");
+    TFile* outfile = new TFile(Form("%s_alpha_output.root", outputprefix.c_str()), "RECREATE");
     
     // Optional: draw and save as image
     TCanvas* c1 = new TCanvas("c1", "", 800, 800);
-    //gStyle->SetOptStat(0);
+    gStyle->SetOptStat(0);
     dhR_alpha->Draw("COLZ");
     Ltanalpha->Draw("same");
-    c1->SaveAs("dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.png");
+    c1->SaveAs(Form("%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
 
     //gStyle->SetCanvasDefH(550);
     //gStyle->SetCanvasDefW(650);
@@ -92,10 +95,10 @@ void txtToHist() {
 
 
     dh2D_yz->SetTitle("2D scattering, n = 1.592, distance = 9 mm, d = 7 #mu m");
-    dh2D_yz->GetXaxis()->SetTitle("[mm]");
-    dh2D_yz->GetYaxis()->SetTitle("[mm]");
+    dh2D_yz->GetXaxis()->SetTitle("Z [mm]");
+    dh2D_yz->GetYaxis()->SetTitle("Y [mm]");
     dh2D_yz->Draw("COLZ");
-    c1->SaveAs("dh2D_yz_output3500_um_pointsource_1M_pld_1592_ver_thetafix.png");
+    c1->SaveAs(Form("%s_dh2D_yz_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
 
 
 
