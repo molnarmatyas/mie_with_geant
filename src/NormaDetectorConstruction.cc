@@ -331,15 +331,14 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   /*
   G4Box* shieldSolid = new G4Box("solid-shield", 2*mm, 2*mm, 0.2*mm);
   G4LogicalVolume* shieldLogical = new G4LogicalVolume(shieldSolid, shieldMaterial, "logic-shield");
-  G4VPhysicalVolume* shieldPhysical = new G4PVPlacement(nullptr,
+  G4VPhysicalVolume* shield_phys = new G4PVPlacement(nullptr,
                                                       G4ThreeVector(5*mm, 0, 0*mm),
                                                       shieldLogical,
                                                       "Target",
                                                       world_log,
                                                       false,
                                                       0);
-                                              */
-
+*/
   /*
   //   -----  DETECTOR ARRAY  -----
   //
@@ -412,15 +411,15 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	std::vector<G4double> refractiveIndexLense = {1.0972, 1.0972, 1.0972, 1.0972};
   G4MaterialPropertiesTable* SMPT = new G4MaterialPropertiesTable();
   
-  SMPT->AddProperty("RINDEX", photonEnergyLense, reflectivity, nEntries);
+  SMPT->AddProperty("RINDEX", photonEnergyLense, refractiveIndexLense, nEntries);
   SMPT->AddProperty("REFLECTIVITY", photonEnergyLense, reflectivity, nEntries);
   //SMPT->AddProperty("TRANSMITTANCE", photonEnergyLense, transmittance, nEntries);
 
   opticalSurfaceLense->SetMaterialPropertiesTable(SMPT);
 
   //G4LogicalSkinSurface* lenseSurface = new G4LogicalSkinSurface("Mirror_1", mirrorLog, opticalSurfaceLense);
-	G4LogicalBorderSurface* lenseSurface_1 = new G4LogicalBorderSurface("MirrorSurface", world_phys, lense_phys_1, opticalSurfaceLense);
-	G4LogicalBorderSurface* lenseSurface_2 = new G4LogicalBorderSurface("MirrorSurface", world_phys, lense_phys_2, opticalSurfaceLense);
+	G4LogicalBorderSurface* lenseSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, lense_phys_1, opticalSurfaceLense);
+	G4LogicalBorderSurface* lenseSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, lense_phys_2, opticalSurfaceLense);
 
   /*
   auto opticalLenseSurface = dynamic_cast<G4OpticalSurface*>(
@@ -433,12 +432,23 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   // Shield
   /*
-  G4OpticalSurface* opticalSurfaceLense = new G4OpticalSurface("MirrorSurface");
-  opticalSurfaceLense = new G4OpticalSurface("MirrorSurface", unified, polished, dielectric_dielectric);
+  G4OpticalSurface* opticalSurfaceShield = new G4OpticalSurface("ShieldSurface");
+  opticalSurfaceShield = new G4OpticalSurface("ShieldSurface", unified, ground, dielectric_dielectric);
 
-  G4LogicalBorderSurface shieldSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
-  */
+  G4LogicalBorderSurface shieldSurface = new G4LogicalBorderSurface("ShieldBorderSurface", world_phys, shield_phys , opticalSurfaceShield);
 
+  // Define reflection and transmission properties
+  std::vector<G4double> shieldReflect = { 1.0,  1.0, 1.00, 1.00};
+  //std::vector<G4double> transmittance = {0.00, 0.00, 0.00, 0.00};
+	//std::vector<G4double> refractiveIndexLense = {1.0972, 1.0972, 1.0972, 1.0972};
+  G4MaterialPropertiesTable* SMPTShield = new G4MaterialPropertiesTable();
+  
+  //SMPTShield->AddProperty("RINDEX", photonEnergyLense, refractiveIndexLense, nEntries);
+  SMPTShield->AddProperty("REFLECTIVITY", photonEnergyLense, shieldReflect, nEntries);
+  //SMPT->AddProperty("TRANSMITTANCE", photonEnergyLense, transmittance, nEntries);
+
+  opticalSurfaceShield->SetMaterialPropertiesTable(SMPTShield);
+*/
 
 
 	////////////////////////////////////////////////////////////////////////////
