@@ -187,7 +187,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   auto lenseMaterial = nist->FindOrBuildMaterial("G4_Al");
   
   G4MaterialPropertiesTable* myMPT3 = new G4MaterialPropertiesTable();
-  std::vector<G4double> photonEnergyLense = {1.884*eV, 1.884*eV, 1.884*eV, 1.884*eV };
+  std::vector<G4double> photonEnergyLense = {1.8*eV, 1.85*eV, 1.9*eV, 1.95*eV };
   
   // Refractive index
   std::vector<G4double> rindexLense = {2.95, 2.95, 2.95, 2.95};
@@ -302,40 +302,31 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   G4LogicalVolume* mirrorLog = new G4LogicalVolume(mirror, lenseMaterial, "SphericalMirror");
   
-  // Create optical surface
-  G4OpticalSurface* opticalSurfaceLense = new G4OpticalSurface("MirrorSurface");
+  /*
   opticalSurfaceLense->SetType(dielectric_dielectric);
-  opticalSurfaceLense->SetFinish(polished);  // For specular reflection
+  opticalSurfaceLense->SetFinish(polished); 
   opticalSurfaceLense->SetModel(unified);
+  */
   
-  // Create surface properties
-  G4MaterialPropertiesTable* surfaceProperties = new G4MaterialPropertiesTable();
-  
-  // Define reflection and transmission properties
-  std::vector<G4double> reflectivity = {1.0, 1.0, 1.0, 1.0};
-  //std::vector<G4double> transmittance = {0.05, 0.05, 0.05, 0.05};
-  
-  surfaceProperties->AddProperty("REFLECTIVITY", photonEnergyLense, reflectivity, nEntries);
-  //surfaceProperties->AddProperty("TRANSMITTANCE", photonEnergyLense, transmittance, nEntries);
-  opticalSurfaceLense->SetMaterialPropertiesTable(surfaceProperties);
   
   // Place in world
   G4ThreeVector lensPosition(5*mm, 0, -5*mm);
   G4RotationMatrix* rotation_1 = new G4RotationMatrix();
   rotation_1->rotateY(45.*deg);
 
-  //new G4PVPlacement(rotation_1, lensPosition, mirrorLog, "mirror1", world_log, false, 0);
+  G4VPhysicalVolume* lense_phys_1 = new G4PVPlacement(rotation_1, lensPosition, mirrorLog, "mirror1", world_log, false, 0);
 
   lensPosition = G4ThreeVector(5*mm, 0, 0);
   G4RotationMatrix* rotation_2 = new G4RotationMatrix();
   rotation_2->rotateY(-45.*deg);
-  //new G4PVPlacement(rotation_2, lensPosition, mirrorLog, "mirror2", world_log, false, 1);
+  G4VPhysicalVolume* lense_phys_2 = new G4PVPlacement(rotation_2, lensPosition, mirrorLog, "mirror2", world_log, false, 1);
 
   G4VisAttributes* mirrorVisAtt = new G4VisAttributes(G4Colour(0.7, 0.7, 0.7));
   mirrorVisAtt->SetForceSolid(true);
   mirrorLog->SetVisAttributes(mirrorVisAtt);
 
   //shielding
+  /*
   G4Box* shieldSolid = new G4Box("solid-shield", 2*mm, 2*mm, 0.2*mm);
   G4LogicalVolume* shieldLogical = new G4LogicalVolume(shieldSolid, shieldMaterial, "logic-shield");
   G4VPhysicalVolume* shieldPhysical = new G4PVPlacement(nullptr,
@@ -345,6 +336,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                                                       world_log,
                                                       false,
                                                       0);
+                                              */
 
   /*
   //   -----  DETECTOR ARRAY  -----
@@ -398,9 +390,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	// Water Tank
 	auto opWaterSurface = new G4OpticalSurface("WaterSurface");
 	opWaterSurface = new G4OpticalSurface("WaterSurface", glisur, polished, x_ray);
-	// opWaterSurface->SetType(dielectric_LUTDAVIS);
-	// opWaterSurface->SetFinish(Rough_LUT);
-	// opWaterSurface->SetModel(DAVIS);
 
 	auto waterSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
 
@@ -410,12 +399,28 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 		opticalSurface->DumpInfo();
 
   // Lense
-  //FIXME
-	G4LogicalBorderSurface lenseSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
+
+  // Create optical surface
+  G4OpticalSurface* opticalSurfaceLense = new G4OpticalSurface("MirrorSurface");
+  opticalSurfaceLense = new G4OpticalSurface("MirrorSurface", unified, polished, dielectric_dielectric);
+
+  // Define reflection and transmission properties
+  std::vector<G4double> reflectivity = {1.0, 1.0, 1.0, 1.0};
+  std::vector<G4double> transmittance = {0.00, 0.00, 0.00, 0.00};
+
+  G4MaterialPropertiesTable* SMPT = new G4MaterialPropertiesTable();
+  
+  SMPT->AddProperty("REFLECTIVITY", photonEnergyLense, reflectivity, nEntries);
+  SMPT->AddProperty("TRANSMITTANCE", photonEnergyLense, transmittance, nEntries);
+
+  opticalSurfaceLense->SetMaterialPropertiesTable(SMPT);
+
+	G4LogicalBorderSurface* lenseSurface_1 = new G4LogicalBorderSurface("MirrorSurface", world_phys, lense_phys_1, opticalSurfaceLense);
+	G4LogicalBorderSurface* lenseSurface_2 = new G4LogicalBorderSurface("MirrorSurface", world_phys, lense_phys_2, opticalSurfaceLense);
 
   // Shield
 
-	G4LogicalBorderSurface shieldSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
+//	G4LogicalBorderSurface shieldSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
 
 
 
