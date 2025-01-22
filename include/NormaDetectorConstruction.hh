@@ -63,13 +63,13 @@ private:
 
   NormaDetectorMessenger *fDetectorMessenger = nullptr;
 
-  G4double fWorld_x = 10 * CLHEP::mm;
-  G4double fWorld_y = 10 * CLHEP::mm;
-  G4double fWorld_z = 10 * CLHEP::mm;
+  G4double fWorld_x = 40 * CLHEP::cm;
+  G4double fWorld_y = 40 * CLHEP::cm;
+  G4double fWorld_z = 40 * CLHEP::cm;
 
-  G4double fScreen_x = 0.5 * CLHEP::mm;
-  G4double fScreen_y = 10 * CLHEP::mm;
-  G4double fScreen_z = 10 * CLHEP::mm;
+  G4double fScreen_x = 0.5 * CLHEP::cm;
+  G4double fScreen_y = 40 * CLHEP::cm;
+  G4double fScreen_z = 40 * CLHEP::cm;
 
   G4VPhysicalVolume *bubble_phys;
 

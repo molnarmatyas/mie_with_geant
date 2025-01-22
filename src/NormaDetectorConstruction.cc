@@ -86,6 +86,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	G4NistManager *nist = G4NistManager::Instance();
 	G4Material *sil = nist->FindOrBuildMaterial("G4_Si");
 
+  G4Material* galactic = nist->FindOrBuildMaterial("G4_Galactic");
+
 	// ------------ Generate & Add Material Properties Table ------------
 	//
   std::vector<G4double> photonEnergy ={0.01 * eV, 0.1 * eV, 1. * eV, 10. * eV};
@@ -184,27 +186,27 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	air->SetMaterialPropertiesTable(myMPT0);
 
 
-  // Lense
-  auto lenseMaterial = nist->FindOrBuildMaterial("G4_Al");
+  // Mirror
+  auto mirrorMaterial = nist->FindOrBuildMaterial("G4_Al");
   
   G4MaterialPropertiesTable* myMPT3 = new G4MaterialPropertiesTable();
-  std::vector<G4double> photonEnergyLense = {1.8*eV, 1.85*eV, 1.9*eV, 1.95*eV };
+  std::vector<G4double> photonEnergyMirror = {1.8*eV, 1.85*eV, 1.9*eV, 1.95*eV };
   
   // Refractive index
  /* 
-  std::vector<G4double> rindexLense = {2.95, 2.95, 2.95, 2.95};
-  myMPT3->AddProperty("RINDEX", photonEnergyLense, rindexLense, nEntries);
+  std::vector<G4double> rindexMirror = {2.95, 2.95, 2.95, 2.95};
+  myMPT3->AddProperty("RINDEX", photonEnergyMirror, rindexMirror, nEntries);
   
   // Absorption length
   std::vector<G4double> absLength = {10.0*mm, 10.0*mm, 10.0*mm, 10.0*mm};  
-  myMPT3->AddProperty("ABSLENGTH", photonEnergyLense, absLength, false, false);
+  myMPT3->AddProperty("ABSLENGTH", photonEnergyMirror, absLength, false, false);
   
   // Rayleigh scattering length
   std::vector<G4double> rayleigh = {1.0*mm, 1.0*mm, 1.0*mm, 1.0*mm };  
-  myMPT3->AddProperty("RAYLEIGH", photonEnergyLense, rayleigh, false, false);
+  myMPT3->AddProperty("RAYLEIGH", photonEnergyMirror, rayleigh, false, false);
   */
   
-  lenseMaterial->SetMaterialPropertiesTable(myMPT3);
+  mirrorMaterial->SetMaterialPropertiesTable(myMPT3);
 
   // Shielding
   auto shieldMaterial = new G4Material("BlackPlastic", 0.94*g/cm3, 1);
@@ -212,10 +214,10 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4MaterialPropertiesTable* myMPT4 = new G4MaterialPropertiesTable();
 
   std::vector<G4double> rindexShield = {1.5, 1.5, 1.5, 1.5};
-  myMPT4->AddProperty("RINDEX", photonEnergyLense, rindexShield, nEntries);
+  myMPT4->AddProperty("RINDEX", photonEnergyMirror, rindexShield, nEntries);
 
   std::vector<G4double> absLengthShield = {1.0*mm, 1.0*mm, 1.0*mm, 1.0*mm};
-  myMPT4->AddProperty("ABSLENGTH", photonEnergyLense, absLengthShield, false, false);
+  myMPT4->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthShield, false, false);
 
 
   shieldMaterial->SetMaterialPropertiesTable(myMPT4);
@@ -252,17 +254,17 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 	if (isPolycone)
 	{
-		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(0.0 * cm, 0.0 * cm, 0.0 * cm), bubbleWP_log,
+		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(1.425 * cm, 9.624 * cm, -13.75 * cm), bubbleWP_log,
 										"Bubble_dis_bnd_proc", world_log, false, 0);
 	}
 	else
 	{
-		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(0.0 * cm, 0.0 * cm, 0.0 * cm), bubbleW_log,
+		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(1.425 * cm, 9.624 * cm, -13.75 * cm), bubbleW_log,
 										"Bubble_dis_bnd_proc", world_log, false, 0);
 	}
 
 	// screen
-  double box_position = 9.5;
+  double box_position = 395;
 	auto screen_box = new G4Box("Screen", fScreen_x, fScreen_y, fScreen_z);
 	auto screen_log = new G4LogicalVolume(screen_box, sil, "Screen");
 	G4VPhysicalVolume *screen_phys = new G4PVPlacement(nullptr, G4ThreeVector(box_position * mm, 0.0 * mm, 0.0 * mm),
@@ -294,7 +296,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 														screenD_log, "ScreenD", world_log, false, 0);
 
 
-  //Lense
+  //Mirror
   
   G4double radius = 1.0*mm;
   G4double thickness = 0.1*mm;
@@ -305,26 +307,26 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                            0.*deg,              // Start angle
                            360.*deg);           // Spanning angle for full circle
 
-  G4LogicalVolume* mirrorLog = new G4LogicalVolume(mirror, lenseMaterial, "SphericalMirror");
+  G4LogicalVolume* mirrorLog = new G4LogicalVolume(mirror, mirrorMaterial, "SphericalMirror");
   
   /*
-  opticalSurfaceLense->SetType(dielectric_dielectric);
-  opticalSurfaceLense->SetFinish(polished); 
-  opticalSurfaceLense->SetModel(unified);
+  opticalSurfaceMirror->SetType(dielectric_dielectric);
+  opticalSurfaceMirror->SetFinish(polished); 
+  opticalSurfaceMirror->SetModel(unified);
   */
   
   
   // Place in world
-  G4ThreeVector lensPosition(5*mm, 0, -5*mm);
+  G4ThreeVector mirrorPosition(5*mm, 0, -5*mm);
   G4RotationMatrix* rotation_1 = new G4RotationMatrix();
   rotation_1->rotateY(45.*deg);
 
-  //G4VPhysicalVolume* lense_phys_1 = new G4PVPlacement(rotation_1, lensPosition, mirrorLog, "mirror1", world_log, false, 0);
+  //G4VPhysicalVolume* mirror_phys_1 = new G4PVPlacement(rotation_1, mirrorPosition, mirrorLog, "mirror1", world_log, false, 0);
 
-  lensPosition = G4ThreeVector(5*mm, 0, 0);
+  mirrorPosition = G4ThreeVector(5*mm, 0, 0);
   G4RotationMatrix* rotation_2 = new G4RotationMatrix();
   rotation_2->rotateY(-45.*deg);
-  //G4VPhysicalVolume* lense_phys_2 = new G4PVPlacement(rotation_2, lensPosition, mirrorLog, "mirror2", world_log, false, 1);
+  //G4VPhysicalVolume* mirror_phys_2 = new G4PVPlacement(rotation_2, mirrorPosition, mirrorLog, "mirror2", world_log, false, 1);
 
   G4VisAttributes* mirrorVisAtt = new G4VisAttributes(G4Colour(0.7, 0.7, 0.7));
   mirrorVisAtt->SetForceSolid(true);
@@ -342,34 +344,34 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                                                       false,
                                                       0);
                                                       */
-  //3D Modell
+  //3D Modell load
   auto mesh = CADMesh::TessellatedMesh::FromSTL("./Argosz.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;;
-  mesh->SetScale(.01);
+  mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids = mesh->GetSolids();
-  G4cout << "solid name: " << solids[2]->GetName() << G4endl;
+
+  std::vector<G4VPhysicalVolume*> argosz_phys(solids.size());
+
+  int isolid = 0;
 
   for (auto solid : mesh->GetSolids())
   {
     G4cout << "solid name: " << solid->GetName() << G4endl;
     auto logical  = new G4LogicalVolume( solid
-                                        , water
+                                        , mirrorMaterial
                                         , "logical"
                                         , 0, 0, 0
     );
 
-    logical->SetVisAttributes(G4Colour( G4UniformRand()
-                                      , G4UniformRand()
-                                      , G4UniformRand()
-                                      , 1.0 ));
-
-    new G4PVPlacement( 0
+    argosz_phys[isolid] = new G4PVPlacement( 0
                       , G4ThreeVector(0, 0, 0)
                       , logical
-                      , "physical"
+                      , solid->GetName()
                       , world_log
                       , false, 0
     );
+    isolid++;
+    if(isolid == 3) break;
   }
   /*
   //   -----  DETECTOR ARRAY  -----
@@ -431,34 +433,34 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	if (opticalSurface)
 		opticalSurface->DumpInfo();
 
-  // Lense
+  // Mirror
 
   // Create optical surface
-  G4OpticalSurface* opticalSurfaceLense = new G4OpticalSurface("MirrorSurface");
-  opticalSurfaceLense = new G4OpticalSurface("MirrorSurface", unified, polishedfrontpainted, dielectric_dielectric);
+  G4OpticalSurface* opticalSurfaceMirror = new G4OpticalSurface("MirrorSurface");
+  opticalSurfaceMirror = new G4OpticalSurface("MirrorSurface", unified, polishedfrontpainted, dielectric_dielectric);
 
   // Define reflection and transmission properties
   std::vector<G4double> reflectivity = { 0.91320,  0.91320,  0.91320,  0.91320};
   //std::vector<G4double> transmittance = {0.00, 0.00, 0.00, 0.00};
-	std::vector<G4double> refractiveIndexLense = {1.0972, 1.0972, 1.0972, 1.0972};
+	std::vector<G4double> refractiveIndexMirror = {1.0972, 1.0972, 1.0972, 1.0972};
   G4MaterialPropertiesTable* SMPT = new G4MaterialPropertiesTable();
   
-  SMPT->AddProperty("RINDEX", photonEnergyLense, refractiveIndexLense, nEntries);
-  SMPT->AddProperty("REFLECTIVITY", photonEnergyLense, reflectivity, nEntries);
-  //SMPT->AddProperty("TRANSMITTANCE", photonEnergyLense, transmittance, nEntries);
+  SMPT->AddProperty("RINDEX", photonEnergyMirror, refractiveIndexMirror, nEntries);
+  SMPT->AddProperty("REFLECTIVITY", photonEnergyMirror, reflectivity, nEntries);
+  //SMPT->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittance, nEntries);
 
-  opticalSurfaceLense->SetMaterialPropertiesTable(SMPT);
+  opticalSurfaceMirror->SetMaterialPropertiesTable(SMPT);
 
-  //G4LogicalSkinSurface* lenseSurface = new G4LogicalSkinSurface("Mirror_1", mirrorLog, opticalSurfaceLense);
-	//G4LogicalBorderSurface* lenseSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, lense_phys_1, opticalSurfaceLense);
-	//G4LogicalBorderSurface* lenseSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, lense_phys_2, opticalSurfaceLense);
+  //G4LogicalSkinSurface* mirrorSurface = new G4LogicalSkinSurface("Mirror_1", mirrorLog, opticalSurfaceMirror);
+	G4LogicalBorderSurface* mirrorSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, argosz_phys[0], opticalSurfaceMirror);
+	G4LogicalBorderSurface* mirrorSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, argosz_phys[1], opticalSurfaceMirror);
 
   /*
-  auto opticalLenseSurface = dynamic_cast<G4OpticalSurface*>(
-    lenseSurface_1->GetSurface(world_phys, lense_phys_1)->GetSurfaceProperty());
-  if(opticalLenseSurface)
+  auto opticalMirrorSurface = dynamic_cast<G4OpticalSurface*>(
+    mirrorSurface_1->GetSurface(world_phys, mirror_phys_1)->GetSurfaceProperty());
+  if(opticalMirrorSurface)
   {
-    opticalLenseSurface->DumpInfo();
+    opticalMirrorSurface->DumpInfo();
   }
   *Pre-compound excitation high energy                 30 MeV
 Angular generator for pre-compound model            1
@@ -476,12 +478,12 @@ Use SoftCutOff option for pre-compound model        0
   // Define reflection and transmission properties
   std::vector<G4double> shieldReflect = { 1.0,  1.0, 1.00, 1.00};
   //std::vector<G4double> transmittance = {0.00, 0.00, 0.00, 0.00};
-	//std::vector<G4double> refractiveIndexLense = {1.0972, 1.0972, 1.0972, 1.0972};
+	//std::vector<G4double> refractiveIndexMirror = {1.0972, 1.0972, 1.0972, 1.0972};
   G4MaterialPropertiesTable* SMPTShield = new G4MaterialPropertiesTable();
   
-  //SMPTShield->AddProperty("RINDEX", photonEnergyLense, refractiveIndexLense, nEntries);
-  SMPTShield->AddProperty("REFLECTIVITY", photonEnergyLense, shieldReflect, nEntries);
-  //SMPT->AddProperty("TRANSMITTANCE", photonEnergyLense, transmittance, nEntries);
+  //SMPTShield->AddProperty("RINDEX", photonEnergyMirror, refractiveIndexMirror, nEntries);
+  SMPTShield->AddProperty("REFLECTIVITY", photonEnergyMirror, shieldReflect, nEntries);
+  //SMPT->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittance, nEntries);
 
   opticalSurfaceShield->SetMaterialPropertiesTable(SMPTShield);
 */
