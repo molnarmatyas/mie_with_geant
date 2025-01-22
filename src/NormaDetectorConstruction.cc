@@ -44,6 +44,7 @@
 #include <G4Orb.hh>
 
 
+#include "CADMesh.hh"
 #include "G4VisAttributes.hh"
 #include "G4Tubs.hh"
 
@@ -220,6 +221,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   shieldMaterial->SetMaterialPropertiesTable(myMPT4);
 
 
+
+
 	// ------------- Volumes --------------
 	//
 	// The world
@@ -316,21 +319,21 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4RotationMatrix* rotation_1 = new G4RotationMatrix();
   rotation_1->rotateY(45.*deg);
 
-  G4VPhysicalVolume* lense_phys_1 = new G4PVPlacement(rotation_1, lensPosition, mirrorLog, "mirror1", world_log, false, 0);
+  //G4VPhysicalVolume* lense_phys_1 = new G4PVPlacement(rotation_1, lensPosition, mirrorLog, "mirror1", world_log, false, 0);
 
   lensPosition = G4ThreeVector(5*mm, 0, 0);
   G4RotationMatrix* rotation_2 = new G4RotationMatrix();
   rotation_2->rotateY(-45.*deg);
-  G4VPhysicalVolume* lense_phys_2 = new G4PVPlacement(rotation_2, lensPosition, mirrorLog, "mirror2", world_log, false, 1);
+  //G4VPhysicalVolume* lense_phys_2 = new G4PVPlacement(rotation_2, lensPosition, mirrorLog, "mirror2", world_log, false, 1);
 
   G4VisAttributes* mirrorVisAtt = new G4VisAttributes(G4Colour(0.7, 0.7, 0.7));
   mirrorVisAtt->SetForceSolid(true);
   mirrorLog->SetVisAttributes(mirrorVisAtt);
 
   //shielding
-  /*
   G4Box* shieldSolid = new G4Box("solid-shield", 2*mm, 2*mm, 0.2*mm);
   G4LogicalVolume* shieldLogical = new G4LogicalVolume(shieldSolid, shieldMaterial, "logic-shield");
+  /*
   G4VPhysicalVolume* shield_phys = new G4PVPlacement(nullptr,
                                                       G4ThreeVector(5*mm, 0, 0*mm),
                                                       shieldLogical,
@@ -338,7 +341,36 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                                                       world_log,
                                                       false,
                                                       0);
-*/
+                                                      */
+  //3D Modell
+  auto mesh = CADMesh::TessellatedMesh::FromSTL("./Argosz.obj");
+  G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;;
+  mesh->SetScale(.01);
+  std::vector<G4VSolid*> solids = mesh->GetSolids();
+  G4cout << "solid name: " << solids[2]->GetName() << G4endl;
+
+  for (auto solid : mesh->GetSolids())
+  {
+    G4cout << "solid name: " << solid->GetName() << G4endl;
+    auto logical  = new G4LogicalVolume( solid
+                                        , water
+                                        , "logical"
+                                        , 0, 0, 0
+    );
+
+    logical->SetVisAttributes(G4Colour( G4UniformRand()
+                                      , G4UniformRand()
+                                      , G4UniformRand()
+                                      , 1.0 ));
+
+    new G4PVPlacement( 0
+                      , G4ThreeVector(0, 0, 0)
+                      , logical
+                      , "physical"
+                      , world_log
+                      , false, 0
+    );
+  }
   /*
   //   -----  DETECTOR ARRAY  -----
   //
@@ -418,8 +450,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   opticalSurfaceLense->SetMaterialPropertiesTable(SMPT);
 
   //G4LogicalSkinSurface* lenseSurface = new G4LogicalSkinSurface("Mirror_1", mirrorLog, opticalSurfaceLense);
-	G4LogicalBorderSurface* lenseSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, lense_phys_1, opticalSurfaceLense);
-	G4LogicalBorderSurface* lenseSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, lense_phys_2, opticalSurfaceLense);
+	//G4LogicalBorderSurface* lenseSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, lense_phys_1, opticalSurfaceLense);
+	//G4LogicalBorderSurface* lenseSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface", world_phys, lense_phys_2, opticalSurfaceLense);
 
   /*
   auto opticalLenseSurface = dynamic_cast<G4OpticalSurface*>(
@@ -428,14 +460,18 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   {
     opticalLenseSurface->DumpInfo();
   }
-  */
+  *Pre-compound excitation high energy                 30 MeV
+Angular generator for pre-compound model            1
+Use NeverGoBack option for pre-compound model       0
+Use SoftCutOff option for pre-compound model        0
+/
 
   // Shield
   /*
   G4OpticalSurface* opticalSurfaceShield = new G4OpticalSurface("ShieldSurface");
   opticalSurfaceShield = new G4OpticalSurface("ShieldSurface", unified, ground, dielectric_dielectric);
 
-  G4LogicalBorderSurface shieldSurface = new G4LogicalBorderSurface("ShieldBorderSurface", world_phys, shield_phys , opticalSurfaceShield);
+  G4LogicalBorderSurface* shieldSurface = new G4LogicalBorderSurface("ShieldBorderSurface", world_phys, shield_phys , opticalSurfaceShield);
 
   // Define reflection and transmission properties
   std::vector<G4double> shieldReflect = { 1.0,  1.0, 1.00, 1.00};
@@ -449,7 +485,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   opticalSurfaceShield->SetMaterialPropertiesTable(SMPTShield);
 */
-
 
 	////////////////////////////////////////////////////////////////////////////
 	// test user-defined properties
