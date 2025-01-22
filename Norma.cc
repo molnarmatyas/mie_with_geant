@@ -237,7 +237,7 @@ int main(int argc, char **argv)
 	}
 	else // Define UI session for interactive mode
 	{
-		UImanager->ApplyCommand("/control/execute vis.mac");
+		UImanager->ApplyCommand("/control/execute simplevis.mac");
 		ui->SessionStart();
 		delete ui;
 	}

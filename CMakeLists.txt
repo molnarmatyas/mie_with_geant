@@ -52,9 +52,11 @@ set(Norma_SCRIPTS
     optPhoton.mac
     gui.mac
     vis.mac
+    simplevis.mac
     run2.mac
     diff_cross_0-180_10000pt.txt
     dhkm_7_1592_1.txt
+    Argosz.obj
   )
 
 foreach(_script ${Norma_SCRIPTS})
