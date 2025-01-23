@@ -254,12 +254,12 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 	if (isPolycone)
 	{
-		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(1.425 * cm, 9.624 * cm, -13.75 * cm), bubbleWP_log,
+		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.49 * mm, 96.2425 * mm, -137.51 * mm), bubbleWP_log,
 										"Bubble_dis_bnd_proc", world_log, false, 0);
 	}
 	else
 	{
-		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(1.425 * cm, 9.624 * cm, -13.75 * cm), bubbleW_log,
+		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.49 * mm, 96.2425 * mm, -137.51 * mm), bubbleW_log,
 										"Bubble_dis_bnd_proc", world_log, false, 0);
 	}
 
@@ -345,7 +345,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                                                       0);
                                                       */
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromSTL("./Argosz.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids = mesh->GetSolids();
@@ -371,7 +371,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                       , false, 0
     );
     isolid++;
-    if(isolid == 3) break;
+    if(isolid == 5) break;
   }
   /*
   //   -----  DETECTOR ARRAY  -----
