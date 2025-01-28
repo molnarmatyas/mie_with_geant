@@ -186,7 +186,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	air->SetMaterialPropertiesTable(myMPT0);
 
 
-  // Mirror
+  // Mirror material
   auto mirrorMaterial = nist->FindOrBuildMaterial("G4_Al");
   
   G4MaterialPropertiesTable* myMPT3 = new G4MaterialPropertiesTable();
@@ -221,6 +221,21 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   shieldMaterial->SetMaterialPropertiesTable(myMPT4);
+
+  
+  // Aspherical lens - B270 material, https://www.schott.com/en-us/products/b-270-p1000313/technical-details
+	// https://refractiveindex.info/?shelf=specs&book=SCHOTT-misc&page=B270
+  G4Material* lensMaterial = new G4Material("B270", 2.56*g/cm3, 1);
+  lensMaterial->AddMaterial(nist->FindOrBuildMaterial("G4_Pyrex_Glass"), 1.0); // should do it for now
+  G4MaterialPropertiesTable* myMPT5 = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexLens = {1.52, 1.52, 1.52, 1.52};
+  myMPT5->AddProperty("RINDEX", photonEnergyMirror, rindexLens, nEntries);
+
+  std::vector<G4double> absLengthLens = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
+  myMPT5->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthLens, false, false);
+
+  lensMaterial->SetMaterialPropertiesTable(myMPT5);
 
 
 
@@ -296,7 +311,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 														screenD_log, "ScreenD", world_log, false, 0);
 
 
-  //Mirror
+  //Mirror instances (2x) deprec. FOR TESTING PURPOSES
   
   G4double radius = 1.0*mm;
   G4double thickness = 0.1*mm;
@@ -352,13 +367,38 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   std::vector<G4VPhysicalVolume*> argosz_phys(solids.size());
 
-  int isolid = 0;
+	std::vector<G4Material*> argosz_mat(solids.size());
 
+  /* 1 -> 16
+  solid name: beam_splitter
+  solid name: mirror
+  solid name: COHERENT_MINI-701L-660S
+  solid name: Hellma_flowcell_131-814-40
+  solid name: ACL12708U
+  solid name: GS3-U3-23S6M-C_sensor
+  solid name: BST04_BeamSplitter
+  solid name: Direct_beam_stop_2
+  solid name: vbpw34s_1
+  solid name: vbpw34s_2
+  solid name: LB1258-A
+  solid name: LA_Mirror
+  solid name: LA_HA_mirror
+  solid name: Direct_beam_stop
+  solid name: HA_mirror
+  solid name: GS3-U3-23S6M-C_sensor_housing
+  */
+ argosz_mat[0] = mirrorMaterial;
+ argosz_mat[1] = mirrorMaterial;
+ argosz_mat[2] = mirrorMaterial;
+ argosz_mat[3] = lensMaterial; // let us try this, larger abs. length
+ argosz_mat[4] = lensMaterial;
+
+  int isolid = 0;
   for (auto solid : mesh->GetSolids())
   {
     G4cout << "solid name: " << solid->GetName() << G4endl;
     auto logical  = new G4LogicalVolume( solid
-                                        , mirrorMaterial
+                                        , argosz_mat[isolid]
                                         , "logical"
                                         , 0, 0, 0
     );
@@ -371,8 +411,11 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                       , false, 0
     );
     isolid++;
-    if(isolid == 5) break;
+    if(isolid == 5) break; // stop when "ACL12708U" loaded
   }
+
+
+
   /*
   //   -----  DETECTOR ARRAY  -----
   //
@@ -487,6 +530,27 @@ Use SoftCutOff option for pre-compound model        0
 
   opticalSurfaceShield->SetMaterialPropertiesTable(SMPTShield);
 */
+
+  // Lens
+	// Create optical surface
+  G4OpticalSurface* opticalSurfaceLens = new G4OpticalSurface("LensSurface");
+  opticalSurfaceLens = new G4OpticalSurface("LensSurface", unified, polished, dielectric_dielectric);
+
+  // Define reflection and transmission properties
+  std::vector<G4double> transmittanceLens = {0.99,  0.99,  0.99,  0.99};//{0.91320,  0.91320,  0.91320,  0.91320};
+  std::vector<G4double> reflectivityLens = {0.01, 0.01, 0.01, 0.01};//{0.00, 0.00, 0.00, 0.00};
+	std::vector<G4double> refractiveIndexLens = {1.52, 1.52, 1.52, 1.52};//{1.0972, 1.0972, 1.0972, 1.0972};
+  G4MaterialPropertiesTable* SMPTlens = new G4MaterialPropertiesTable();
+  
+  SMPTlens->AddProperty("RINDEX", photonEnergyMirror, refractiveIndexLens, nEntries);
+  SMPTlens->AddProperty("REFLECTIVITY", photonEnergyMirror, reflectivityLens, nEntries);
+  SMPTlens->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceLens, nEntries);
+
+  opticalSurfaceLens->SetMaterialPropertiesTable(SMPTlens);
+
+	G4LogicalBorderSurface* lensSurface1 = new G4LogicalBorderSurface("LensBorderSurface", world_phys, argosz_phys[3], opticalSurfaceLens);
+	G4LogicalBorderSurface* lensSurface2 = new G4LogicalBorderSurface("LensBorderSurface", world_phys, argosz_phys[4], opticalSurfaceLens);
+
 
 	////////////////////////////////////////////////////////////////////////////
 	// test user-defined properties
