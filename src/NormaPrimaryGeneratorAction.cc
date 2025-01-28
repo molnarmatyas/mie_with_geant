@@ -58,11 +58,13 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 	G4double y = (0.0);// - (1.5 * CLHEP::um));
 	// std::cout<<"startpos photon "<<y/CLHEP::um<<std::endl;
 	//fParticleGun->SetParticlePosition(G4ThreeVector(-17 * CLHEP::um, y, 0*mm));
-	fParticleGun->SetParticlePosition(G4ThreeVector(-29.35 * CLHEP::mm, 96.075 * CLHEP::mm, -157.84 * CLHEP::mm));
+//	fParticleGun->SetParticlePosition(G4ThreeVector(-29.35 * CLHEP::mm, 96.075 * CLHEP::mm, -157.84 * CLHEP::mm));
+	fParticleGun->SetParticlePosition(G4ThreeVector(14.49 * mm, 96.2425 * mm, -137.51 * mm));
+		
 	G4double dy = (G4UniformRand() - 0.5) * 0.1;
 	G4double dz = (G4UniformRand() - 0.5) * 0.1;
 	// fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., dy, dz));
-	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(-1., 0, 0));
+	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., 0, 0));
 	fParticleGun->SetParticleEnergy(1.884 * eV);
   //G4cout << "Gun from " << fParticleGun->GetParticlePosition().x() << ", " << fParticleGun->GetParticlePosition().y() << ", " << fParticleGun->GetParticlePosition().z() << G4endl; 
 

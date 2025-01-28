@@ -86,14 +86,13 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	G4NistManager *nist = G4NistManager::Instance();
 	G4Material *sil = nist->FindOrBuildMaterial("G4_Si");
 
-  G4Material* galactic = nist->FindOrBuildMaterial("G4_Galactic");
 
 	// ------------ Generate & Add Material Properties Table ------------
 	//
   std::vector<G4double> photonEnergy ={0.01 * eV, 0.1 * eV, 1. * eV, 10. * eV};
   const G4int nEntries = 4;
   std::vector<G4double> absorptionLength ={1.*m, 1.*m, 1.*m, 1.*m};
-  std::vector<G4double> refractiveIndexWorld ={1.331, 1.331, 1.331, 1.331};
+  std::vector<G4double> refractiveIndexWorld ={1., 1., 1., 1.};
 
 	// Water
 	// Material properties can be added as arrays. However, in this case it is
@@ -369,6 +368,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids = mesh->GetSolids();
 
+  std::vector<G4LogicalVolume*> argosz_log(solids.size());
   std::vector<G4VPhysicalVolume*> argosz_phys(solids.size());
 
 	std::vector<G4Material*> argosz_mat(solids.size());
@@ -401,19 +401,20 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   for (auto solid : mesh->GetSolids())
   {
     G4cout << "solid name: " << solid->GetName() << G4endl;
-    auto logical  = new G4LogicalVolume( solid
+    argosz_log[isolid]  = new G4LogicalVolume( solid
                                         , argosz_mat[isolid]
                                         , "logical"
                                         , 0, 0, 0
     );
-
-    argosz_phys[isolid] = new G4PVPlacement( 0
-                      , G4ThreeVector(0, 0, 0)
-                      , logical
-                      , solid->GetName()
-                      , world_log
-                      , false, 0
-    );
+    if(isolid != 3) {
+      argosz_phys[isolid] = new G4PVPlacement( 0
+                        , G4ThreeVector(0, 0, 0)
+                        , argosz_log[isolid]
+                        , solid->GetName()
+                        , world_log
+                        , false, 0
+      );
+    }
     isolid++;
     if(isolid == 5) break; // stop when "ACL12708U" loaded
   }
@@ -538,7 +539,7 @@ Use SoftCutOff option for pre-compound model        0
   // Lens
 	// Create optical surface
   G4OpticalSurface* opticalSurfaceLens = new G4OpticalSurface("LensSurface");
-  opticalSurfaceLens = new G4OpticalSurface("LensSurface", unified, polished, dielectric_dielectric);
+  opticalSurfaceLens = new G4OpticalSurface("LensSurface", unified, ground, dielectric_dielectric);
 
   // Define reflection and transmission properties
   std::vector<G4double> transmittanceLens = {0.99,  0.99,  0.99,  0.99};//{0.91320,  0.91320,  0.91320,  0.91320};
@@ -553,6 +554,8 @@ Use SoftCutOff option for pre-compound model        0
   opticalSurfaceLens->SetMaterialPropertiesTable(SMPTlens);
 
 	G4LogicalBorderSurface* lensSurface1 = new G4LogicalBorderSurface("LensBorderSurface", world_phys, argosz_phys[3], opticalSurfaceLens);
+  //G4LogicalSkinSurface* lensSurface2 = new G4LogicalSkinSurface("LensSkinSurface", argosz_log[4], opticalSurfaceLens);
+  
 	G4LogicalBorderSurface* lensSurface2 = new G4LogicalBorderSurface("LensBorderSurface", world_phys, argosz_phys[4], opticalSurfaceLens);
 
 
