@@ -92,7 +92,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   std::vector<G4double> photonEnergy ={0.01 * eV, 0.1 * eV, 1. * eV, 10. * eV};
   const G4int nEntries = 4;
   std::vector<G4double> absorptionLength ={1.*m, 1.*m, 1.*m, 1.*m};
-  std::vector<G4double> refractiveIndexWorld ={1., 1., 1., 1.};
+  std::vector<G4double> refractiveIndexWorld ={1.000277, 1.000277, 1.000277, 1.000277}; // instead of 1.331
 
 	// Water
 	// Material properties can be added as arrays. However, in this case it is
@@ -403,7 +403,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
     G4cout << "solid name: " << solid->GetName() << G4endl;
     argosz_log[isolid]  = new G4LogicalVolume( solid
                                         , argosz_mat[isolid]
-                                        , "logical"
+                                        , solid->GetName()//"logical"
                                         , 0, 0, 0
     );
     if(isolid != 3) {
@@ -551,7 +551,8 @@ Use SoftCutOff option for pre-compound model        0
   SMPTlens->AddProperty("REFLECTIVITY", photonEnergyMirror, reflectivityLens, nEntries);
   SMPTlens->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceLens, nEntries);
 
-  opticalSurfaceLens->SetMaterialPropertiesTable(SMPTlens);
+  //myMPT5->AddProperty("REFLECTIVITY", photonEnergyMirror, reflectivityLens, nEntries);
+  opticalSurfaceLens->SetMaterialPropertiesTable(SMPTlens);//myMPT5);
 
 	G4LogicalBorderSurface* lensSurface1 = new G4LogicalBorderSurface("LensBorderSurface", world_phys, argosz_phys[3], opticalSurfaceLens);
   //G4LogicalSkinSurface* lensSurface2 = new G4LogicalSkinSurface("LensSkinSurface", argosz_log[4], opticalSurfaceLens);

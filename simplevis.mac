@@ -27,8 +27,8 @@
 # Add transparency (optional for complex geometries)
 /vis/scene/add/trajectories smooth
 /vis/scene/endOfEventAction accumulate
-/vis/geometry/set/visibility World 1   # Make the world volume visible (optional)
-/vis/geometry/set/visibility World 0   # Alternatively, hide it
+/vis/geometry/set/visibility World 1  # Make the world volume visible (optional)
+/vis/geometry/set/visibility World 0 false  # Alternatively, hide it
 /vis/viewer/set/lineSegmentsPerCircle 100
 # Turning off visibility for certain volumes:
 /vis/geometry/set/visibility Screen 0 false
@@ -37,6 +37,7 @@
 /vis/geometry/set/visibility ScreenD 0 false
 /vis/geometry/set/visibility ScreenL 0 false
 /vis/geometry/set/visibility ScreenR 0 false
+/vis/geometry/set/colour Hellma_flowcell_131-814-40 0 255 255 255 30 # why does not this work?
 #
 
 # Background color
