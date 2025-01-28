@@ -30,7 +30,14 @@
 /vis/geometry/set/visibility World 1   # Make the world volume visible (optional)
 /vis/geometry/set/visibility World 0   # Alternatively, hide it
 /vis/viewer/set/lineSegmentsPerCircle 100
-
+# Turning off visibility for certain volumes:
+/vis/geometry/set/visibility Screen 0 false
+/vis/geometry/set/visibility ScreenB 0 false
+/vis/geometry/set/visibility ScreenU 0 false
+/vis/geometry/set/visibility ScreenD 0 false
+/vis/geometry/set/visibility ScreenL 0 false
+/vis/geometry/set/visibility ScreenR 0 false
+#
 
 # Background color
 /vis/viewer/set/background 0 0 0  # Black background (R G B format)

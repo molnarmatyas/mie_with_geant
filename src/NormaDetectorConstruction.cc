@@ -235,6 +235,10 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   std::vector<G4double> absLengthLens = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
   myMPT5->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthLens, false, false);
 
+  std::vector<G4double> transmittanceB270 = {0.99,  0.99,  0.99,  0.99};//{0.91320,  0.91320,  0.91320,  0.91320};
+	myMPT5->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceB270, nEntries);
+
+
   lensMaterial->SetMaterialPropertiesTable(myMPT5);
 
 
