@@ -34,6 +34,7 @@
 build/*
 figs/*
 geant4-*
+.vscode/*
 
 # Compiled source #
 ###################
