@@ -300,7 +300,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_sensorupdate.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids = mesh->GetSolids();
@@ -311,29 +311,29 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	std::vector<G4Material*> argosz_mat(solids.size());
 
   /* 1 -> 16
-  solid name: beam_splitter
-  solid name: mirror
-  solid name: COHERENT_MINI-701L-660S
-  solid name: Hellma_flowcell_131-814-40
-  solid name: ACL12708U
-  solid name: GS3-U3-23S6M-C_sensor
-  solid name: BST04_BeamSplitter
-  solid name: Direct_beam_stop_2
-  solid name: vbpw34s_1
-  solid name: vbpw34s_2
-  solid name: LB1258-A
-  solid name: LA_Mirror
-  solid name: LA_HA_mirror
-  solid name: Direct_beam_stop
-  solid name: HA_mirror
-  solid name: GS3-U3-23S6M-C_sensor_housing
+  0 - solid name: beam_splitter
+  1 - solid name: mirror
+  2 - solid name: COHERENT_MINI-701L-660S
+  3 - solid name: Hellma_flowcell_131-814-40
+  4 - solid name: ACL12708U
+  5 - solid name: GS3-U3-23S6M-C_sensor
+  6 - solid name: BST04_BeamSplitter
+  7 - solid name: Direct_beam_stop_2
+  8 - solid name: vbpw34s_1
+  9 - solid name: vbpw34s_2
+  10 - solid name: LB1258-A
+  11 - solid name: LA_Mirror
+  12 - solid name: LA_HA_mirror
+  13 - solid name: Direct_beam_stop
+  14 - solid name: HA_mirror
+  15 - solid name: GS3-U3-23S6M-C_sensor_housing
   */
  argosz_mat[0] = mirrorMaterial;
  argosz_mat[1] = mirrorMaterial;
  argosz_mat[2] = mirrorMaterial;
  argosz_mat[3] = lensMaterial; // let us try this, larger abs. length
  argosz_mat[4] = lensMaterial;
- argosz_mat[5] = lensMaterial;
+ argosz_mat[5] = sil;
  argosz_mat[6] = lensMaterial;
  argosz_mat[7] = shieldMaterial;
  argosz_mat[8] = lensMaterial;
@@ -364,7 +364,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
       );
     }
     isolid++;
-    //if(isolid == 8) break; // stop when "ACL12708U" loaded
+    if(isolid == 15) break; // stop when "ACL12708U" loaded
   }
 
 

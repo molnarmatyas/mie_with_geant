@@ -232,7 +232,7 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 
 
 	if (prevolume->GetName() == "world" &&
-		((postvolume->GetName() == "Screen")/* || (postvolume->GetName() == "ScreenB") ||
+		((postvolume->GetName() == "GS3-U3-23S6M-C_sensor")/* || (postvolume->GetName() == "ScreenB") ||
 		 (postvolume->GetName() == "ScreenL") || (postvolume->GetName() == "ScreenR") ||
 		 (postvolume->GetName() == "ScreenU") || (postvolume->GetName() == "ScreenD")*/))
 	{
