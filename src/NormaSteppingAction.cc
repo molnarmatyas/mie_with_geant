@@ -87,10 +87,12 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 			if (process->GetProcessName() == "OpMieHG")
 			{
 				mieProcess = dynamic_cast<G4OpMieHG *>(process);
+        /*
 				if (mieProcess)
 				{
 					G4cout << "Mie process found" << G4endl;
 				}
+        */
 			}
 		}
 	}
@@ -141,9 +143,9 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 
   G4double alpha = momdir.angle(momentumdirection);
 
-  G4cout << "PrimVertex from " << gunPosX << ", " << gunPosY << ", " << gunPosZ << G4endl; 
+//  G4cout << "PrimVertex from " << gunPosX << ", " << gunPosY << ", " << gunPosZ << G4endl; 
 
-	G4cout << "MomentumDirTheta Phi: " << theta << " | " << phi << G4endl;
+	//G4cout << "MomentumDirTheta Phi: " << theta << " | " << phi << G4endl;
 
 	G4double phi2;
 	G4double theta2;
@@ -205,7 +207,7 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 		if (mieProcess)
 		{
 			mieProcess->ResetMieCounter();
-			G4cout << "Mie counter explicitly reset to zero" << G4endl;
+			//G4cout << "Mie counter explicitly reset to zero" << G4endl;
 		}
 	}
   G4ThreeVector Vn = G4ThreeVector(1, 1, 1);
@@ -230,7 +232,7 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 
 
 	if (prevolume->GetName() == "world" &&
-		((postvolume->GetName() == "Screen")/* || (postvolume->GetName() == "ScreenB") ||
+		((postvolume->GetName() == "GS3-U3-23S6M-C_sensor")/* || (postvolume->GetName() == "ScreenB") ||
 		 (postvolume->GetName() == "ScreenL") || (postvolume->GetName() == "ScreenR") ||
 		 (postvolume->GetName() == "ScreenU") || (postvolume->GetName() == "ScreenD")*/))
 	{

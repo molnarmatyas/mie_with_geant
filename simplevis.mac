@@ -18,7 +18,7 @@
 /vis/viewer/set/lineSegmentsPerCircle 100  # Improve tessellation resolution for curves
 
 # Set view angle and orientation
-/vis/viewer/set/viewpointThetaPhi 70 30  # Adjust angles as needed
+/vis/viewer/set/viewpointThetaPhi 0 0  # Adjust angles as needed
 /vis/viewer/set/upVector 0 1 0           # Set the up direction (Y-axis in this case)
 
 # Zoom to fit the entire scene
@@ -27,7 +27,6 @@
 # Add transparency (optional for complex geometries)
 /vis/scene/add/trajectories smooth
 /vis/scene/endOfEventAction accumulate
-/vis/geometry/set/visibility World 1  # Make the world volume visible (optional)
 /vis/geometry/set/visibility World 0 false  # Alternatively, hide it
 /vis/viewer/set/lineSegmentsPerCircle 100
 # Turning off visibility for certain volumes:

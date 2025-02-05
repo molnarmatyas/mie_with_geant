@@ -56,7 +56,7 @@ set(Norma_SCRIPTS
     run2.mac
     diff_cross_0-180_10000pt.txt
     dhkm_7_1592_1.txt
-    Argosz.obj
+    Argosz_sensorupdate.obj
   )
 
 foreach(_script ${Norma_SCRIPTS})
