@@ -6,8 +6,8 @@
 
 void txtToHist() {
     // Input text file path
-    std::string filename = "../build/output3500_990_0_149.txt";
-    std::string outputprefix = "shield_02mm";
+    std::string filename = "../build/output3500_990_0.txt";
+    std::string outputprefix = "3D_modell_camera_test_1";
     
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi());
@@ -16,8 +16,8 @@ void txtToHist() {
     TH1D* dhPosX = new TH1D("dhPosX", "dhPosX", 1000, 0, 10);
     TH1D* dhPosY = new TH1D("dhPosY", "dhPosY", 1000, 0, 10);
     TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 10);
-    TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 1000, -5, 5, 1000, -5, 5);
-    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [pixel]", 1000, 0, TMath::Pi()/2.0, 1000, 0, 15 * 200);
+    TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 100, -10, 10, 100, -10, 10);
+    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [pixel]", 1000, 0, TMath::Pi() / 2.0, 1000, 0, 7.5 * 200);
     TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
     
@@ -27,6 +27,15 @@ void txtToHist() {
         std::cerr << "Error opening file: " << filename << std::endl;
         return;
     }
+    double x_min = 8.478684;
+    double y_min = 92.734001;
+    double z_min = -107.531036;
+    double x_max = 18.715816;
+    double y_max = 99.765999;
+    double z_max = -101.050804;
+    double x_center = (x_min + x_max ) / 2.0;
+    double y_center = (y_min + y_max ) / 2.0;
+    double z_center = (z_min + z_max ) / 2.0;
     
     // Read file line by line
     std::string line;
@@ -39,25 +48,31 @@ void txtToHist() {
         // Parse the line
         std::istringstream iss(line);
         double theta3, genTheta, R, postX, postY, postZ, alpha, alpha_man;
+        double localR, localpostX, localpostY, localpostZ;
         
         // Read all 6 columns
         if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ >> alpha >> alpha_man)) {
             std::cerr << "Error parsing line: " << line << std::endl;
             continue;
         }
+        localpostX = (x_center - postX);
+        localpostY = (y_center - postY);
+        localpostZ = (z_center - postZ);
+        
+        localR = sqrt(localpostY * localpostY + localpostZ * localpostZ);
         
         // Fill the histogram with the last two columns
         dhTheta->Fill(theta3);
         dhGenTheta->Fill(genTheta);
-        dhR->Fill(R * 200.0);
-        dhPosX->Fill(postX);
-        dhPosY->Fill(postY);
-        dhPosZ->Fill(postZ);
+        dhR->Fill(localR * 200.0);
+        dhPosX->Fill(localpostX);
+        dhPosY->Fill(localpostY);
+        dhPosZ->Fill(localpostZ);
         dhXSect->Fill(theta3);
-        dhR_alpha->Fill(alpha, R * 200.0);
+        dhR_alpha->Fill(genTheta, localR * 200.0);
         dhtheta_alpha->Fill(theta3, alpha);
-        dh2D_yz->Fill(postZ, postY);
-        dh2D_rx_tantheta->Fill(R / postX, std::tan(theta3));
+        dh2D_yz->Fill(localpostZ, localpostY);
+        dh2D_rx_tantheta->Fill(localR / localpostX, std::tan(theta3));
     }
 //  dh2D_yz->GetZaxis()->SetRangeUser(0,10);
     TF1* oneoversin = new TF1("oneoversin","1/sin(x)");
@@ -86,7 +101,7 @@ void txtToHist() {
     TCanvas* c1 = new TCanvas("c1", "", 800, 800);
     gStyle->SetOptStat(0);
     dhR_alpha->Draw("COLZ");
-    Ltanalpha->Draw("same");
+    //Ltanalpha->Draw("same");
     c1->SaveAs(Form("%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
 
     //gStyle->SetCanvasDefH(550);
