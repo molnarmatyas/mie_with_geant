@@ -228,14 +228,14 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   lensMaterial->AddMaterial(nist->FindOrBuildMaterial("G4_Pyrex_Glass"), 1.0); // should do it for now
   G4MaterialPropertiesTable* myMPT5 = new G4MaterialPropertiesTable();
 
-  std::vector<G4double> rindexLens = {1.52, 1.52, 1.52, 1.52};
+  std::vector<G4double> rindexLens = {1.5203, 1.5203, 1.5203, 1.5203};
   myMPT5->AddProperty("RINDEX", photonEnergyMirror, rindexLens, nEntries);
 
   std::vector<G4double> absLengthLens = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
   myMPT5->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthLens, false, false);
 
   std::vector<G4double> transmittanceB270 = {0.99,  0.99,  0.99,  0.99};//{0.91320,  0.91320,  0.91320,  0.91320};
-	myMPT5->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceB270, nEntries);
+	//myMPT5->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceB270, nEntries);
 
 
   lensMaterial->SetMaterialPropertiesTable(myMPT5);
@@ -539,7 +539,7 @@ Use SoftCutOff option for pre-compound model        0
   // Lens
 	// Create optical surface
   G4OpticalSurface* opticalSurfaceLens = new G4OpticalSurface("LensSurface");
-  opticalSurfaceLens = new G4OpticalSurface("LensSurface", unified, ground, dielectric_dielectric);
+  opticalSurfaceLens = new G4OpticalSurface("LensSurface", unified, polished, dielectric_dielectric);
 
   // Define reflection and transmission properties
   std::vector<G4double> transmittanceLens = {0.99,  0.99,  0.99,  0.99};//{0.91320,  0.91320,  0.91320,  0.91320};
@@ -547,17 +547,18 @@ Use SoftCutOff option for pre-compound model        0
 	std::vector<G4double> refractiveIndexLens = {1.52, 1.52, 1.52, 1.52};//{1.0972, 1.0972, 1.0972, 1.0972};
   G4MaterialPropertiesTable* SMPTlens = new G4MaterialPropertiesTable();
   
-  SMPTlens->AddProperty("RINDEX", photonEnergyMirror, refractiveIndexLens, nEntries);
+  //SMPTlens->AddProperty("RINDEX", photonEnergyMirror, refractiveIndexLens, nEntries);
   SMPTlens->AddProperty("REFLECTIVITY", photonEnergyMirror, reflectivityLens, nEntries);
   SMPTlens->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceLens, nEntries);
 
   //myMPT5->AddProperty("REFLECTIVITY", photonEnergyMirror, reflectivityLens, nEntries);
-  opticalSurfaceLens->SetMaterialPropertiesTable(SMPTlens);//myMPT5);
+  //opticalSurfaceLens->SetMaterialPropertiesTable(SMPTlens);//myMPT5);
 
-	G4LogicalBorderSurface* lensSurface1 = new G4LogicalBorderSurface("LensBorderSurface", world_phys, argosz_phys[3], opticalSurfaceLens);
-  //G4LogicalSkinSurface* lensSurface2 = new G4LogicalSkinSurface("LensSkinSurface", argosz_log[4], opticalSurfaceLens);
+	G4LogicalBorderSurface* lensSurfaceIN = new G4LogicalBorderSurface("LensBorderSurfaceIN", world_phys, argosz_phys[4], opticalSurfaceLens);
+  G4LogicalBorderSurface* lensSurfaceOUT = new G4LogicalBorderSurface("LensBorderSurfaceOUT", argosz_phys[4], world_phys, opticalSurfaceLens);
+	//G4LogicalSkinSurface* lensSurface2 = new G4LogicalSkinSurface("LensSkinSurface", argosz_log[4], opticalSurfaceLens);
   
-	G4LogicalBorderSurface* lensSurface2 = new G4LogicalBorderSurface("LensBorderSurface", world_phys, argosz_phys[4], opticalSurfaceLens);
+	G4LogicalBorderSurface* flowcellSurface = new G4LogicalBorderSurface("FlowCellBorderSurface", world_phys, argosz_phys[3], opticalSurfaceLens);
 
 
 	////////////////////////////////////////////////////////////////////////////
