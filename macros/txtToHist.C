@@ -3,6 +3,7 @@
 #include <string>
 #include <TH2D.h>
 #include <TFile.h>
+#include <TMath.h>
 
 void txtToHist() {
     // Input text file path
@@ -17,9 +18,11 @@ void txtToHist() {
     TH1D* dhPosY = new TH1D("dhPosY", "dhPosY", 1000, 0, 10);
     TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 10);
     TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 100, -10, 10, 100, -10, 10);
+    TH2D* dh2D_xy = new TH2D("dh2D_xy", "; X [mm]; Y [mm]", 150, -6, 6, 120, -4, 4);
     TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [pixel]", 1000, 0, TMath::Pi() / 2.0, 1000, 0, 7.5 * 200);
     TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
+    TH3D* dh3D_xyz = new TH3D("dh3D_xyz", "; X [mm]; Y [mm]; Z [mm]", 100,5,20, 100,90,100, 100,-110,-100);
     
     // Open the input file
     std::ifstream infile(filename);
@@ -36,6 +39,12 @@ void txtToHist() {
     double x_center = (x_min + x_max ) / 2.0;
     double y_center = (y_min + y_max ) / 2.0;
     double z_center = (z_min + z_max ) / 2.0;
+
+    // Define rotation angle (convert to radians)
+    //double M_PI = TMath::Pi();
+    double theta = 25.0 * M_PI / 180.0; // FIXME this is not the real angle; how on earth can I measure angle in FreeCAD??? 
+    double cosTheta = TMath::Cos(theta);
+    double sinTheta = TMath::Sin(theta);
     
     // Read file line by line
     std::string line;
@@ -55,9 +64,20 @@ void txtToHist() {
             std::cerr << "Error parsing line: " << line << std::endl;
             continue;
         }
-        localpostX = (x_center - postX);
-        localpostY = (y_center - postY);
-        localpostZ = (z_center - postZ);
+
+        // Translate to local origin
+        double shiftedX = postX - x_center;
+        double shiftedZ = postZ - z_center;
+
+        // Apply 2D rotation in the XZ plane
+        localpostX = cosTheta * shiftedX + sinTheta * shiftedZ;
+        localpostZ = -sinTheta * shiftedX + cosTheta * shiftedZ;
+        // Y is not affected by rotation
+        localpostY = postY - y_center;
+
+        //localpostX = (x_center - postX);
+        //localpostY = (y_center - postY);
+        //localpostZ = (z_center - postZ);
         
         localR = sqrt(localpostY * localpostY + localpostZ * localpostZ);
         
@@ -72,6 +92,8 @@ void txtToHist() {
         dhR_alpha->Fill(genTheta, localR * 200.0);
         dhtheta_alpha->Fill(theta3, alpha);
         dh2D_yz->Fill(localpostZ, localpostY);
+        dh2D_xy->Fill(localpostX, localpostY);
+        dh3D_xyz->Fill(postX,postY,postZ);
         dh2D_rx_tantheta->Fill(localR / localpostX, std::tan(theta3));
     }
 //  dh2D_yz->GetZaxis()->SetRangeUser(0,10);
@@ -126,9 +148,11 @@ void txtToHist() {
     dhPosY->Write();
     dhPosZ->Write();
     dh2D_yz->Write();
+    dh2D_xy->Write();
     dhR_alpha->Write();
     dhtheta_alpha->Write();
     dh2D_rx_tantheta->Write();
+    dh3D_xyz->Write();
 
     outfile->Close();
 }

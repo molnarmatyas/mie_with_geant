@@ -364,7 +364,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
       );
     }
     isolid++;
-    if(isolid == 15) break; // stop when "ACL12708U" loaded
+    if(isolid == 15) break;
   }
 
 
