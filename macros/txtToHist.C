@@ -17,14 +17,9 @@ void txtToHist() {
     TH1D* dhPosX = new TH1D("dhPosX", "dhPosX", 1000, 0, 10);
     TH1D* dhPosY = new TH1D("dhPosY", "dhPosY", 1000, 0, 10);
     TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 10);
-<<<<<<< HEAD
     TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 500, -10, 10, 500, -10, 10);
-    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [mm]", 1000, 0, 180, 1000, 0, 7.5);
-=======
-    TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 100, -10, 10, 100, -10, 10);
     TH2D* dh2D_xy = new TH2D("dh2D_xy", "; X [mm]; Y [mm]", 150, -6, 6, 120, -4, 4);
-    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [pixel]", 1000, 0, TMath::Pi() / 2.0, 1000, 0, 7.5 * 200);
->>>>>>> e75e5381398fa40a66d16846746e01af544e54b0
+    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [mm]", 1000, 0, 180, 1000, 0, 7.5);
     TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
     TH3D* dh3D_xyz = new TH3D("dh3D_xyz", "; X [mm]; Y [mm]; Z [mm]", 100,5,20, 100,90,100, 100,-110,-100);
