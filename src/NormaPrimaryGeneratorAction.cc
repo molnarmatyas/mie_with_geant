@@ -59,7 +59,7 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 	// std::cout<<"startpos photon "<<y/CLHEP::um<<std::endl;
 	//fParticleGun->SetParticlePosition(G4ThreeVector(-17 * CLHEP::um, y, 0*mm));
 //	fParticleGun->SetParticlePosition(G4ThreeVector(-29.35 * CLHEP::mm, 96.075 * CLHEP::mm, -157.84 * CLHEP::mm)); //laser
-	fParticleGun->SetParticlePosition(G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm)); //14.49 //center of cell
+	fParticleGun->SetParticlePosition(G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.0725 * mm)); //14.49 //center of cell
 		
 	G4double dy = (G4UniformRand() - 0.5) * 0.1;
 	G4double dz = (G4UniformRand() - 0.5) * 0.1;

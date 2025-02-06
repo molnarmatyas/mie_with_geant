@@ -6,18 +6,18 @@
 
 void txtToHist() {
     // Input text file path
-    std::string filename = "../build/output3500_990_0.txt";
-    std::string outputprefix = "3D_modell_camera_test_1";
+    std::string filename = "../build/3d_modell_12deg.txt";
+    std::string outputprefix = "3D_modell_camera_12_deg";
     
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
-    TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi());
+    TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
     TH1D* dhXSect = new TH1D("dhXSect", "dhXSect", 1000, 0, TMath::Pi());
-    TH1D* dhR = new TH1D("dhR", "dhR", 1000, 0, 10 * 200);
+    TH1D* dhR = new TH1D("dhR", "dhR", 1000, 0, 10);
     TH1D* dhPosX = new TH1D("dhPosX", "dhPosX", 1000, 0, 10);
     TH1D* dhPosY = new TH1D("dhPosY", "dhPosY", 1000, 0, 10);
     TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 10);
-    TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 100, -10, 10, 100, -10, 10);
-    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [pixel]", 1000, 0, TMath::Pi() / 2.0, 1000, 0, 7.5 * 200);
+    TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 500, -10, 10, 500, -10, 10);
+    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [mm]", 1000, 0, 180, 1000, 0, 7.5);
     TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
     
@@ -64,12 +64,12 @@ void txtToHist() {
         // Fill the histogram with the last two columns
         dhTheta->Fill(theta3);
         dhGenTheta->Fill(genTheta);
-        dhR->Fill(localR * 200.0);
+        dhR->Fill(localR);
         dhPosX->Fill(localpostX);
         dhPosY->Fill(localpostY);
         dhPosZ->Fill(localpostZ);
         dhXSect->Fill(theta3);
-        dhR_alpha->Fill(genTheta, localR * 200.0);
+        dhR_alpha->Fill(genTheta*180.0 / TMath::Pi(), localR);
         dhtheta_alpha->Fill(theta3, alpha);
         dh2D_yz->Fill(localpostZ, localpostY);
         dh2D_rx_tantheta->Fill(localR / localpostX, std::tan(theta3));
@@ -78,7 +78,7 @@ void txtToHist() {
     TF1* oneoversin = new TF1("oneoversin","1/sin(x)");
     dhXSect->Multiply(oneoversin);
 
-    TF1* Ltanalpha = new TF1("Ltanalpha","9.0*tan(x) * 200");
+    TF1* Ltanalpha = new TF1("Ltanalpha","9.0*tan(x)");
     Ltanalpha->SetLineWidth(1);
     Ltanalpha->SetLineColorAlpha(kRed,0.75);
     //setup for cross section
@@ -109,11 +109,11 @@ void txtToHist() {
     c1->SetLogz(1);
 
 
-    dh2D_yz->SetTitle("2D scattering, n = 1.592, distance = 9 mm, d = 7 #mu m");
+    dh2D_yz->SetTitle("2D scattering, n = 1.592, 3D model, d = 7 #mu m");
     dh2D_yz->GetXaxis()->SetTitle("Z [mm]");
     dh2D_yz->GetYaxis()->SetTitle("Y [mm]");
     dh2D_yz->Draw("COLZ");
-    c1->SaveAs(Form("%s_dh2D_yz_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
+    c1->SaveAs(Form("%s_dh2D_yz_pointsource_1M_discrete.pdf", outputprefix.c_str()));
 
 
 
