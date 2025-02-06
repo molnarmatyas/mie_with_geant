@@ -257,12 +257,12 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 	if (isPolycone)
 	{
-		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.0725 * mm), bubbleWP_log,
+		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm), bubbleWP_log,
 										"Bubble_dis_bnd_proc", world_log, false, 0);
 	}
 	else
 	{
-		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.0725 * mm), bubbleW_log,
+		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm), bubbleW_log,
 										"Bubble_dis_bnd_proc", world_log, false, 0);
 	}
 
@@ -473,18 +473,26 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 //  opticalSurfaceLens->SetMaterialPropertiesTable(SMPTlens);//myMPT5);
 
   // Beam splitter
-  G4OpticalSurface* splitterSurface = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
+  G4OpticalSurface* splitterSurface_front = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
+  G4OpticalSurface* splitterSurface_back = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
   
-  G4MaterialPropertiesTable* surfaceMPT = new G4MaterialPropertiesTable();
-  std::vector<G4double> reflectivitySplitter = {0.5, 0.5, 0.5, 0.5};  // 50% reflection
-  std::vector<G4double> transmittanceSplitter = {0.5, 0.5, 0.5, 0.5}; // 50% transmission
-  surfaceMPT->AddProperty("REFLECTIVITY", photonEnergyMirror, reflectivitySplitter);
-  surfaceMPT->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceSplitter);
+  G4MaterialPropertiesTable* surfaceMPT_front = new G4MaterialPropertiesTable();
+  G4MaterialPropertiesTable* surfaceMPT_back = new G4MaterialPropertiesTable();
+  std::vector<G4double> reflectivitySplitter_front = {0.5, 0.5, 0.5, 0.5};  // 50% reflection
+  std::vector<G4double> reflectivitySplitter_back = {0., 0., 0., 0.};  // 0% reflection
+  std::vector<G4double> transmittanceSplitter_front = {0.5, 0.5, 0.5, 0.5}; // 50% transmission
+  std::vector<G4double> transmittanceSplitter_back = {1.0, 1.0, 1.0, 1.}; // 100% transmission
+  //surfaceMPT_front->AddProperty("REFLECTIVITY", photonEnergyMirror, reflectivitySplitter_front);
+  //surfaceMPT_back->AddProperty("REFLECTIVITY", photonEnergyMirror, reflectivitySplitter_back);
+  surfaceMPT_front->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceSplitter_front);
+  surfaceMPT_back->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceSplitter_back);
   
-  splitterSurface->SetMaterialPropertiesTable(surfaceMPT);
+  splitterSurface_front->SetMaterialPropertiesTable(surfaceMPT_front);
+  splitterSurface_back->SetMaterialPropertiesTable(surfaceMPT_back);
   //this is not used now in the simulation
 	//G4LogicalBorderSurface* splitterSurface1 = new G4LogicalBorderSurface("splitterBorderSurface1", world_phys, argosz_phys[0], opticalSurfaceLens);
-	G4LogicalBorderSurface* splitterSurface1 = new G4LogicalBorderSurface("splitterBorderSurface1", world_phys, argosz_phys[6], opticalSurfaceLens);
+	G4LogicalBorderSurface* splitterBorderSurface_front = new G4LogicalBorderSurface("splitterBorderSurface_front", world_phys, argosz_phys[6], splitterSurface_front);
+	G4LogicalBorderSurface* splitterBorderSurface_back = new G4LogicalBorderSurface("splitterBorderSurface_back", argosz_phys[6], world_phys, splitterSurface_back);
 
 
 
