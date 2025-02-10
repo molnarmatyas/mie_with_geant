@@ -354,7 +354,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                                         , solid->GetName()//"logical"
                                         , 0, 0, 0
     );
-    if(isolid != 3) {
+    if(isolid != 13) {
       argosz_phys[isolid] = new G4PVPlacement( 0
                         , G4ThreeVector(0, 0, 0)
                         , argosz_log[isolid]
@@ -466,7 +466,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   
 
 	G4LogicalBorderSurface* lensSurface1 = new G4LogicalBorderSurface("LensBorderSurface1", world_phys, argosz_phys[3], opticalSurfaceLens);
-  //G4LogicalSkinSurface* lensSurface2 = new G4LogicalSkinSurface("LensSkinSurface", argosz_log[4], opticalSurfaceLens);
   
 	G4LogicalBorderSurface* lensSurface2 = new G4LogicalBorderSurface("LensBorderSurface2", world_phys, argosz_phys[4], opticalSurfaceLens);
 	G4LogicalBorderSurface* lensSurface2_1 = new G4LogicalBorderSurface("LensBorderSurface2_1", argosz_phys[4], world_phys, opticalSurfaceLens);
