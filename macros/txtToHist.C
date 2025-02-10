@@ -5,11 +5,15 @@
 #include <TFile.h>
 #include <TMath.h>
 
+#define NDEG 14
+
 void txtToHist() {
-    // Input text file path
-    std::string filename = "../build/3d_modell_12deg.txt";
-    std::string outputprefix = "3D_modell_camera_12_deg";
-    
+  // Input text file path
+  for(int ideg = 0; ideg < NDEG; ideg+=2)
+  {
+    std::string filename = Form("../build/3d_modell_transmittance_%ideg.txt", ideg);
+    std::string outputprefix = Form("3D_modell_beamsplitter_tm_%i", ideg);
+
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
     TH1D* dhXSect = new TH1D("dhXSect", "dhXSect", 1000, 0, TMath::Pi());
@@ -19,16 +23,16 @@ void txtToHist() {
     TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 10);
     TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 500, -10, 10, 500, -10, 10);
     TH2D* dh2D_xy = new TH2D("dh2D_xy", "; X [mm]; Y [mm]", 150, -6, 6, 120, -4, 4);
-    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [mm]", 1000, 0, 180, 1000, 0, 7.5);
+    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [mm]", 1000, -1, 180, 1000, 0, 7.5);
     TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
     TH3D* dh3D_xyz = new TH3D("dh3D_xyz", "; X [mm]; Y [mm]; Z [mm]", 100,5,20, 100,90,100, 100,-110,-100);
-    
+
     // Open the input file
     std::ifstream infile(filename);
     if (!infile.is_open()) {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        return;
+      std::cerr << "Error opening file: " << filename << std::endl;
+      return;
     }
     double x_min = 8.478684;
     double y_min = 92.734001;
@@ -42,61 +46,62 @@ void txtToHist() {
 
     // Define rotation angle (convert to radians)
     //double M_PI = TMath::Pi();
-    double theta = 25.0 * M_PI / 180.0; // FIXME this is not the real angle; how on earth can I measure angle in FreeCAD??? 
+    double theta = 30.0 * M_PI / 180.0; 
     double cosTheta = TMath::Cos(theta);
     double sinTheta = TMath::Sin(theta);
-    
+
     // Read file line by line
     std::string line;
     while (std::getline(infile, line)) {
-        // Skip empty lines
-        if (line.empty()) continue;
+      // Skip empty lines
+      if (line.empty()) continue;
 
-        std::replace(line.begin(), line.end(), ',', ' ');
+      std::replace(line.begin(), line.end(), ',', ' ');
 
-        // Parse the line
-        std::istringstream iss(line);
-        double theta3, genTheta, R, postX, postY, postZ, alpha, alpha_man;
-        double localR, localpostX, localpostY, localpostZ;
-        
-        // Read all 6 columns
-        if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ >> alpha >> alpha_man)) {
-            std::cerr << "Error parsing line: " << line << std::endl;
-            continue;
-        }
+      // Parse the line
+      std::istringstream iss(line);
+      double theta3, genTheta, R, postX, postY, postZ, alpha, alpha_man;
+      double localR, localpostX, localpostY, localpostZ;
 
-        // Translate to local origin
-        double shiftedX = postX - x_center;
-        double shiftedZ = postZ - z_center;
+      // Read all 6 columns
+      if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ >> alpha >> alpha_man)) {
+        std::cerr << "Error parsing line: " << line << std::endl;
+        continue;
+      }
 
-        // Apply 2D rotation in the XZ plane
-        localpostX = cosTheta * shiftedX + sinTheta * shiftedZ;
-        localpostZ = -sinTheta * shiftedX + cosTheta * shiftedZ;
-        // Y is not affected by rotation
-        localpostY = postY - y_center;
+      // Translate to local origin
+      double shiftedX = postX - x_center;
+      double shiftedY = postY - y_center;
+      double shiftedZ = postZ - z_center;
 
-        //localpostX = (x_center - postX);
-        //localpostY = (y_center - postY);
-        //localpostZ = (z_center - postZ);
-        
-        localR = sqrt(localpostY * localpostY + localpostZ * localpostZ);
-        
-        // Fill the histogram with the last two columns
-        dhTheta->Fill(theta3);
-        dhGenTheta->Fill(genTheta);
-        dhR->Fill(localR);
-        dhPosX->Fill(localpostX);
-        dhPosY->Fill(localpostY);
-        dhPosZ->Fill(localpostZ);
-        dhXSect->Fill(theta3);
-        dhR_alpha->Fill(genTheta*180.0 / TMath::Pi(), localR);
-        dhtheta_alpha->Fill(theta3, alpha);
-        dh2D_yz->Fill(localpostZ, localpostY);
-        dh2D_xy->Fill(localpostX, localpostY);
-        dh3D_xyz->Fill(postX,postY,postZ);
-        dh2D_rx_tantheta->Fill(localR / localpostX, std::tan(theta3));
+      // Apply 2D rotation in the XZ plane
+      localpostX = cosTheta * shiftedX + sinTheta * shiftedZ;
+      localpostZ = -sinTheta * shiftedX + cosTheta * shiftedZ;
+      // Y is not affected by rotation
+      localpostY = postY - y_center;
+
+      //localpostX = (x_center - postX);
+      //localpostY = (y_center - postY);
+      //localpostZ = (z_center - postZ);
+
+      localR = sqrt(localpostY * localpostY + localpostX * localpostX);
+
+      // Fill the histogram with the last two columns
+      dhTheta->Fill(theta3);
+      dhGenTheta->Fill(genTheta);
+      dhR->Fill(localR);
+      dhPosX->Fill(localpostX);
+      dhPosY->Fill(localpostY);
+      dhPosZ->Fill(localpostZ);
+      dhXSect->Fill(theta3);
+      dhR_alpha->Fill(genTheta*180.0 / TMath::Pi(), localR);
+      dhtheta_alpha->Fill(theta3, alpha);
+      dh2D_yz->Fill(localpostZ, localpostY);
+      dh2D_xy->Fill(localpostX, localpostY);
+      dh3D_xyz->Fill(postX,postY,postZ);
+      dh2D_rx_tantheta->Fill(localR / localpostX, std::tan(theta3));
     }
-//  dh2D_yz->GetZaxis()->SetRangeUser(0,10);
+    //  dh2D_yz->GetZaxis()->SetRangeUser(0,10);
     TF1* oneoversin = new TF1("oneoversin","1/sin(x)");
     dhXSect->Multiply(oneoversin);
 
@@ -105,26 +110,26 @@ void txtToHist() {
     Ltanalpha->SetLineColorAlpha(kRed,0.75);
     //setup for cross section
     /*
-    int inpNevent = 1000000;
-    int outNevent = dhTheta->GetEntries();
-    double cellAreamm = 1.539e-4; 
-    double Lmm = 10.0;
-    double dSigmadOmega;
-    for(int ievent = 0; ievent < dhTheta->GetEntries(); ievent++) {
+       int inpNevent = 1000000;
+       int outNevent = dhTheta->GetEntries();
+       double cellAreamm = 1.539e-4; 
+       double Lmm = 10.0;
+       double dSigmadOmega;
+       for(int ievent = 0; ievent < dhTheta->GetEntries(); ievent++) {
 
        dSigmadOmega = outNevent * cellAreamm / inpNevent / (2*TMath::Pi() / Lmm * TMath::Cos(
-    }
-    */
-    
+       }
+     */
+
     // Create a ROOT output file to save the histogram
     TFile* outfile = new TFile(Form("%s_alpha_output.root", outputprefix.c_str()), "RECREATE");
-    
+
     // Optional: draw and save as image
     TCanvas* c1 = new TCanvas("c1", "", 800, 800);
     gStyle->SetOptStat(0);
     dhR_alpha->Draw("COLZ");
     //Ltanalpha->Draw("same");
-    c1->SaveAs(Form("%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
+    c1->SaveAs(Form("figs/%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
 
     //gStyle->SetCanvasDefH(550);
     //gStyle->SetCanvasDefW(650);
@@ -135,11 +140,13 @@ void txtToHist() {
     dh2D_yz->GetXaxis()->SetTitle("Z [mm]");
     dh2D_yz->GetYaxis()->SetTitle("Y [mm]");
     dh2D_yz->Draw("COLZ");
-    c1->SaveAs(Form("%s_dh2D_yz_pointsource_1M_discrete.pdf", outputprefix.c_str()));
+    c1->SaveAs(Form("figs/%s_dh2D_yz_pointsource_1M_discrete.pdf", outputprefix.c_str()));
+
+    TProfile* prof = dhR_alpha->ProfileX("_prof_max", 1, -1, "");
 
 
 
-
+    prof->Write();
     dhTheta->Write();
     dhGenTheta->Write();
     dhXSect->Write();
@@ -155,4 +162,5 @@ void txtToHist() {
     dh3D_xyz->Write();
 
     outfile->Close();
+  }
 }
