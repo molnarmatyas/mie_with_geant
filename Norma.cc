@@ -179,8 +179,17 @@ int main(int argc, char **argv)
   }
   */
 
-	std::string filename = "output" + std::to_string((int)(p.bubbleRadius * 1000000)) + "_" +
-						   std::to_string((int)(p.g * 1000)) + "_" + std::to_string((int)(p.p)) + ".txt";
+	const char* numeric_simulation_file_path = nullptr; 
+  std::string filename;
+	if ((numeric_simulation_file_path =  std::getenv("NUMERIC_MIE_FPATH"))) {
+    std::string numeric_path = numeric_simulation_file_path;
+	  filename = "output" + numeric_path + std::to_string((int)(p.bubbleRadius * 1000000)) + "_" +
+	  					   std::to_string((int)(p.g * 1000)) + "_" + std::to_string((int)(p.p)) + ".txt";
+  }
+  else {
+	  filename = "output" + std::to_string((int)(p.bubbleRadius * 1000000)) + "_" +
+	  					   std::to_string((int)(p.g * 1000)) + "_" + std::to_string((int)(p.p)) + ".txt";
+  }
 	std::string availableFilename = getAvailableFilename(filename);
 
 	// ez létrehoz egy output_x.txt-t és abba ír, thread safe, át van passzolva a stepping actionnek
