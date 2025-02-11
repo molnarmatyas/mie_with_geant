@@ -57,6 +57,7 @@ set(Norma_SCRIPTS
     diff_cross_0-180_10000pt.txt
     dhkm_7_1592_1.txt
     Argosz_sensorupdate.obj
+    Argosz_sensorupdate_with_shield.obj
   )
 
 foreach(_script ${Norma_SCRIPTS})
