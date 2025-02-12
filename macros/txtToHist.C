@@ -41,7 +41,7 @@ void txtToHist() {
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
     //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string filename = "../build/100M_output3500_990_0.txt";
+    std::string filename = "../build/output3500_990_0.txt";
     //std::string outputprefix = Form("3D_modell_flowcell_shield_%i", ideg);
     std::string outputprefix = "3D_modell_flowcell_shield_";
 
