@@ -5,14 +5,14 @@
 #include <TFile.h>
 #include <TMath.h>
 
-#define NDEG 14
+#define NDEG 46
 
 void txtToHist() {
   // Input text file path
-  for(int ideg = 0; ideg < NDEG; ideg+=2)
+  for(int ideg = 0; ideg < NDEG; ideg++)
   {
-    std::string filename = Form("../build/3d_modell_transmittance_%ideg.txt", ideg);
-    std::string outputprefix = Form("3D_modell_beamsplitter_tm_%i", ideg);
+    std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
+    std::string outputprefix = Form("3D_modell_flowcell_shield_%i", ideg);
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -136,11 +136,11 @@ void txtToHist() {
     c1->SetLogz(1);
 
 
-    dh2D_yz->SetTitle("2D scattering, n = 1.592, 3D model, d = 7 #mu m");
-    dh2D_yz->GetXaxis()->SetTitle("Z [mm]");
-    dh2D_yz->GetYaxis()->SetTitle("Y [mm]");
-    dh2D_yz->Draw("COLZ");
-    c1->SaveAs(Form("figs/%s_dh2D_yz_pointsource_1M_discrete.pdf", outputprefix.c_str()));
+    dh2D_xy->SetTitle(Form("2D scattering, deg=%i, n = 1.592, 3D model, d = 7 #mu m", ideg));
+    dh2D_xy->GetXaxis()->SetTitle("X [mm]");
+    dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
+    dh2D_xy->Draw("COLZ");
+    c1->SaveAs(Form("figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
 
     TProfile* prof = dhR_alpha->ProfileX("_prof_max", 1, -1, "");
 
