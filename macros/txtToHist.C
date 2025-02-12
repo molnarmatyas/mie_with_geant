@@ -5,14 +5,15 @@
 #include <TFile.h>
 #include <TMath.h>
 
-#define NDEG 46
+#define NDEG 14
+double pixel = 0.02256; // in mm
 
 void txtToHist() {
   // Input text file path
-  for(int ideg = 0; ideg < NDEG; ideg++)
+  for(int ideg = 0; ideg < NDEG; ideg+=2)
   {
-    std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string outputprefix = Form("3D_modell_flowcell_shield_%i", ideg);
+    std::string filename = Form("../build/3d_modell_transmittance_flowcell_%ideg.txt", ideg);
+    std::string outputprefix = Form("3D_modell_transmittance_flowcell_%i", ideg);
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -23,7 +24,7 @@ void txtToHist() {
     TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 10);
     TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 500, -10, 10, 500, -10, 10);
     TH2D* dh2D_xy = new TH2D("dh2D_xy", "; X [mm]; Y [mm]", 150, -6, 6, 120, -4, 4);
-    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha; R [mm]", 1000, -1, 180, 1000, 0, 7.5);
+    TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha [deg] ; R [pixel]", 1000, -1, 180, 1000/pixel, 0, 7.5/pixel);
     TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
     TH3D* dh3D_xyz = new TH3D("dh3D_xyz", "; X [mm]; Y [mm]; Z [mm]", 100,5,20, 100,90,100, 100,-110,-100);
@@ -84,7 +85,7 @@ void txtToHist() {
       //localpostY = (y_center - postY);
       //localpostZ = (z_center - postZ);
 
-      localR = sqrt(localpostY * localpostY + localpostX * localpostX);
+      localR = sqrt(localpostY * localpostY + localpostX * localpostX) / pixel;
 
       // Fill the histogram with the last two columns
       dhTheta->Fill(theta3);
@@ -143,6 +144,8 @@ void txtToHist() {
     c1->SaveAs(Form("figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
 
     TProfile* prof = dhR_alpha->ProfileX("_prof_max", 1, -1, "");
+    prof->GetYaxis()->SetTitle("R [pixel]");
+    prof->GetXaxis()->SetTitle("#alpha [deg]");
 
 
 
