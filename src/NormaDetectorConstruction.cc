@@ -350,7 +350,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   int isolid = 0;
   for (auto solid : mesh->GetSolids())
   {
-    if(isolid == 14 || isolid == 16) continue;
+    //if(isolid == 14 || isolid == 16) continue;
     G4cout << "solid name: " << solid->GetName() << G4endl;
     argosz_log[isolid]  = new G4LogicalVolume( solid
                                         , argosz_mat[isolid]
@@ -366,7 +366,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
       );
     
     isolid++;
-    //if(isolid == 16) break;
+    if(isolid == 16) break;
   }
 
 
