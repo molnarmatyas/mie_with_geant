@@ -5,14 +5,45 @@
 #include <TFile.h>
 #include <TMath.h>
 
-#define NDEG 46
+#define NDEG 1 //46
 
+
+void SetGrayscalePalette(TCanvas* c, TH2D* hCCD) {
+    const Int_t NCont = 255; // Number of colors in the palette
+    gStyle->SetNumberContours(NCont);
+    
+    const Int_t nColors = 2; // Only black and white
+    Double_t stops[nColors] = {0.0, 1.0}; // Position of colors in the range
+    Double_t red[nColors]   = {0.0, 1.0}; // 1.0, 0.0: White to Black <--> 0.0, 1.0 black to white
+    Double_t green[nColors] = {0.0, 1.0};
+    Double_t blue[nColors]  = {0.0, 1.0};
+    
+    //Int_t palette = TColor::CreateGradientColorTable(nColors, stops, red, green, blue, NCont);
+    //gStyle->SetPalette(palette);
+    TColor::CreateGradientColorTable(nColors, stops, red, green, blue, NCont);
+
+    c->SetFillColor(kBlack);  // Set canvas background color to black
+    gPad->SetFrameFillColor(kBlack); // Set frame (plot background) to black
+    //gStyle->SetMinimum(1e-6);  // Ensures empty bins are shown in the color scale
+    
+    hCCD->GetXaxis()->SetLabelColor(kWhite);
+    hCCD->GetXaxis()->SetTitleColor(kWhite);
+    hCCD->GetXaxis()->SetAxisColor(kWhite);
+    hCCD->GetYaxis()->SetLabelColor(kWhite);
+    hCCD->GetYaxis()->SetTitleColor(kWhite);
+    hCCD->GetYaxis()->SetAxisColor(kWhite);
+    hCCD->GetZaxis()->SetLabelColor(kWhite);
+    hCCD->GetZaxis()->SetTitleColor(kWhite);
+}
+// --- MAIN ---
 void txtToHist() {
   // Input text file path
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
-    std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string outputprefix = Form("3D_modell_flowcell_shield_%i", ideg);
+    //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
+    std::string filename = "../build/100M_output3500_990_0.txt";
+    //std::string outputprefix = Form("3D_modell_flowcell_shield_%i", ideg);
+    std::string outputprefix = "3D_modell_flowcell_shield_";
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -129,7 +160,7 @@ void txtToHist() {
     gStyle->SetOptStat(0);
     dhR_alpha->Draw("COLZ");
     //Ltanalpha->Draw("same");
-    c1->SaveAs(Form("figs/%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
+    c1->SaveAs(Form("../figs/%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
 
     //gStyle->SetCanvasDefH(550);
     //gStyle->SetCanvasDefW(650);
@@ -140,10 +171,18 @@ void txtToHist() {
     dh2D_xy->GetXaxis()->SetTitle("X [mm]");
     dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
     dh2D_xy->Draw("COLZ");
-    c1->SaveAs(Form("figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
+    //c1->SaveAs(Form("../figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
+    c1->SaveAs(Form("../figs/%s_dh2D_xy_colorful.pdf", outputprefix.c_str()));
 
+    // Black & white image of CCD screen (black=min, white=max)
+    TCanvas *c2 = new TCanvas("c2", "CCD Image", 800, 600);
+    SetGrayscalePalette(c2, dh2D_xy); // Apply grayscale palette
+    dh2D_xy->Draw("COLZ");
+    c2->SaveAs("../figs/ccd_grayscale_output.png");
+
+
+    // R vs alpha
     TProfile* prof = dhR_alpha->ProfileX("_prof_max", 1, -1, "");
-
 
 
     prof->Write();
