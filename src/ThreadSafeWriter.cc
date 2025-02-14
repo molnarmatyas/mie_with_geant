@@ -1,4 +1,7 @@
 #include "ThreadSafeWriter.hh"
+#include "G4Threading.hh"
+#include "G4AutoLock.hh"
+namespace { G4Mutex myMutex = G4MUTEX_INITIALIZER; }
 
 ThreadSafeWriter::ThreadSafeWriter(const std::string &filename) : outFile(filename, std::ios::app)
 {
@@ -11,6 +14,7 @@ ThreadSafeWriter::ThreadSafeWriter(const std::string &filename) : outFile(filena
 
 ThreadSafeWriter::~ThreadSafeWriter()
 {
+  G4AutoLock lock(&myMutex);
 	if (outFile.is_open())
 	{
 		outFile.close();
@@ -19,6 +23,7 @@ ThreadSafeWriter::~ThreadSafeWriter()
 
 void ThreadSafeWriter::write(const std::string &message)
 {
-	std::lock_guard<std::mutex> guard(fileMutex);
+	//std::lock_guard<std::mutex> guard(fileMutex);
+  G4AutoLock lock(&myMutex);
 	outFile << message << std::endl;
 }

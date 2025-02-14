@@ -56,6 +56,7 @@
 #include <execinfo.h>
 #include <filesystem>
 #include <signal.h>
+#include "G4AutoDelete.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 namespace
@@ -195,7 +196,9 @@ int main(int argc, char **argv)
 	// ez létrehoz egy output_x.txt-t és abba ír, thread safe, át van passzolva a stepping actionnek
 	// ott van is egy példa
 	// std::stringstream -el lehet sztringet csinálni és beleírni
+//  ThreadSafeWriter *writer = new ThreadSafeWriter(availableFilename);
 	ThreadSafeWriter writer(availableFilename);
+  G4AutoDelete::Register(&writer);
 
 	// Instantiate G4UIExecutive if interactive mode
 	G4UIExecutive *ui = nullptr;

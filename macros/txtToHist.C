@@ -5,15 +5,46 @@
 #include <TFile.h>
 #include <TMath.h>
 
-#define NDEG 14
+#define NDEG 1
 double pixel = 0.02256; // in mm
 
+
+void SetGrayscalePalette(TCanvas* c, TH2D* hCCD) {
+    const Int_t NCont = 255; // Number of colors in the palette
+    gStyle->SetNumberContours(NCont);
+    
+    const Int_t nColors = 2; // Only black and white
+    Double_t stops[nColors] = {0.0, 1.0}; // Position of colors in the range
+    Double_t red[nColors]   = {0.0, 1.0}; // 1.0, 0.0: White to Black <--> 0.0, 1.0 black to white
+    Double_t green[nColors] = {0.0, 1.0};
+    Double_t blue[nColors]  = {0.0, 1.0};
+    
+    //Int_t palette = TColor::CreateGradientColorTable(nColors, stops, red, green, blue, NCont);
+    //gStyle->SetPalette(palette);
+    TColor::CreateGradientColorTable(nColors, stops, red, green, blue, NCont);
+
+    c->SetFillColor(kBlack);  // Set canvas background color to black
+    gPad->SetFrameFillColor(kBlack); // Set frame (plot background) to black
+    //gStyle->SetMinimum(1e-6);  // Ensures empty bins are shown in the color scale
+    
+    hCCD->GetXaxis()->SetLabelColor(kWhite);
+    hCCD->GetXaxis()->SetTitleColor(kWhite);
+    hCCD->GetXaxis()->SetAxisColor(kWhite);
+    hCCD->GetYaxis()->SetLabelColor(kWhite);
+    hCCD->GetYaxis()->SetTitleColor(kWhite);
+    hCCD->GetYaxis()->SetAxisColor(kWhite);
+    hCCD->GetZaxis()->SetLabelColor(kWhite);
+    hCCD->GetZaxis()->SetTitleColor(kWhite);
+}
+// --- MAIN ---
 void txtToHist() {
   // Input text file path
-  for(int ideg = 0; ideg < NDEG; ideg+=2)
+  for(int ideg = 0; ideg < NDEG; ideg++)
   {
-    std::string filename = Form("../build/3d_modell_transmittance_flowcell_%ideg.txt", ideg);
-    std::string outputprefix = Form("3D_modell_transmittance_flowcell_%i", ideg);
+    //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
+    std::string filename = "../build/OneDrive_1_2-12-2025/output3500_990_0.txt/output3500_990_0.txt";
+    //std::string outputprefix = Form("3D_modell_transmittance_flowcell_shield_%i", ideg);
+    std::string outputprefix = "3D_modell_beamstop_mie_greyscale";
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -23,7 +54,7 @@ void txtToHist() {
     TH1D* dhPosY = new TH1D("dhPosY", "dhPosY", 1000, 0, 10);
     TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 10);
     TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 500, -10, 10, 500, -10, 10);
-    TH2D* dh2D_xy = new TH2D("dh2D_xy", "; X [mm]; Y [mm]", 150, -6, 6, 120, -4, 4);
+    TH2D* dh2D_xy = new TH2D("dh2D_xy", "; X [pixel]; Y [pixel]", 150, -6/pixel, 6/pixel, 120, -4/pixel, 4/pixel);
     TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha [deg] ; R [pixel]", 1000, -1, 180, 1000/pixel, 0, 7.5/pixel);
     TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
@@ -98,7 +129,7 @@ void txtToHist() {
       dhR_alpha->Fill(genTheta*180.0 / TMath::Pi(), localR);
       dhtheta_alpha->Fill(theta3, alpha);
       dh2D_yz->Fill(localpostZ, localpostY);
-      dh2D_xy->Fill(localpostX, localpostY);
+      dh2D_xy->Fill(localpostX/pixel, localpostY/pixel);
       dh3D_xyz->Fill(postX,postY,postZ);
       dh2D_rx_tantheta->Fill(localR / localpostX, std::tan(theta3));
     }
@@ -134,15 +165,21 @@ void txtToHist() {
 
     //gStyle->SetCanvasDefH(550);
     //gStyle->SetCanvasDefW(650);
-    c1->SetLogz(1);
+
+    // Black & white image of CCD screen (black=min, white=max)
+    TCanvas *c2 = new TCanvas("c2", "CCD Image", 800, 600);
+    SetGrayscalePalette(c2, dh2D_xy); // Apply grayscale palette
+    c2->SetLogz(1);
 
 
     dh2D_xy->SetTitle(Form("2D scattering, deg=%i, n = 1.592, 3D model, d = 7 #mu m", ideg));
-    dh2D_xy->GetXaxis()->SetTitle("X [mm]");
-    dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
+    dh2D_xy->GetXaxis()->SetTitle("X [pixel]");
+    dh2D_xy->GetYaxis()->SetTitle("Y [pixel]");
     dh2D_xy->Draw("COLZ");
-    c1->SaveAs(Form("figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
+    c2->SaveAs(Form("figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
 
+
+    // R vs alpha
     TProfile* prof = dhR_alpha->ProfileX("_prof_max", 1, -1, "");
     prof->GetYaxis()->SetTitle("R [pixel]");
     prof->GetXaxis()->SetTitle("#alpha [deg]");
