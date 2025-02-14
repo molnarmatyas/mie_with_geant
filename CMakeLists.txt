@@ -58,6 +58,7 @@ set(Norma_SCRIPTS
     dhkm_7_1592_1.txt
     Argosz_sensorupdate.obj
     Argosz_sensorupdate_with_shield.obj
+    Argosz_matyimod_housing.obj
   )
 
 foreach(_script ${Norma_SCRIPTS})

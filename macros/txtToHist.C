@@ -42,9 +42,9 @@ void txtToHist() {
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
     //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string filename = "../build/OneDrive_1_2-12-2025/output3500_990_0.txt/output3500_990_0.txt";
-    //std::string outputprefix = Form("3D_modell_transmittance_flowcell_shield_%i", ideg);
-    std::string outputprefix = "3D_modell_beamstop_mie_greyscale";
+    std::string filename = "../build/100M_output3500_990_0.txt";
+    //std::string outputprefix = Form("3D_modell_flowcell_shield_%i", ideg);
+    std::string outputprefix = "3D_modell_flowcell_shield_";
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -165,6 +165,15 @@ void txtToHist() {
 
     //gStyle->SetCanvasDefH(550);
     //gStyle->SetCanvasDefW(650);
+    c1->SetLogz(1);
+
+
+    dh2D_xy->SetTitle(Form("2D scattering, deg=%i, n = 1.592, 3D model, d = 7 #mu m", ideg));
+    dh2D_xy->GetXaxis()->SetTitle("X [mm]");
+    dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
+    dh2D_xy->Draw("COLZ");
+    //c1->SaveAs(Form("../figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
+    c1->SaveAs(Form("../figs/%s_dh2D_xy_colorful.pdf", outputprefix.c_str()));
 
     // Black & white image of CCD screen (black=min, white=max)
     TCanvas *c2 = new TCanvas("c2", "CCD Image", 800, 600);
