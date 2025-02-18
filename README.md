@@ -31,16 +31,21 @@ cd geant4-11.2.0
 ```
 
 Apply the [patch](patch/numeric_mie.patch):
+Before applying, one needs to copy one of the dependencies to the geant4-11.2.0 directory
+```
+cp src/ThreadSafeWriter.cc geant4-11.2.0/source/processes/optical/src/
+cp include/ThreadSafeWriter.hh geant4-11.2.0/source/processes/optical/include/
+cp patch/numeric_mie_v2.patch geant4-11.2.0/
+cd geant4-11.2.0
+patch -p1 --fuzz=3 --ignore-whitespace --merge --verbose < numeric_mie.patch
+```
+Older methods
 ```
 git apply ../mie_with_geant/patch/numeric_mie.patch
 ```
 or, if in this directory (make sure geant4-* is in the .gitignore):
 ```
 git apply ../patch/numeric_mie.patch
-```
-Or, rather this one works REALLY, after copying it in the geant4-11.2.0 directory (and *maybe* performing `cp src/ThreadSafeWriter.cc geant4-11.2.0/source/processes/optical/src/`, `cp include/ThreadSafeWriter.hh geant4-11.2.0/source/processes/optical/include/` and `cp patch/numeric_mie_v2.patch geant4-11.2.0/`, in `cd geant4-11.2.0`):
-```
-patch -p1 --fuzz=3 --ignore-whitespace --merge --verbose < numeric_mie.patch
 ```
 
 
@@ -58,11 +63,11 @@ mkdir geant4-build && cd geant4-build
 
 Run CMake:
 ```
-cmake -DCMAKE_INSTALL_PREFIX=/opt/geant4/ -DGEANT4_USE_GDML=ON -DXERCESC_ROOT_DIR=/opt/xerces-c/ -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_QT=ON -DGEANT4_USE_OPENGL_X11=ON -DGEANT4_USE_RAYTRACER_X11=ON -DGEANT4_USE_SYSTEM_CLHEP=ON -DCLHEP_INCLUDE_DIR=/opt/CLHEP/include/ -DCLHEP_LIBRARY=/opt/CLHEP/lib/ -DGEANT4_INSTALL_EXAMPLES=ON -DCLHEP_ROOT_DIR=/opt/CLHEP/ -DGEANT4_BUILD_MULTITHREADED=ON $geant_extra_args ../geant4-11.2.0
-```
-or:
-```
 cmake -DCMAKE_INSTALL_PREFIX=../geant4-install -DGEANT4_USE_GDML=ON -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_QT=ON -DGEANT4_USE_OPENGL_X11=ON -DGEANT4_USE_RAYTRACER_X11=ON -DGEANT4_USE_SYSTEM_CLHEP=ON -DCLHEP_INCLUDE_DIR=../../../GEANT/CLHEP/install/include/ -DCLHEP_LIBRARY=../../../GEANT/CLHEP/install/include/lib -DGEANT4_INSTALL_EXAMPLES=ON -DCLHEP_ROOT_DIR=../../../GEANT/CLHEP/install/ -DGEANT4_BUILD_MULTITHREADED=ON $geant_extra_args ../geant4-11.2.0
+```
+alternatively, if you have CLHEP in /opt, for example in Docker or other VM:
+```
+cmake -DCMAKE_INSTALL_PREFIX=/opt/geant4/ -DGEANT4_USE_GDML=ON -DXERCESC_ROOT_DIR=/opt/xerces-c/ -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_QT=ON -DGEANT4_USE_OPENGL_X11=ON -DGEANT4_USE_RAYTRACER_X11=ON -DGEANT4_USE_SYSTEM_CLHEP=ON -DCLHEP_INCLUDE_DIR=/opt/CLHEP/include/ -DCLHEP_LIBRARY=/opt/CLHEP/lib/ -DGEANT4_INSTALL_EXAMPLES=ON -DCLHEP_ROOT_DIR=/opt/CLHEP/ -DGEANT4_BUILD_MULTITHREADED=ON $geant_extra_args ../geant4-11.2.0
 ```
 
 Use `make -jN` command. Replace `N` with the number of jobs you prefer. For the best performance use your physical core count. For example on an 8 core CPU use:
@@ -111,7 +116,7 @@ If `NUMERIC_MIE_FPATH` is not set, it will use the original `OPMieHG` process.
 ### Output
 Currently it is using [ThreadSafeWriter](include/ThreadSafeWriter.hh) to write the calculated theta and generated theta to a file in the following format:
 ```
-[calculated_theta], [generated_theta]
+[calculated_theta], [generated_theta], [distance on 2D plane], [detector hit position X],  [detector hit position Y],  [detector hit position Z], [momentum direction at the cell - alpha angle (not used anymore)], [manually calculated alpha angle (not used anymore)] 
 ...
-[calculated_theta], [generated_theta]
+[calculated_theta], [generated_theta], [distance on 2D plane], [detector hit position X],  [detector hit position Y],  [detector hit position Z], [momentum direction at the cell - alpha angle (not used anymore)], [manually calculated alpha angle (not used anymore)] 
 ```
