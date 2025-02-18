@@ -224,6 +224,26 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   lensMaterial->SetMaterialPropertiesTable(myMPT5);
 
+
+	// LB1258-A lens - N-BK7 material
+	// https://www.schott.com/shop/medias/schott-datasheet-n-bk7-eng.pdf?context=bWFzdGVyfHJvb3R8NjkxODAwfGFwcGxpY2F0aW9uL3BkZnxoZTUvaDM4Lzg4MTAzMTYxMDM3MTAucGRmfGJjNmI4ZjFmY2Q1NjMxMTE0MjkzMTUwOGRmMTUzOTg2NWJjZTgzMjA0OTc2NTNiMThjN2RhMjI4NGZmMWM4MWU
+  G4Material* lensMaterialNBK7 = new G4Material("NBK7", 2.51*g/cm3, 1);
+  lensMaterialNBK7->AddMaterial(nist->FindOrBuildMaterial("G4_Pyrex_Glass"), 1.0); // should do it for now
+  G4MaterialPropertiesTable* MPT_nbk7 = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexLensNBK7 = {1.51680, 1.51680, 1.51680, 1.51680};
+  MPT_nbk7->AddProperty("RINDEX", photonEnergyMirror, rindexLensNBK7, nEntries);
+
+  std::vector<G4double> absLengthLensNBK7 = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
+  MPT_nbk7->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthLensNBK7, false, false);
+
+  /*
+  std::vector<G4double> transmittanceB270 = {0.99,  0.99,  0.99,  0.99};//{0.91320,  0.91320,  0.91320,  0.91320};
+	myMPT5->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceB270, nEntries);
+  */
+
+  lensMaterialNBK7->SetMaterialPropertiesTable(MPT_nbk7);
+
   // Helma flow cell - made of quartz glass
   G4Material* flowcellMaterial = nist->FindOrBuildMaterial("G4_SILICON_DIOXIDE");
   G4MaterialPropertiesTable* myMPT6 = new G4MaterialPropertiesTable();
@@ -349,7 +369,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[7] = shieldMaterial;
  argosz_mat[8] = lensMaterial;
  argosz_mat[9] = lensMaterial;
- argosz_mat[10] = lensMaterial;
+ argosz_mat[10] = lensMaterialNBK7;
  argosz_mat[11] = mirrorMaterial;
  argosz_mat[12] = mirrorMaterial;
  argosz_mat[13] = shieldMaterial;
@@ -360,7 +380,12 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   int isolid = 0;
   for (auto solid : mesh->GetSolids())
   {
-    //if(isolid == 14 || isolid == 16) continue;
+		/*
+    if(isolid == 13 || isolid == 3){
+			isolid++;
+			continue;
+		}
+		*/
     G4cout << "solid name: " << solid->GetName() << G4endl;
     argosz_log[isolid]  = new G4LogicalVolume( solid
                                         , argosz_mat[isolid]
