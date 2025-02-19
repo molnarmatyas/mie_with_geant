@@ -85,7 +85,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	// Get nist material manager
 	G4NistManager *nist = G4NistManager::Instance();
 	G4Material *sil = nist->FindOrBuildMaterial("G4_Si");
-
+	G4Material *copper = nist->FindOrBuildMaterial("G4_Cu");
+	G4Material *alu_oxide = nist->FindOrBuildMaterial("G4_ALUMINUM_OXIDE");
 
 	// ------------ Generate & Add Material Properties Table ------------
 	//
@@ -203,7 +204,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   shieldMaterial->SetMaterialPropertiesTable(myMPT4);
-  
 
   
   // Aspherical lens - B270 material, https://www.schott.com/en-us/products/b-270-p1000313/technical-details
@@ -245,6 +245,20 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   lensMaterialNBK7->SetMaterialPropertiesTable(MPT_nbk7);
 
+  //OD 0.5 ND filter - NG4 material
+  //https://www.sydor.com/wp-content/uploads/SCHOTT-NG4-Neutral-Density-Filter.pdf
+  G4Material* lensMaterialNG4 = new G4Material("NG4", 2.43*g/cm3, 1);
+  lensMaterialNG4->AddMaterial(nist->FindOrBuildMaterial("G4_Pyrex_Glass"), 1.0); // should do it for now
+  G4MaterialPropertiesTable* MPT_ng4 = new G4MaterialPropertiesTable();
+  
+  std::vector<G4double> rindexLensNG4 = {1.510, 1.510, 1.510, 1.510};
+  MPT_ng4->AddProperty("RINDEX", photonEnergyMirror, rindexLensNG4, nEntries);
+
+  std::vector<G4double> absLengthLensNG4 = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
+  MPT_ng4->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthLensNG4, false, false);
+
+  lensMaterialNG4->SetMaterialPropertiesTable(MPT_ng4);
+  
   // Helma flow cell - made of quartz glass
   G4Material* flowcellMaterial = nist->FindOrBuildMaterial("G4_SILICON_DIOXIDE");
   G4MaterialPropertiesTable* myMPT6 = new G4MaterialPropertiesTable();
@@ -335,8 +349,44 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
+  
+  //Simplified
   solids.push_back(mesh->GetSolid("beam_splitter"));
   solids.push_back(mesh->GetSolid("mirror"));
+  solids.push_back(mesh->GetSolid("COHERENT_MINI-701L-660S"));
+  solids.push_back(mesh->GetSolid("Hellma_flowcell_131-814-40"));
+  solids.push_back(mesh->GetSolid("ACL12708U"));
+  solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor"));
+  solids.push_back(mesh->GetSolid("BST04_BeamSplitter"));
+  solids.push_back(mesh->GetSolid("Direct_beam_stop_2"));
+  solids.push_back(mesh->GetSolid("vbpw34s_1"));
+  solids.push_back(mesh->GetSolid("vbpw34s_2"));
+  solids.push_back(mesh->GetSolid("LB1258-A"));
+  solids.push_back(mesh->GetSolid("LA_Mirror"));
+  solids.push_back(mesh->GetSolid("LA_HA_mirror"));
+  solids.push_back(mesh->GetSolid("Direct_beam_stop"));
+  solids.push_back(mesh->GetSolid("HA_mirror"));
+  solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing_PRIM"));
+  solids.push_back(mesh->GetSolid("shield"));
+
+
+  //Complete
+  solids.push_back(mesh->GetSolid("lense_outer_housing"));
+  solids.push_back(mesh->GetSolid("sensor_shield_1"));
+  solids.push_back(mesh->GetSolid("half_shield"));
+  solids.push_back(mesh->GetSolid("BST04_BeamSplitter_housing"));
+  solids.push_back(mesh->GetSolid("LA_HA_housing"));
+  solids.push_back(mesh->GetSolid("LA_HA_holder"));
+  solids.push_back(mesh->GetSolid("half_shield_2"));
+  solids.push_back(mesh->GetSolid("beam_splitter_1"));
+  solids.push_back(mesh->GetSolid("mirror_1"));
+  solids.push_back(mesh->GetSolid("LA_HA_mirror_underpart"));
+  solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
+  solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
+  solids.push_back(mesh->GetSolid("BST04_BeamSplitter_underpart"));
+  solids.push_back(mesh->GetSolid("vbpw34s_1_sensor"));
+  solids.push_back(mesh->GetSolid("vbpw34s_2_sensor"));
+  solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing"));
 
   std::vector<G4LogicalVolume*> argosz_log(solids.size());
   std::vector<G4VPhysicalVolume*> argosz_phys(solids.size());
