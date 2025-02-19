@@ -333,7 +333,9 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_optikai_elrendezes_250217.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;;
   mesh->SetScale(1.0);
-  std::vector<G4VSolid*> solids = mesh->GetSolids();
+  std::vector<G4VSolid*> solids; // = mesh->GetSolids();
+  solids.push_back(mesh->GetSolid("beam_splitter"));
+  solids.push_back(mesh->GetSolid("mirror"));
 
   std::vector<G4LogicalVolume*> argosz_log(solids.size());
   std::vector<G4VPhysicalVolume*> argosz_phys(solids.size());
@@ -351,7 +353,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   7  solid name: BST04_BeamSplitter
   8  solid name: Direct_beam_stop_2
   9  solid name: vbpw34s_1
-  10  solid name: vbpw34s_2
+  10 solid name: vbpw34s_2
   11 solid name: LB1258-A
   12 solid name: LA_Mirror
   13 solid name: LA_HA_mirror
@@ -424,7 +426,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[28] = shieldMaterial;
 
   int isolid = 0;
-  for (auto solid : mesh->GetSolids())
+  for (auto solid : solids)
   {
     //if(isolid == 14 || isolid == 16) continue;
     G4cout << "solid name: " << solid->GetName() << G4endl;
@@ -547,13 +549,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4OpticalSurface* opticalSurfaceLens = new G4OpticalSurface("LensSurface");
   opticalSurfaceLens = new G4OpticalSurface("LensSurface", unified, polished, dielectric_dielectric);
 
-  // Define reflection and transmission properties
-  std::vector<G4double> transmittanceLens = {0.99,  0.99,  0.99,  0.99};//{0.91320,  0.91320,  0.91320,  0.91320};
-  std::vector<G4double> reflectivityLens = {0.01, 0.01, 0.01, 0.01};//{0.00, 0.00, 0.00, 0.00};
-	std::vector<G4double> refractiveIndexLens = {1.52, 1.52, 1.52, 1.52};//{1.0972, 1.0972, 1.0972, 1.0972};
-  G4MaterialPropertiesTable* SMPTlens = new G4MaterialPropertiesTable();
-  
-
 	//G4LogicalBorderSurface* flowcellSurface1 = new G4LogicalBorderSurface("LensBorderSurface1", world_phys, argosz_phys[3], opticalSurfaceLens);
         // ACL12708U
 	G4LogicalBorderSurface* lensSurface1_in = new G4LogicalBorderSurface("LensBorderSurface2", world_phys, argosz_phys[4], opticalSurfaceLens);
@@ -561,7 +556,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
         // LB1258-A
 	G4LogicalBorderSurface* lensSurface2_in = new G4LogicalBorderSurface("LensBorderSurface2", world_phys, argosz_phys[10], opticalSurfaceLens);
 	G4LogicalBorderSurface* lensSurface2_out = new G4LogicalBorderSurface("LensBorderSurface2_1", argosz_phys[10], world_phys, opticalSurfaceLens);
-//  opticalSurfaceLens->SetMaterialPropertiesTable(SMPTlens);//myMPT5);
 
   // Beam splitter
   // BST04_BeamSplitter
@@ -586,10 +580,10 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	G4LogicalBorderSurface* splitterBorderSurface_front = new G4LogicalBorderSurface("splitterBorderSurface_front", world_phys, argosz_phys[6], splitterSurface_front);
 	G4LogicalBorderSurface* splitterBorderSurface_back = new G4LogicalBorderSurface("splitterBorderSurface_back", argosz_phys[6], world_phys, splitterSurface_back);
 
-  //flowcell - not working atm FIXME
+  //flowcell - seems to be acceptable?
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
 	G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
-	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, ARGosz_phys[3], splitterSurface_back);
 
 
 
