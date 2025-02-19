@@ -203,6 +203,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   shieldMaterial->SetMaterialPropertiesTable(myMPT4);
+  
 
   
   // Aspherical lens - B270 material, https://www.schott.com/en-us/products/b-270-p1000313/technical-details
