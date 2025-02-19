@@ -59,6 +59,7 @@ set(Norma_SCRIPTS
     Argosz_sensorupdate.obj
     Argosz_sensorupdate_with_shield.obj
     Argosz_matyimod_housing.obj
+    Argosz_optikai_elrendezes_250217.obj
   )
 
 foreach(_script ${Norma_SCRIPTS})

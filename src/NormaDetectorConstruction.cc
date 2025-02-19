@@ -310,7 +310,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_matyimod_housing.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_optikai_elrendezes_250217.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids = mesh->GetSolids();
@@ -321,41 +321,87 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	std::vector<G4Material*> argosz_mat(solids.size());
 
   /* 0 -> 16
-  0  solid name: beam_splitter
-  1  solid name: mirror
-  2  solid name: COHERENT_MINI-701L-660S
-  3  solid name: Hellma_flowcell_131-814-40
-  4  solid name: ACL12708U
-  5  solid name: GS3-U3-23S6M-C_sensor
-  6  solid name: BST04_BeamSplitter
-  7  solid name: Direct_beam_stop_2
-  8  solid name: vbpw34s_1
-  9  solid name: vbpw34s_2
-  10 solid name: LB1258-A
-  11 solid name: LA_Mirror
-  12 solid name: LA_HA_mirror
-  13 solid name: Direct_beam_stop
-  14 solid name: HA_mirror
-  15 solid name: CylinderShield
+     Simplified 3D model
+  1  solid name: beam_splitter
+  2  solid name: mirror
+  3  solid name: COHERENT_MINI-701L-660S
+  4  solid name: Hellma_flowcell_131-814-40
+  5  solid name: ACL12708U
+  6  solid name: GS3-U3-23S6M-C_sensor
+  7  solid name: BST04_BeamSplitter
+  8  solid name: Direct_beam_stop_2
+  9  solid name: vbpw34s_1
+  10  solid name: vbpw34s_2
+  11 solid name: LB1258-A
+  12 solid name: LA_Mirror
+  13 solid name: LA_HA_mirror
+  14 solid name: Direct_beam_stop
+  15 solid name: HA_mirror
   16 solid name: GS3-U3-23S6M-C_sensor_housing_PRIM
+  0 solid name: shield
   */
- argosz_mat[0] = mirrorMaterial;
+  /*
+     Complete 3D model
+  0  solid name: ACL12708U
+  1  solid name: lense_outer_housing
+  2  solid name: LB1258-A
+  3  solid name: COHERENT_MINI-701L-660S
+  4  solid name: sensor_shield_1
+  5  solid name: half_shield
+  6  solid name: BST04_BeamSplitter_housing
+  7  solid name: LA_HA_housing
+  8  solid name: LA_HA_holder
+  9  solid name: GS3-U3-23S6M-C_sensor
+ 10  solid name: LA_HA_mirror
+ 11  solid name: half_shield_2
+ 12  solid name: BST04_BeamSplitter
+ 13  solid name: Direct_beam_stop
+ 14  solid name: beam_splitter_1
+ 15  solid name: mirror_1
+ 16  solid name: LA_HA_mirror_underpart
+ 17  solid name: HA_mirror_underpart
+ 18  solid name: LA_mirror_underpart
+ 19  solid name: BST04_BeamSplitter_underpart
+ 20  solid name: Hellma_flowcell_131-814-40
+ 21  solid name: HA_mirror
+ 22  solid name: LA_mirror
+ 23  solid name: vbpw34s_1_sensor
+ 24  solid name: vbpw34s_2_sensor
+ 25  solid name: Direct_beam_stop_2
+ 26  solid name: vbpw34s_1
+ 27  solid name: vbpw34s_2
+ 28  solid name: GS3-U3-23S6M-C_sensor_housing
+*/
  argosz_mat[1] = mirrorMaterial;
  argosz_mat[2] = mirrorMaterial;
- argosz_mat[3] = flowcellMaterial; 
- argosz_mat[4] = lensMaterial;
- argosz_mat[5] = sil;
- argosz_mat[6] = lensMaterial;
- argosz_mat[7] = shieldMaterial;
- argosz_mat[8] = lensMaterial;
+ argosz_mat[3] = mirrorMaterial;
+ argosz_mat[4] = flowcellMaterial; 
+ argosz_mat[5] = lensMaterial;
+ argosz_mat[6] = sil;
+ argosz_mat[7] = lensMaterial;
+ argosz_mat[8] = shieldMaterial;
  argosz_mat[9] = lensMaterial;
  argosz_mat[10] = lensMaterial;
- argosz_mat[11] = mirrorMaterial;
+ argosz_mat[11] = lensMaterial;
  argosz_mat[12] = mirrorMaterial;
- argosz_mat[13] = shieldMaterial;
- argosz_mat[14] = mirrorMaterial;
- argosz_mat[15] = shieldMaterial;
+ argosz_mat[13] = mirrorMaterial;
+ argosz_mat[14] = shieldMaterial;
+ argosz_mat[15] = mirrorMaterial;
  argosz_mat[16] = shieldMaterial;
+ argosz_mat[0] = shieldMaterial;
+ argosz_mat[17] = shieldMaterial;
+ argosz_mat[18] = shieldMaterial;
+ argosz_mat[19] = shieldMaterial;
+ argosz_mat[20] = shieldMaterial;
+ argosz_mat[21] = shieldMaterial;
+ argosz_mat[22] = shieldMaterial;
+ argosz_mat[22] = shieldMaterial;
+ argosz_mat[23] = shieldMaterial;
+ argosz_mat[24] = shieldMaterial;
+ argosz_mat[25] = shieldMaterial;
+ argosz_mat[26] = shieldMaterial;
+ argosz_mat[27] = shieldMaterial;
+ argosz_mat[28] = shieldMaterial;
 
   int isolid = 0;
   for (auto solid : mesh->GetSolids())
@@ -367,6 +413,16 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                                         , solid->GetName()//"logical"
                                         , 0, 0, 0
     );
+    if(isolid == 4) 
+    { 
+      argosz_phys[isolid] = new G4PVPlacement( 0
+                        , G4ThreeVector(-.40, 0, 0)
+                        , argosz_log[isolid]
+                        , solid->GetName()
+                        , world_log
+                        , false, 0
+      );
+    } else {
       argosz_phys[isolid] = new G4PVPlacement( 0
                         , G4ThreeVector(0, 0, 0)
                         , argosz_log[isolid]
@@ -374,6 +430,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                         , world_log
                         , false, 0
       );
+    }
     
     isolid++;
     //if(isolid == 16) break;
@@ -459,34 +516,27 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   opticalSurfaceMirror->SetMaterialPropertiesTable(SMPT);
 
-	G4LogicalBorderSurface* mirrorSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface_1", world_phys, argosz_phys[0], opticalSurfaceMirror);
-	G4LogicalBorderSurface* mirrorSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface_2", world_phys, argosz_phys[1], opticalSurfaceMirror);
-	G4LogicalBorderSurface* mirrorSurface_11 = new G4LogicalBorderSurface("MirrorBorderSurface_11", world_phys, argosz_phys[11], opticalSurfaceMirror);
-	G4LogicalBorderSurface* mirrorSurface_12 = new G4LogicalBorderSurface("MirrorBorderSurface_12", world_phys, argosz_phys[12], opticalSurfaceMirror);
-	G4LogicalBorderSurface* mirrorSurface_14 = new G4LogicalBorderSurface("MirrorBorderSurface_14", world_phys, argosz_phys[14], opticalSurfaceMirror);
+	G4LogicalBorderSurface* mirrorSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface_1", world_phys, argosz_phys[1], opticalSurfaceMirror);
+	G4LogicalBorderSurface* mirrorSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface_2", world_phys, argosz_phys[2], opticalSurfaceMirror);
+	G4LogicalBorderSurface* mirrorSurface_11 = new G4LogicalBorderSurface("MirrorBorderSurface_11", world_phys, argosz_phys[12], opticalSurfaceMirror);
+	G4LogicalBorderSurface* mirrorSurface_12 = new G4LogicalBorderSurface("MirrorBorderSurface_12", world_phys, argosz_phys[13], opticalSurfaceMirror);
+	G4LogicalBorderSurface* mirrorSurface_14 = new G4LogicalBorderSurface("MirrorBorderSurface_14", world_phys, argosz_phys[15], opticalSurfaceMirror);
 
   // Lens
 	// Create optical surface
   G4OpticalSurface* opticalSurfaceLens = new G4OpticalSurface("LensSurface");
   opticalSurfaceLens = new G4OpticalSurface("LensSurface", unified, polished, dielectric_dielectric);
 
-  // Define reflection and transmission properties
-  std::vector<G4double> transmittanceLens = {0.99,  0.99,  0.99,  0.99};//{0.91320,  0.91320,  0.91320,  0.91320};
-  std::vector<G4double> reflectivityLens = {0.01, 0.01, 0.01, 0.01};//{0.00, 0.00, 0.00, 0.00};
-	std::vector<G4double> refractiveIndexLens = {1.52, 1.52, 1.52, 1.52};//{1.0972, 1.0972, 1.0972, 1.0972};
-  G4MaterialPropertiesTable* SMPTlens = new G4MaterialPropertiesTable();
-  
 
-	//G4LogicalBorderSurface* flowcellSurface1 = new G4LogicalBorderSurface("LensBorderSurface1", world_phys, argosz_phys[3], opticalSurfaceLens);
         // ACL12708U
-	G4LogicalBorderSurface* lensSurface1_in = new G4LogicalBorderSurface("LensBorderSurface2", world_phys, argosz_phys[4], opticalSurfaceLens);
-	G4LogicalBorderSurface* lensSurface1_out = new G4LogicalBorderSurface("LensBorderSurface2_1", argosz_phys[4], world_phys, opticalSurfaceLens);
+	G4LogicalBorderSurface* lensSurface1_in = new G4LogicalBorderSurface("LensBorderSurface2", world_phys, argosz_phys[5], opticalSurfaceLens);
+	G4LogicalBorderSurface* lensSurface1_out = new G4LogicalBorderSurface("LensBorderSurface2_1", argosz_phys[5], world_phys, opticalSurfaceLens);
         // LB1258-A
-	G4LogicalBorderSurface* lensSurface2_in = new G4LogicalBorderSurface("LensBorderSurface2", world_phys, argosz_phys[10], opticalSurfaceLens);
-	G4LogicalBorderSurface* lensSurface2_out = new G4LogicalBorderSurface("LensBorderSurface2_1", argosz_phys[10], world_phys, opticalSurfaceLens);
-//  opticalSurfaceLens->SetMaterialPropertiesTable(SMPTlens);//myMPT5);
+	G4LogicalBorderSurface* lensSurface2_in = new G4LogicalBorderSurface("LensBorderSurface2", world_phys, argosz_phys[11], opticalSurfaceLens);
+	G4LogicalBorderSurface* lensSurface2_out = new G4LogicalBorderSurface("LensBorderSurface2_1", argosz_phys[11], world_phys, opticalSurfaceLens);
 
   // Beam splitter
+  // BST04_BeamSplitter
   G4OpticalSurface* splitterSurface_front = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
   G4OpticalSurface* splitterSurface_back = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
   
@@ -505,13 +555,13 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   splitterSurface_back->SetMaterialPropertiesTable(surfaceMPT_back);
   //this is not used now in the simulation
 	//G4LogicalBorderSurface* splitterSurface1 = new G4LogicalBorderSurface("splitterBorderSurface1", world_phys, argosz_phys[0], opticalSurfaceLens);
-	G4LogicalBorderSurface* splitterBorderSurface_front = new G4LogicalBorderSurface("splitterBorderSurface_front", world_phys, argosz_phys[6], splitterSurface_front);
-	G4LogicalBorderSurface* splitterBorderSurface_back = new G4LogicalBorderSurface("splitterBorderSurface_back", argosz_phys[6], world_phys, splitterSurface_back);
+	G4LogicalBorderSurface* splitterBorderSurface_front = new G4LogicalBorderSurface("splitterBorderSurface_front", world_phys, argosz_phys[7], splitterSurface_front);
+	G4LogicalBorderSurface* splitterBorderSurface_back = new G4LogicalBorderSurface("splitterBorderSurface_back", argosz_phys[7], world_phys, splitterSurface_back);
 
   //flowcell - not working atm FIXME
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
-	G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
-	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+	G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[4], world_phys, splitterSurface_back);
+	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[4], splitterSurface_back);
 
 
 
