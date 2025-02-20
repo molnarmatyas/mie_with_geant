@@ -330,8 +330,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_optikai_elrendezes_250217.obj");
-  G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;;
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_matyimod_housing.obj");
+  G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids = mesh->GetSolids();
 
@@ -342,23 +342,23 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   /* 0 -> 16
      Simplified 3D model
-  1  solid name: beam_splitter
-  2  solid name: mirror
-  3  solid name: COHERENT_MINI-701L-660S
-  4  solid name: Hellma_flowcell_131-814-40
-  5  solid name: ACL12708U
-  6  solid name: GS3-U3-23S6M-C_sensor
-  7  solid name: BST04_BeamSplitter
-  8  solid name: Direct_beam_stop_2
-  9  solid name: vbpw34s_1
-  10  solid name: vbpw34s_2
-  11 solid name: LB1258-A
-  12 solid name: LA_Mirror
-  13 solid name: LA_HA_mirror
-  14 solid name: Direct_beam_stop
-  15 solid name: HA_mirror
+  0  solid name: beam_splitter
+  1  solid name: mirror
+  2  solid name: COHERENT_MINI-701L-660S
+  3  solid name: Hellma_flowcell_131-814-40
+  4  solid name: ACL12708U
+  5  solid name: GS3-U3-23S6M-C_sensor
+  6  solid name: BST04_BeamSplitter
+  7  solid name: Direct_beam_stop_2
+  8  solid name: vbpw34s_1
+  9  solid name: vbpw34s_2
+  10 solid name: LB1258-A
+  11 solid name: LA_Mirror
+  12 solid name: LA_HA_mirror
+  13 solid name: Direct_beam_stop
+  14 solid name: HA_mirror
+  15 solid name: CylinderShield
   16 solid name: GS3-U3-23S6M-C_sensor_housing_PRIM
-  0 solid name: shield
   */
   /*
      Complete 3D model
@@ -392,6 +392,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  27  solid name: vbpw34s_2
  28  solid name: GS3-U3-23S6M-C_sensor_housing
 */
+ argosz_mat[0] = mirrorMaterial;
  argosz_mat[1] = mirrorMaterial;
  argosz_mat[2] = mirrorMaterial;
  argosz_mat[3] = flowcellMaterial; 
@@ -399,8 +400,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[5] = sil;
  argosz_mat[6] = lensMaterial;
  argosz_mat[7] = shieldMaterial;
- argosz_mat[8] = lensMaterial;
- argosz_mat[9] = lensMaterial;
+ argosz_mat[8] = sil;
+ argosz_mat[9] = sil;
  argosz_mat[10] = lensMaterial;
  argosz_mat[11] = mirrorMaterial;
  argosz_mat[12] = mirrorMaterial;
@@ -408,7 +409,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[14] = mirrorMaterial;
  argosz_mat[15] = shieldMaterial;
  argosz_mat[16] = shieldMaterial;
- argosz_mat[0] = shieldMaterial;
+ /*
  argosz_mat[17] = shieldMaterial;
  argosz_mat[18] = shieldMaterial;
  argosz_mat[19] = shieldMaterial;
@@ -422,6 +423,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[26] = shieldMaterial;
  argosz_mat[27] = shieldMaterial;
  argosz_mat[28] = shieldMaterial;
+ */
 
   int isolid = 0;
   for (auto solid : mesh->GetSolids())
@@ -433,7 +435,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
                                         , solid->GetName()//"logical"
                                         , 0, 0, 0
     );
-    if(isolid == 4) 
+    if(isolid == 3) 
     { 
       argosz_phys[isolid] = new G4PVPlacement( 0
                         , G4ThreeVector(-.40, 0, 0)
