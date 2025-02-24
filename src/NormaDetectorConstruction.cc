@@ -362,12 +362,12 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("vbpw34s_1"));
   solids.push_back(mesh->GetSolid("vbpw34s_2"));
   solids.push_back(mesh->GetSolid("LB1258-A"));
-  solids.push_back(mesh->GetSolid("LA_Mirror"));
+  solids.push_back(mesh->GetSolid("LA_mirror"));
   solids.push_back(mesh->GetSolid("LA_HA_mirror"));
   solids.push_back(mesh->GetSolid("Direct_beam_stop"));
   solids.push_back(mesh->GetSolid("HA_mirror"));
-  solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing_PRIM"));
-  solids.push_back(mesh->GetSolid("shield"));
+  //solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing_PRIM"));
+  //solids.push_back(mesh->GetSolid("shield"));
 
 
   //Complete
@@ -378,8 +378,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("LA_HA_housing"));
   solids.push_back(mesh->GetSolid("LA_HA_holder"));
   solids.push_back(mesh->GetSolid("half_shield_2"));
-  solids.push_back(mesh->GetSolid("beam_splitter_1"));
-  solids.push_back(mesh->GetSolid("mirror_1"));
   solids.push_back(mesh->GetSolid("LA_HA_mirror_underpart"));
   solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
   solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
@@ -634,7 +632,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   //flowcell - seems to be acceptable?
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
 	G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
-	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, ARGosz_phys[3], splitterSurface_back);
+	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
 
 
 
