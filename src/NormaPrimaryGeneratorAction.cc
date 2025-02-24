@@ -58,12 +58,14 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 	G4double y = (0.0);// - (1.5 * CLHEP::um));
 	// std::cout<<"startpos photon "<<y/CLHEP::um<<std::endl;
 	//fParticleGun->SetParticlePosition(G4ThreeVector(-17 * CLHEP::um, y, 0*mm));
-//	fParticleGun->SetParticlePosition(G4ThreeVector(-29.35 * CLHEP::mm, 96.075 * CLHEP::mm, -157.84 * CLHEP::mm)); //laser
+  //fParticleGun->SetParticlePosition(G4ThreeVector(-29.35 * CLHEP::mm, 96.076 * CLHEP::mm, -157.841 * CLHEP::mm)); //laser
 	fParticleGun->SetParticlePosition(G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm)); //14.49 //center of cell
 		
+  /*
 	G4double dy = (G4UniformRand() - 0.5) * 0.1;
 	G4double dz = (G4UniformRand() - 0.5) * 0.1;
 	// fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., dy, dz));
+  */
 	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., 0.0, 0.)); // -1 backwards
 	fParticleGun->SetParticleEnergy(1.884 * eV);
   //G4cout << "Gun from " << fParticleGun->GetParticlePosition().x() << ", " << fParticleGun->GetParticlePosition().y() << ", " << fParticleGun->GetParticlePosition().z() << G4endl; 
@@ -85,11 +87,14 @@ void NormaPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
   /*
   G4double t = 2*CLHEP::pi  * G4UniformRand();
   G4double r = std::sqrt(0.1/CLHEP::pi) * (G4UniformRand());
-  G4double x0 = -29.35 * CLHEP::mm;
-  G4double y0 = r * std::cos(t) + 96.1 * CLHEP::mm;
-  G4double z0 = r * std::sin(t) + -157.88 * CLHEP::mm;
+  G4double x0 = 14.09 * CLHEP::mm;
+  G4double y0 = r * std::cos(t) + 96.2425 * CLHEP::mm;
+  G4double z0 = r * std::sin(t) + -137.51 * CLHEP::mm;
   //G4cerr << "Gun from " << x0 << ", " << y0 << ", " << z0 << G4endl; 
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0)*CLHEP::mm); // so then 0.1 mm^2 is the source
+	G4double dy = 0.0;//(G4UniformRand() - 0.5) * 0.1;
+	G4double dz = 0.0;//(G4UniformRand() - 0.5) * 0.1;
+	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., dy, dz));
   */
 	fParticleGun->GeneratePrimaryVertex(anEvent);
 }

@@ -85,7 +85,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	// Get nist material manager
 	G4NistManager *nist = G4NistManager::Instance();
 	G4Material *sil = nist->FindOrBuildMaterial("G4_Si");
-
+	G4Material *copper = nist->FindOrBuildMaterial("G4_Cu");
+	G4Material *alu_oxide = nist->FindOrBuildMaterial("G4_ALUMINUM_OXIDE");
 
 	// ------------ Generate & Add Material Properties Table ------------
 	//
@@ -244,6 +245,20 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   lensMaterialNBK7->SetMaterialPropertiesTable(MPT_nbk7);
 
+  //OD 0.5 ND filter - NG4 material
+  //https://www.sydor.com/wp-content/uploads/SCHOTT-NG4-Neutral-Density-Filter.pdf
+  G4Material* lensMaterialNG4 = new G4Material("NG4", 2.43*g/cm3, 1);
+  lensMaterialNG4->AddMaterial(nist->FindOrBuildMaterial("G4_Pyrex_Glass"), 1.0); // should do it for now
+  G4MaterialPropertiesTable* MPT_ng4 = new G4MaterialPropertiesTable();
+  
+  std::vector<G4double> rindexLensNG4 = {1.510, 1.510, 1.510, 1.510};
+  MPT_ng4->AddProperty("RINDEX", photonEnergyMirror, rindexLensNG4, nEntries);
+
+  std::vector<G4double> absLengthLensNG4 = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
+  MPT_ng4->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthLensNG4, false, false);
+
+  lensMaterialNG4->SetMaterialPropertiesTable(MPT_ng4);
+  
   // Helma flow cell - made of quartz glass
   G4Material* flowcellMaterial = nist->FindOrBuildMaterial("G4_SILICON_DIOXIDE");
   G4MaterialPropertiesTable* myMPT6 = new G4MaterialPropertiesTable();
@@ -256,6 +271,19 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   flowcellMaterial->SetMaterialPropertiesTable(myMPT6);
 
+	// Physiological saline solution
+	G4Material* saltwater = nist->FindOrBuildMaterial("G4_WATER");
+	G4MaterialPropertiesTable* saline_MPT = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexSaline = {1.34, 1.34, 1.34, 1.34}; // FIXME more precise!
+  saline_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexSaline, nEntries);
+
+  std::vector<G4double> absLengthSaline = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
+  saline_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthSaline, false, false);
+
+  saltwater->SetMaterialPropertiesTable(saline_MPT);
+
+
 
 
 	// ------------- Volumes --------------
@@ -266,6 +294,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	G4VPhysicalVolume *world_phys =
 		new G4PVPlacement(nullptr, G4ThreeVector(), world_log, "world", nullptr, false, 0, checkOverlaps);
 
+	/*
 	// The Bubble
 
 	G4double Pz[11] = {-fBubble_r * 1.0, -fBubble_r * 0.8, -fBubble_r * 0.6, -fBubble_r * 0.4, -fBubble_r * 0.2, 0,
@@ -295,6 +324,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 		bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm), bubbleW_log,
 										"Bubble_dis_bnd_proc", world_log, false, 0);
 	}
+	*/
 
 	// screen
   double box_position = 395;
@@ -330,12 +360,46 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_optikai_elrendezes_250217.obj");
-  G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;;
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_matyimod_housing.obj");
+  G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
+  
+  //Simplified
   solids.push_back(mesh->GetSolid("beam_splitter"));
   solids.push_back(mesh->GetSolid("mirror"));
+  solids.push_back(mesh->GetSolid("COHERENT_MINI-701L-660S"));
+  solids.push_back(mesh->GetSolid("Hellma_flowcell_131-814-40"));
+  solids.push_back(mesh->GetSolid("ACL12708U"));
+  solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor"));
+  solids.push_back(mesh->GetSolid("BST04_BeamSplitter"));
+  solids.push_back(mesh->GetSolid("Direct_beam_stop_2"));
+  solids.push_back(mesh->GetSolid("vbpw34s_1"));
+  solids.push_back(mesh->GetSolid("vbpw34s_2"));
+  solids.push_back(mesh->GetSolid("LB1258-A"));
+  solids.push_back(mesh->GetSolid("LA_mirror"));
+  solids.push_back(mesh->GetSolid("LA_HA_mirror"));
+  solids.push_back(mesh->GetSolid("Direct_beam_stop"));
+  solids.push_back(mesh->GetSolid("HA_mirror"));
+  //solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing_PRIM"));
+  //solids.push_back(mesh->GetSolid("shield"));
+
+
+  //Complete
+  solids.push_back(mesh->GetSolid("lense_outer_housing"));
+  solids.push_back(mesh->GetSolid("sensor_shield_1"));
+  solids.push_back(mesh->GetSolid("half_shield"));
+  solids.push_back(mesh->GetSolid("BST04_BeamSplitter_housing"));
+  solids.push_back(mesh->GetSolid("LA_HA_housing"));
+  solids.push_back(mesh->GetSolid("LA_HA_holder"));
+  solids.push_back(mesh->GetSolid("half_shield_2"));
+  solids.push_back(mesh->GetSolid("LA_HA_mirror_underpart"));
+  solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
+  solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
+  solids.push_back(mesh->GetSolid("BST04_BeamSplitter_underpart"));
+  solids.push_back(mesh->GetSolid("vbpw34s_1_sensor"));
+  solids.push_back(mesh->GetSolid("vbpw34s_2_sensor"));
+  solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing"));
 
   std::vector<G4LogicalVolume*> argosz_log(solids.size());
   std::vector<G4VPhysicalVolume*> argosz_phys(solids.size());
@@ -360,7 +424,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   14 solid name: Direct_beam_stop
   15 solid name: HA_mirror
   16 solid name: GS3-U3-23S6M-C_sensor_housing_PRIM
-  0 solid name: shield
+	17 solid name: Saltywater
   */
   /*
      Complete 3D model
@@ -394,6 +458,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  27  solid name: vbpw34s_2
  28  solid name: GS3-U3-23S6M-C_sensor_housing
 */
+ argosz_mat[0] = mirrorMaterial;
  argosz_mat[1] = mirrorMaterial;
  argosz_mat[2] = mirrorMaterial;
  argosz_mat[3] = flowcellMaterial; 
@@ -401,8 +466,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[5] = sil;
  argosz_mat[6] = lensMaterial;
  argosz_mat[7] = shieldMaterial;
- argosz_mat[8] = lensMaterial;
- argosz_mat[9] = lensMaterial;
+ argosz_mat[8] = sil;
+ argosz_mat[9] = sil;
  argosz_mat[10] = lensMaterial;
  argosz_mat[11] = mirrorMaterial;
  argosz_mat[12] = mirrorMaterial;
@@ -410,7 +475,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[14] = mirrorMaterial;
  argosz_mat[15] = shieldMaterial;
  argosz_mat[16] = shieldMaterial;
- argosz_mat[0] = shieldMaterial;
+ argosz_mat[17] = saltwater;
+ /*
  argosz_mat[17] = shieldMaterial;
  argosz_mat[18] = shieldMaterial;
  argosz_mat[19] = shieldMaterial;
@@ -424,21 +490,27 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[26] = shieldMaterial;
  argosz_mat[27] = shieldMaterial;
  argosz_mat[28] = shieldMaterial;
+ */
 
   int isolid = 0;
   for (auto solid : solids)
   {
-    //if(isolid == 14 || isolid == 16) continue;
+    /*
+		if(isolid == 14 || isolid == 16){
+		  isolid++
+		  continue;
+	  } 
+		*/
     G4cout << "solid name: " << solid->GetName() << G4endl;
     argosz_log[isolid]  = new G4LogicalVolume( solid
                                         , argosz_mat[isolid]
                                         , solid->GetName()//"logical"
                                         , 0, 0, 0
     );
-    if(isolid == 4) 
+    if(isolid == 3 || isolid == 17) 
     { 
       argosz_phys[isolid] = new G4PVPlacement( 0
-                        , G4ThreeVector(-.40, 0, 0)
+                        , G4ThreeVector(-0.40, 0, 0)
                         , argosz_log[isolid]
                         , solid->GetName()
                         , world_log
@@ -457,6 +529,37 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
     isolid++;
     //if(isolid == 16) break;
   }
+
+
+	// The Bubble IN SALINE SOLUTION
+
+	G4double Pz[11] = {-fBubble_r * 1.0, -fBubble_r * 0.8, -fBubble_r * 0.6, -fBubble_r * 0.4, -fBubble_r * 0.2, 0,
+		fBubble_r * 0.2,	 fBubble_r * 0.4,  fBubble_r * 0.6,	 fBubble_r * 0.8,  fBubble_r * 1.0};
+G4double Prin[11] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
+G4double Prout[11] = {fBubble_r * 0.01, fBubble_r * 0.25, fBubble_r * 0.55, fBubble_r * 0.8,
+		 fBubble_r * 0.9,	fBubble_r * 0.99, fBubble_r * 0.92, fBubble_r * 0.8,
+		 fBubble_r * 0.5,	fBubble_r * 0.3,  fBubble_r * 0.05};
+std::cout << fBubble_r / CLHEP::um << std::endl;
+for (int i = 0; i < 11; i++)
+{
+std::cout << Pz[i] / CLHEP::um << " " << Prin[i] / CLHEP::um << " " << Prout[i] / CLHEP::um << std::endl;
+}
+auto bubbleWP = new G4Polycone("Bubble", 0., 360. * deg, 11, Pz, Prin, Prout);
+auto bubbleWP_log = new G4LogicalVolume(bubbleWP, water, "Bubble");
+
+auto bubbleW = new G4Orb("Bubble", fBubble_r);
+auto bubbleW_log = new G4LogicalVolume(bubbleW, water, "Bubble");
+
+if (isPolycone)
+{
+bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm), bubbleWP_log,
+					 "Bubble_dis_bnd_proc", argosz_log[17], false, 0);
+}
+else
+{
+bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.49 * mm, 96.2425 * mm, -137.51 * mm), bubbleW_log,
+					 "Bubble_dis_bnd_proc", argosz_log[17], false, 0);
+}
 
 
 
@@ -513,10 +616,11 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 	auto opWaterSurface = new G4OpticalSurface("WaterSurface");
 	opWaterSurface = new G4OpticalSurface("WaterSurface", glisur, polished, x_ray);
 
-	auto waterSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
+	//auto waterSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
+	auto waterSurface = new G4LogicalBorderSurface("WaterSurface", argosz_phys[17], bubble_phys, opWaterSurface); // in SALINE SOLUTION
 
 	auto opticalSurface =
-		dynamic_cast<G4OpticalSurface *>(waterSurface->GetSurface(world_phys, bubble_phys)->GetSurfaceProperty());
+		dynamic_cast<G4OpticalSurface *>(waterSurface->GetSurface(argosz_phys[17], bubble_phys)->GetSurfaceProperty()); // in SALINE SOLUTION
 	if (opticalSurface)
 		opticalSurface->DumpInfo();
 
@@ -583,7 +687,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   //flowcell - seems to be acceptable?
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
 	G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
-	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, ARGosz_phys[3], splitterSurface_back);
+	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
 
 
 
