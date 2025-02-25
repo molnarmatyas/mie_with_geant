@@ -642,10 +642,13 @@ bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.49 * mm, 96.2425 * mm,
 	G4LogicalBorderSurface* splitterBorderSurface_front = new G4LogicalBorderSurface("splitterBorderSurface_front", world_phys, argosz_phys[6], splitterSurface_front);
 	G4LogicalBorderSurface* splitterBorderSurface_back = new G4LogicalBorderSurface("splitterBorderSurface_back", argosz_phys[6], world_phys, splitterSurface_back);
 
-  //flowcell - not working atm FIXME
+  //flowcell
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
-	G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
-	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+	G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, flowcellSurface);
+	G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], flowcellSurface);
+
+	G4LogicalBorderSurface* flowcell_saltwater_BorderSurface_in_out = new G4LogicalBorderSurface("flowcell_saltwater_BorderSurface_in_out", argosz_phys[3], argosz_phys[17], flowcellSurface);
+	G4LogicalBorderSurface* flowcell_saltwater_BorderSurface_out_in = new G4LogicalBorderSurface("flowcell_saltwater_BorderSurface_out_in", argosz_phys[17], argosz_phys[3], flowcellSurface);
 
 
 
