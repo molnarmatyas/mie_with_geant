@@ -360,7 +360,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_matyimod_housing.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_optikai_elrendezes_250217.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -369,7 +369,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("beam_splitter"));
   solids.push_back(mesh->GetSolid("mirror"));
   solids.push_back(mesh->GetSolid("COHERENT_MINI-701L-660S"));
-  solids.push_back(mesh->GetSolid("Hellma_flowcell_131-814-40"));
+  solids.push_back(mesh->GetSolid("Hellma_flowcell_131-814-40_notube"));
   solids.push_back(mesh->GetSolid("ACL12708U"));
   solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor"));
   solids.push_back(mesh->GetSolid("BST04_BeamSplitter"));
@@ -383,7 +383,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("HA_mirror"));
   //solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing_PRIM"));
   //solids.push_back(mesh->GetSolid("shield"));
-
+  solids.push_back(mesh->GetSolid("Saltywater"));
 
   //Complete
   solids.push_back(mesh->GetSolid("lense_outer_housing"));
@@ -423,8 +423,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   13 solid name: LA_HA_mirror
   14 solid name: Direct_beam_stop
   15 solid name: HA_mirror
-  16 solid name: GS3-U3-23S6M-C_sensor_housing_PRIM
-	17 solid name: Saltywater
+  16 solid name: Saltywater
   */
   /*
      Complete 3D model
@@ -473,16 +472,13 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[12] = mirrorMaterial;
  argosz_mat[13] = shieldMaterial;
  argosz_mat[14] = mirrorMaterial;
- argosz_mat[15] = shieldMaterial;
- argosz_mat[16] = shieldMaterial;
- argosz_mat[17] = saltwater;
- /*
+ argosz_mat[15] = saltwater;
+ argosz_mat[16] = lensMaterial;
  argosz_mat[17] = shieldMaterial;
- argosz_mat[18] = shieldMaterial;
+ argosz_mat[18] = air;
  argosz_mat[19] = shieldMaterial;
  argosz_mat[20] = shieldMaterial;
  argosz_mat[21] = shieldMaterial;
- argosz_mat[22] = shieldMaterial;
  argosz_mat[22] = shieldMaterial;
  argosz_mat[23] = shieldMaterial;
  argosz_mat[24] = shieldMaterial;
@@ -490,7 +486,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
  argosz_mat[26] = shieldMaterial;
  argosz_mat[27] = shieldMaterial;
  argosz_mat[28] = shieldMaterial;
- */
+ argosz_mat[29] = air;
 
   int isolid = 0;
   for (auto solid : solids)
