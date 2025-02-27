@@ -57,8 +57,8 @@ set(Norma_SCRIPTS
     diff_cross_0-180_10000pt.txt
     dhkm_7_1592_1.txt
     Argosz_good_flowcell_fix.obj
-    Argosz_sensorupdate_with_shield.obj
     Argosz_matyimod_housing.obj
+    Argosz_250226_directbeamstop_fix.obj
     Argosz_optikai_elrendezes_250217.obj
   )
 
