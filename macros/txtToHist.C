@@ -42,9 +42,9 @@ void txtToHist() {
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
     //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string filename = "../build/100M_output3500_990_0.txt";
-    //std::string outputprefix = Form("3D_modell_flowcell_shield_%i", ideg);
-    std::string outputprefix = "3D_modell_flowcell_shield_";
+    std::string filename = "../build/10M_polistirol_fixed_flowcell_saltywater_surface_far_point_source.txt";
+    //std::string outputprefix = Form("1M_3D_modell_fixed_flowcell_saltywater_surface_point_source_degbydeg_%i", ideg);
+    std::string outputprefix = "10M_polistirol_3D_modell_fixed_flowcell_saltywater_surface_point_source_";
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -66,12 +66,24 @@ void txtToHist() {
       std::cerr << "Error opening file: " << filename << std::endl;
       return;
     }
+    /*
+      Simple model sensor location
     double x_min = 8.478684;
     double y_min = 92.734001;
     double z_min = -107.531036;
     double x_max = 18.715816;
     double y_max = 99.765999;
     double z_max = -101.050804;
+    */
+    /*
+      complete model sensor location
+    */
+    double x_min = 8.22955;
+    double y_min = 92.734;
+    double z_min = -106.676;
+    double x_max = 18.2223;
+    double y_max = 99.764;
+    double z_max = -100.618;
     double x_center = (x_min + x_max ) / 2.0;
     double y_center = (y_min + y_max ) / 2.0;
     double z_center = (z_min + z_max ) / 2.0;
@@ -173,19 +185,20 @@ void txtToHist() {
     dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
     dh2D_xy->Draw("COLZ");
     //c1->SaveAs(Form("../figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
-    c1->SaveAs(Form("../figs/%s_dh2D_xy_colorful.pdf", outputprefix.c_str()));
+    c1->SaveAs(Form("figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
+    dh2D_xy->Write();
 
     // Black & white image of CCD screen (black=min, white=max)
     TCanvas *c2 = new TCanvas("c2", "CCD Image", 800, 600);
     SetGrayscalePalette(c2, dh2D_xy); // Apply grayscale palette
-    c2->SetLogz(1);
+    //c2->SetLogz(1);
 
 
     dh2D_xy->SetTitle(Form("2D scattering, deg=%i, n = 1.592, 3D model, d = 7 #mu m", ideg));
     dh2D_xy->GetXaxis()->SetTitle("X [pixel]");
     dh2D_xy->GetYaxis()->SetTitle("Y [pixel]");
     dh2D_xy->Draw("COLZ");
-    c2->SaveAs(Form("figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
+    c2->SaveAs(Form("figs/%s_dh2D_xy_discrete.png", outputprefix.c_str()));
 
 
     // R vs alpha
@@ -204,7 +217,6 @@ void txtToHist() {
     dhPosY->Write();
     dhPosZ->Write();
     dh2D_yz->Write();
-    dh2D_xy->Write();
     dhR_alpha->Write();
     dhtheta_alpha->Write();
     dh2D_rx_tantheta->Write();
