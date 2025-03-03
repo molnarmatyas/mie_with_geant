@@ -283,6 +283,22 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   saltwater->SetMaterialPropertiesTable(saline_MPT);
 
+  // OD 0.5 ND filter; partially based on https://www.3doptix.com/catalog/optics/filter/edmund-optics/88-277
+  G4Material* NDglass = nist->FindOrBuildMaterial("G4_Pyrex_Glass");
+  G4MaterialPropertiesTable* ND_MPT = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexND = {1.458448271212196, 1.458448271212196, 1.458448271212196, 1.458448271212196};
+  ND_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexND, nEntries);
+
+  std::vector<G4double> absLengthND = {5.0*m, 5.0*m, 5.0*m, 5.0*m};
+  ND_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthND, false, false);
+
+  std::vector<G4double> transmittanceND = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
+  ND_MPT->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceND, false, false);
+
+  NDglass->SetMaterialPropertiesTable(ND_MPT);
+
+
 
 
 
@@ -507,7 +523,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // LA_HA_holder
   argosz_mat[21] = shieldMaterial;
   // ND_filter
-  argosz_mat[22] = lensMaterial;
+  argosz_mat[22] = NDglass;
   // LA_HA_mirror_underpart
   argosz_mat[23] = shieldMaterial;
   // HA_mirror_underpart
@@ -585,14 +601,15 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   auto bubbleW = new G4Orb("Bubble", fBubble_r);
   auto bubbleW_log = new G4LogicalVolume(bubbleW, water, "Bubble");
 
+  G4double shift = .0;//0.035 * mm; // to make resulting CCD image symmetrical
   if (isPolycone)
   {
-    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm), bubbleWP_log,
+    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm + shift), bubbleWP_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
   }
   else
   {
-    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.49 * mm, 96.2425 * mm, -137.51 * mm), bubbleW_log,
+    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.49 * mm, 96.2425 * mm, -137.51 * mm + shift), bubbleW_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
   }
 
@@ -723,6 +740,16 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
   G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
   G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+  
+  // ND filter
+  G4OpticalSurface* NDFilterSurface = new G4OpticalSurface("NDFilterSurface");
+  NDFilterSurface->SetType(dielectric_dielectric);
+  NDFilterSurface->SetFinish(polished); // or ground if it’s a diffusing ND filter
+  NDFilterSurface->SetModel(unified);
+
+  G4LogicalBorderSurface* ND_in = new G4LogicalBorderSurface("NDFilterBorder", world_phys, argosz_phys[22], NDFilterSurface);
+  G4LogicalBorderSurface* ND_out = new G4LogicalBorderSurface("NDFilterBorder", argosz_phys[22], world_phys, NDFilterSurface);
+
 
 
 
