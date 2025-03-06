@@ -394,7 +394,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("vbpw34s_2"));
   solids.push_back(mesh->GetSolid("LB1258-A"));
   solids.push_back(mesh->GetSolid("LA_mirror"));
-  solids.push_back(mesh->GetSolid("LA_HA_mirror"));
+  solids.push_back(mesh->GetSolid("LA_HA_mirror")); //FIXME its name is misleading, this is a separator
   //solids.push_back(mesh->GetSolid("Direct_beam_stop")); //currently disabled
   solids.push_back(mesh->GetSolid("Direct_beam_stop_0.75"));
   solids.push_back(mesh->GetSolid("HA_mirror"));
@@ -505,7 +505,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // LA_mirror
   argosz_mat[11] = mirrorMaterial;
   // LA_HA_mirror
-  argosz_mat[12] = mirrorMaterial;
+  argosz_mat[12] = shieldMaterial;
   // Direct_beam_stop_0.75
   argosz_mat[13] = shieldMaterial;
   // HA_mirror
