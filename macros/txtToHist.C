@@ -41,10 +41,11 @@ void txtToHist() {
   // Input text file path
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
+    TH2D* dh2D_xz[2];
     //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string filename = "../build/10M_polistirol_fixed_flowcell_saltywater_surface_far_point_source.txt";
+    std::string filename = "../build/1M_complete_model_small_sensors_update_noshift.txt";
     //std::string outputprefix = Form("1M_3D_modell_fixed_flowcell_saltywater_surface_point_source_degbydeg_%i", ideg);
-    std::string outputprefix = "10M_polistirol_3D_modell_fixed_flowcell_saltywater_surface_point_source_";
+    std::string outputprefix = "1M_3D_complete_model_small_sensors_polistirol_15um_";
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -54,11 +55,15 @@ void txtToHist() {
     TH1D* dhPosY = new TH1D("dhPosY", "dhPosY", 1000, 0, 10);
     TH1D* dhPosZ = new TH1D("dhPosZ", "dhPosZ", 1000, 0, 10);
     TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 500, -10, 10, 500, -10, 10);
-    TH2D* dh2D_xy = new TH2D("dh2D_xy", "; X [pixel]; Y [pixel]", 150, -6/pixel, 6/pixel, 120, -4/pixel, 4/pixel);
+    dh2D_xz[0] = new TH2D("dh2D_xz_det_1", "; X [mm]; Z [mm]", 500, -2, 2, 500, -2, 2);
+    dh2D_xz[1] = new TH2D("dh2D_xz_det_2", "; X [mm]; Z [mm]", 500, -2, 2, 500, -2, 2);
+    TH2D* dh2D_xy = new TH2D("dh2D_xy", "; CCD X [pixel]; Y [pixel]", 150, -6/pixel, 6/pixel, 120, -4/pixel, 4/pixel);
     TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha [deg] ; R [pixel]", 1000, -1, 180, 1000/pixel, 0, 7.5/pixel);
+    TH2D* dhR_alpha_det_1 = new TH2D("dhR_alpha_det_1", "vbpw34s_1 #alpha vs R; #alpha [deg] ; R [pixel]", 100, -1, 30, 1000, 0, 3);
+    TH2D* dhR_alpha_det_2 = new TH2D("dhR_alpha_det_2", "vbpw34s_2 #alpha vs R; #alpha [deg] ; R [pixel]", 100, -1, 30, 1000, 0, 3);
     TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
-    TH3D* dh3D_xyz = new TH3D("dh3D_xyz", "; X [mm]; Y [mm]; Z [mm]", 100,5,20, 100,90,100, 100,-110,-100);
+    TH3D* dh3D_xyz = new TH3D("dh3D_xyz", "; CCD X [mm]; Y [mm]; Z [mm]", 100,5,20, 100,90,100, 100,-110,-100);
 
     // Open the input file
     std::ifstream infile(filename);
@@ -88,6 +93,27 @@ void txtToHist() {
     double y_center = (y_min + y_max ) / 2.0;
     double z_center = (z_min + z_max ) / 2.0;
 
+      
+    double det_1_x_min = 48.3132;
+    double det_1_y_min = 106.42;
+    double det_1_z_min = -139.75;
+    double det_1_x_max = 51.3132;
+    double det_1_y_max = 106.56;
+    double det_1_z_max = -136.75;
+    double det_1_x_center = (det_1_x_min + det_1_x_max ) / 2.0;
+    double det_1_y_center = (det_1_y_min + det_1_y_max ) / 2.0;
+    double det_1_z_center = (det_1_z_min + det_1_z_max ) / 2.0;
+
+    double det_2_x_min = 61.3132;
+    double det_2_y_min = 106.42;
+    double det_2_z_min = -139.75;
+    double det_2_x_max = 64.3132;
+    double det_2_y_max = 106.56;
+    double det_2_z_max = -136.75;
+    double det_2_x_center = (det_2_x_min + det_2_x_max ) / 2.0;
+    double det_2_y_center = (det_2_y_min + det_2_y_max ) / 2.0;
+    double det_2_z_center = (det_2_z_min + det_2_z_max ) / 2.0;
+
     // Define rotation angle (convert to radians)
     //double M_PI = TMath::Pi();
     double theta = 30.0 * M_PI / 180.0; 
@@ -106,17 +132,46 @@ void txtToHist() {
       std::istringstream iss(line);
       double theta3, genTheta, R, postX, postY, postZ, alpha, alpha_man;
       double localR, localpostX, localpostY, localpostZ;
+      double shiftedX, shiftedY, shiftedZ;
 
       // Read all 6 columns
       if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ >> alpha >> alpha_man)) {
         std::cerr << "Error parsing line: " << line << std::endl;
         continue;
       }
+      if(postX >= det_2_x_min) //vbpw34s_2
+      {
+        // Translate to local origin
+        double shiftedX = postX - det_2_x_center;
+        double shiftedY = postY - det_2_y_center;
+        double shiftedZ = postZ - det_2_z_center;
+        localR = sqrt(shiftedZ * shiftedZ + shiftedX * shiftedX);
+        dhR_alpha_det_2->Fill(genTheta*180.0 / TMath::Pi(), localR);
+        dh2D_xz[1]->Fill(shiftedZ, shiftedX);
 
-      // Translate to local origin
-      double shiftedX = postX - x_center;
-      double shiftedY = postY - y_center;
-      double shiftedZ = postZ - z_center;
+        continue;
+      }
+      else if(postX >= det_1_x_min && postX <= det_1_x_max) //vbpw34s_1
+      {
+        // Translate to local origin
+        double shiftedX = postX - det_1_x_center;
+        double shiftedY = postY - det_1_y_center;
+        double shiftedZ = postZ - det_1_z_center;
+        localR = sqrt(shiftedZ * shiftedZ + shiftedX * shiftedX);
+        dhR_alpha_det_1->Fill(genTheta*180.0 / TMath::Pi(), localR);
+        dh2D_xz[0]->Fill(shiftedZ, shiftedX);
+
+        continue;
+      }
+      else  // CCD
+      {
+        // Translate to local origin
+        double shiftedX = postX - x_center;
+        double shiftedY = postY - y_center;
+        double shiftedZ = postZ - z_center;
+
+      }
+
 
       // Apply 2D rotation in the XZ plane
       localpostX = cosTheta * shiftedX + sinTheta * shiftedZ;
@@ -184,6 +239,16 @@ void txtToHist() {
     dh2D_xy->GetXaxis()->SetTitle("X [mm]");
     dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
     dh2D_xy->Draw("COLZ");
+
+    dh2D_xz[0]->SetTitle(Form("2D scattering, deg=%i, vbpw34s_1", ideg));
+    dh2D_xz[0]->GetXaxis()->SetTitle("X [mm]");
+    dh2D_xz[0]->GetYaxis()->SetTitle("Z [mm]");
+    dh2D_xz[0]->Draw("COLZ");
+
+    dh2D_xz[1]->SetTitle(Form("2D scattering, deg=%i, vbpw34s_2", ideg));
+    dh2D_xz[1]->GetXaxis()->SetTitle("X [mm]");
+    dh2D_xz[1]->GetYaxis()->SetTitle("Z [mm]");
+    dh2D_xz[1]->Draw("COLZ");
     //c1->SaveAs(Form("../figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
     c1->SaveAs(Form("figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
     dh2D_xy->Write();
@@ -218,6 +283,10 @@ void txtToHist() {
     dhPosZ->Write();
     dh2D_yz->Write();
     dhR_alpha->Write();
+    dhR_alpha_det_1->Write();
+    dh2D_xz[0]->Write();
+    dh2D_xz[1]->Write();
+    dhR_alpha_det_2->Write();
     dhtheta_alpha->Write();
     dh2D_rx_tantheta->Write();
     dh3D_xyz->Write();
