@@ -231,10 +231,11 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
   }
 
 
-	if (prevolume->GetName() == "world" &&
-		((postvolume->GetName() == "GS3-U3-23S6M-C_sensor")/* || (postvolume->GetName() == "ScreenB") ||
-		 (postvolume->GetName() == "ScreenL") || (postvolume->GetName() == "ScreenR") ||
-		 (postvolume->GetName() == "ScreenU") || (postvolume->GetName() == "ScreenD")*/))
+	if (
+      ( prevolume->GetName() == "world" && postvolume->GetName() == "GS3-U3-23S6M-C_sensor") || 
+      ( prevolume->GetName() == "vbpw34s_1" && postvolume->GetName() == "vbpw34s_1_sensor") ||
+      ( prevolume->GetName() == "vbpw34s_2" && postvolume->GetName() == "vbpw34s_2_sensor")
+     ) 
 	{
 		ss.str("");
 		double theta3 = asin(sqrt(postY * postY + postZ * postZ) / sqrt(postX * postX + postY * postY + postZ * postZ));

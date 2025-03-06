@@ -376,7 +376,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250226_directbeamstop_fix.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250226_small_detectors.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -414,11 +414,13 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
   solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
   solids.push_back(mesh->GetSolid("BST04_BeamSplitter_underpart"));
-  solids.push_back(mesh->GetSolid("vbpw34s_1_sensor"));
-  solids.push_back(mesh->GetSolid("vbpw34s_2_sensor"));
+  solids.push_back(mesh->GetSolid("vbpw34s_1_sensor_cable"));
+  solids.push_back(mesh->GetSolid("vbpw34s_2_sensor_cable"));
   solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing"));
   solids.push_back(mesh->GetSolid("camera_outer_window"));
   solids.push_back(mesh->GetSolid("sensor_package_window"));
+  solids.push_back(mesh->GetSolid("vbpw34s_1_sensor"));
+  solids.push_back(mesh->GetSolid("vbpw34s_2_sensor"));
 
   std::vector<G4LogicalVolume*> argosz_log(solids.size());
   std::vector<G4VPhysicalVolume*> argosz_phys(solids.size());
@@ -495,9 +497,9 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // Direct_beam_stop_2
   argosz_mat[7] = shieldMaterial;
   // vbpw34s_1
-  argosz_mat[8] = sil;
+  argosz_mat[8] = lensMaterial;
   // vbpw34s_2
-  argosz_mat[9] = sil;
+  argosz_mat[9] = lensMaterial;
   // LB1258-A
   argosz_mat[10] = lensMaterial;
   // LA_mirror
@@ -542,6 +544,10 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[30] = lensMaterial;
   // sensor_package_window
   argosz_mat[31] = lensMaterial;
+  // vbpw34s_1_sensor001
+  argosz_mat[32] = sil;
+  // vbpw34s_2_sensor001
+  argosz_mat[33] = sil;
 
   int isolid = 0;
   for (auto solid : solids)
@@ -558,8 +564,9 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
         , solid->GetName()//"logical"
         , 0, 0, 0
         );
-    if(isolid == 3 || isolid == 15) 
-    { 
+    switch(isolid) {
+    case 3:
+    case 15:
       argosz_phys[isolid] = new G4PVPlacement( 0
           , G4ThreeVector(-0.40, 0, 0)
           , argosz_log[isolid]
@@ -567,7 +574,26 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
           , world_log
           , false, 0
           );
-    } else {
+      break;
+    case 32:
+      argosz_phys[isolid] = new G4PVPlacement( 0
+          , G4ThreeVector(0.0, 0, 0)
+          , argosz_log[isolid]
+          , solid->GetName()
+          , argosz_log[8]
+          , false, 0 
+          );
+      break;
+    case 33:
+      argosz_phys[isolid] = new G4PVPlacement( 0
+          , G4ThreeVector(0.0, 0, 0)
+          , argosz_log[isolid]
+          , solid->GetName()
+          , argosz_log[9]
+          , false, 0
+          );
+      break;
+    default:
       argosz_phys[isolid] = new G4PVPlacement( 0
           , G4ThreeVector(0, 0, 0)
           , argosz_log[isolid]
@@ -575,6 +601,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
           , world_log
           , false, 0
           );
+      break;
     }
 
     isolid++;
@@ -601,7 +628,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   auto bubbleW = new G4Orb("Bubble", fBubble_r);
   auto bubbleW_log = new G4LogicalVolume(bubbleW, water, "Bubble");
 
-  G4double shift = .0;//0.035 * mm; // to make resulting CCD image symmetrical
+  G4double shift = 0.0 * mm;//0.035 * mm; // to make resulting CCD image symmetrical
   if (isPolycone)
   {
     bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm + shift), bubbleWP_log,
