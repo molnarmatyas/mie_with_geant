@@ -56,10 +56,8 @@ set(Norma_SCRIPTS
     run2.mac
     diff_cross_0-180_10000pt.txt
     dhkm_7_1592_1.txt
-    Argosz_good_flowcell_fix.obj
-    Argosz_250226_directbeamstop_fix.obj
-    Argosz_matyimod_housing.obj
-    Argosz_optikai_elrendezes_250217.obj
+    crosssection_radians_poli_15_10000.txt
+    Argosz_250226_small_detectors.obj
   )
 
 foreach(_script ${Norma_SCRIPTS})
