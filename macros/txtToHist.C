@@ -43,9 +43,9 @@ void txtToHist() {
   {
     TH2D* dh2D_xz[2];
     //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string filename = "../build/1M_complete_model_small_sensors_update_noshift.txt";
+    std::string filename = "../build/1M_complete_model_LA_HA_update_small_sensors_update_noshift.txt";
     //std::string outputprefix = Form("1M_3D_modell_fixed_flowcell_saltywater_surface_point_source_degbydeg_%i", ideg);
-    std::string outputprefix = "1M_3D_complete_model_small_sensors_polistirol_15um_";
+    std::string outputprefix = "1M_3D_complete_model_LA_HA_update_small_sensors_polistirol_15um_";
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -169,36 +169,36 @@ void txtToHist() {
         double shiftedX = postX - x_center;
         double shiftedY = postY - y_center;
         double shiftedZ = postZ - z_center;
+        // Apply 2D rotation in the XZ plane
+        localpostX = cosTheta * shiftedX + sinTheta * shiftedZ;
+        localpostZ = -sinTheta * shiftedX + cosTheta * shiftedZ;
+        // Y is not affected by rotation
+        localpostY = postY - y_center;
+
+        //localpostX = (x_center - postX);
+        //localpostY = (y_center - postY);
+        //localpostZ = (z_center - postZ);
+
+        localR = sqrt(localpostY * localpostY + localpostX * localpostX) / pixel;
+        dhR_alpha->Fill(genTheta*180.0 / TMath::Pi(), localR);
+        dhR->Fill(localR);
+        dhPosX->Fill(localpostX);
+        dhPosY->Fill(localpostY);
+        dhPosZ->Fill(localpostZ);
+        dh2D_yz->Fill(localpostZ, localpostY);
+        dh2D_xy->Fill(localpostX/pixel, localpostY/pixel);
+        dh3D_xyz->Fill(postX,postY,postZ);
+        dh2D_rx_tantheta->Fill(localR / localpostX, std::tan(theta3));
 
       }
 
 
-      // Apply 2D rotation in the XZ plane
-      localpostX = cosTheta * shiftedX + sinTheta * shiftedZ;
-      localpostZ = -sinTheta * shiftedX + cosTheta * shiftedZ;
-      // Y is not affected by rotation
-      localpostY = postY - y_center;
-
-      //localpostX = (x_center - postX);
-      //localpostY = (y_center - postY);
-      //localpostZ = (z_center - postZ);
-
-      localR = sqrt(localpostY * localpostY + localpostX * localpostX) / pixel;
 
       // Fill the histogram with the last two columns
       dhTheta->Fill(theta3);
       dhGenTheta->Fill(genTheta);
-      dhR->Fill(localR);
-      dhPosX->Fill(localpostX);
-      dhPosY->Fill(localpostY);
-      dhPosZ->Fill(localpostZ);
       dhXSect->Fill(theta3);
-      dhR_alpha->Fill(genTheta*180.0 / TMath::Pi(), localR);
       dhtheta_alpha->Fill(theta3, alpha);
-      dh2D_yz->Fill(localpostZ, localpostY);
-      dh2D_xy->Fill(localpostX/pixel, localpostY/pixel);
-      dh3D_xyz->Fill(postX,postY,postZ);
-      dh2D_rx_tantheta->Fill(localR / localpostX, std::tan(theta3));
     }
     //  dh2D_yz->GetZaxis()->SetRangeUser(0,10);
     TF1* oneoversin = new TF1("oneoversin","1/sin(x)");
@@ -239,6 +239,8 @@ void txtToHist() {
     dh2D_xy->GetXaxis()->SetTitle("X [mm]");
     dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
     dh2D_xy->Draw("COLZ");
+    c1->SaveAs(Form("figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
+    dh2D_xy->Write();
 
     dh2D_xz[0]->SetTitle(Form("2D scattering, deg=%i, vbpw34s_1", ideg));
     dh2D_xz[0]->GetXaxis()->SetTitle("X [mm]");
@@ -250,8 +252,6 @@ void txtToHist() {
     dh2D_xz[1]->GetYaxis()->SetTitle("Z [mm]");
     dh2D_xz[1]->Draw("COLZ");
     //c1->SaveAs(Form("../figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
-    c1->SaveAs(Form("figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
-    dh2D_xy->Write();
 
     // Black & white image of CCD screen (black=min, white=max)
     TCanvas *c2 = new TCanvas("c2", "CCD Image", 800, 600);
