@@ -376,7 +376,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250226_small_detectors.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250307.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -394,7 +394,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("vbpw34s_2"));
   solids.push_back(mesh->GetSolid("LB1258-A"));
   solids.push_back(mesh->GetSolid("LA_mirror"));
-  solids.push_back(mesh->GetSolid("LA_HA_mirror")); //FIXME its name is misleading, this is a separator
+  solids.push_back(mesh->GetSolid("LA_HA_separator")); //FIXME its name is misleading, this is a separator
   //solids.push_back(mesh->GetSolid("Direct_beam_stop")); //currently disabled
   solids.push_back(mesh->GetSolid("Direct_beam_stop_0.75"));
   solids.push_back(mesh->GetSolid("HA_mirror"));
@@ -410,7 +410,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("LA_HA_housing"));
   solids.push_back(mesh->GetSolid("LA_HA_holder"));
   solids.push_back(mesh->GetSolid("ND_filter"));
-  solids.push_back(mesh->GetSolid("LA_HA_mirror_underpart"));
+  solids.push_back(mesh->GetSolid("LA_HA_separator_underpart"));
   solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
   solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
   solids.push_back(mesh->GetSolid("BST04_BeamSplitter_underpart"));
@@ -631,12 +631,13 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4double shift = 0.0 * mm;//0.035 * mm; // to make resulting CCD image symmetrical
   if (isPolycone)
   {
-    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.09 * mm, 96.2425 * mm, -137.51 * mm + shift), bubbleWP_log,
+    // old position 14.09 * mm, 96.2425 * mm, -137.51 * mm 
+    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift), bubbleWP_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
   }
   else
   {
-    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.49 * mm, 96.2425 * mm, -137.51 * mm + shift), bubbleW_log,
+    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift), bubbleWP_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
   }
 
