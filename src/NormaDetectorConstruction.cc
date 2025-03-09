@@ -376,6 +376,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
+  //auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250226_small_detectors.obj");
   auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250307.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
@@ -637,7 +638,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   }
   else
   {
-    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift), bubbleWP_log,
+    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift), bubbleW_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
   }
 
