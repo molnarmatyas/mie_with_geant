@@ -148,6 +148,7 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	//G4cout << "MomentumDirTheta Phi: " << theta << " | " << phi << G4endl;
 
 	G4double phi2;
+	G4double phi3;
 	G4double theta2;
 
 	if (abs(postX - preX) < 0.00001)
@@ -185,6 +186,7 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	if (procname == "OpMieHG")
 	{
 		genTheta = ((G4OpMieHG *)pds)->radThetaGen;
+		phi3 = atan((postZ - preZ) / (postY - preY)) / M_PI * 360;
 	}
   /*
 	std::cout << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID() << " " << prevolume->GetName() << " "
@@ -230,6 +232,7 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
     //G4cout << "momdir angle: " << angleMan << " | cross: " << cross << G4endl; 
   }
 
+  int det_num = 0;
 
 	if (
       ( prevolume->GetName() == "world" && postvolume->GetName() == "GS3-U3-23S6M-C_sensor") || 
@@ -248,9 +251,13 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
     //G4cout << "Angle between prim vertex and mie manual 2: " << angleMan <<G4endl;
     //G4cout << "Angle Theta: " << theta3 * 180 / CLHEP::pi <<G4endl;
 
+    if(postvolume->GetName() == "GS3-U3-23S6M-C_sensor") det_num = 0;
+    if(postvolume->GetName() == "vbpw34s_1_sensor") det_num = 1;
+    if(postvolume->GetName() == "vbpw34s_2_sensor") det_num = 2;
+
 		if (((G4OpMieHG *)pds)->generated)
 		{
-			ss << theta3 << ", " << genTheta << ", " << r << ", " << postX << ", " << postY << ", " << postZ << ", " << alpha << ", " << angleMan;
+			ss << theta3 << ", " << genTheta << ", " << r << ", " << postX << ", " << postY << ", " << postZ << ", " << alpha << ", " << angleMan << ", " << phi3 << ", " << det_num;
 			if (writer)
 				writer->write(ss.str());
 		}

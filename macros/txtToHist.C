@@ -43,9 +43,9 @@ void txtToHist() {
   {
     TH2D* dh2D_xz[2];
     //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string filename = "../build/1M_complete_model_LA_HA_update_small_sensors_update_noshift.txt";
+    std::string filename = "../build/1M_updated_complete_model_15um_poli_withphi3_.txt";
     //std::string outputprefix = Form("1M_3D_modell_fixed_flowcell_saltywater_surface_point_source_degbydeg_%i", ideg);
-    std::string outputprefix = "1M_3D_complete_model_LA_HA_update_small_sensors_polistirol_15um_";
+    std::string outputprefix = "1M_3D_updated_complete_model_with_phi3_all_sensors_polistirol_15um_";
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -61,7 +61,8 @@ void txtToHist() {
     TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha [deg] ; R [pixel]", 1000, -1, 180, 1000/pixel, 0, 7.5/pixel);
     TH2D* dhR_alpha_det_1 = new TH2D("dhR_alpha_det_1", "vbpw34s_1 #alpha vs R; #alpha [deg] ; R [pixel]", 100, -1, 30, 1000, 0, 3);
     TH2D* dhR_alpha_det_2 = new TH2D("dhR_alpha_det_2", "vbpw34s_2 #alpha vs R; #alpha [deg] ; R [pixel]", 100, -1, 30, 1000, 0, 3);
-    TH2D* dhtheta_alpha = new TH2D("dhtheta_alpha", "#theta vs #alpha; #theta; #alpha", 1000, 0, TMath::Pi(), 1000, 0, TMath::Pi());
+    TH2D* dhphi_alpha_det_1 = new TH2D("dhphi_alpha_det_1", "#phi vs #alpha; #phi; #alpha", 1000, -1.0*180, 180, 1000, 0.0, 180);
+    TH2D* dhphi_alpha_det_2 = new TH2D("dhphi_alpha_det_2", "#phi vs #alpha; #phi; #alpha", 1000, -1.0*180, 180, 1000, 0.0, 180);
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
     TH3D* dh3D_xyz = new TH3D("dh3D_xyz", "; CCD X [mm]; Y [mm]; Z [mm]", 100,5,20, 100,90,100, 100,-110,-100);
 
@@ -130,16 +131,17 @@ void txtToHist() {
 
       // Parse the line
       std::istringstream iss(line);
-      double theta3, genTheta, R, postX, postY, postZ, alpha, alpha_man;
+      double theta3, genTheta, R, postX, postY, postZ, alpha, alpha_man, phi3;
       double localR, localpostX, localpostY, localpostZ;
       double shiftedX, shiftedY, shiftedZ;
+      int det_num;
 
       // Read all 6 columns
-      if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ >> alpha >> alpha_man)) {
+      if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ >> alpha >> alpha_man >> phi3 >> det_num)) {
         std::cerr << "Error parsing line: " << line << std::endl;
         continue;
       }
-      if(postX >= det_2_x_min) //vbpw34s_2
+      if(det_num == 2) //vbpw34s_2
       {
         // Translate to local origin
         double shiftedX = postX - det_2_x_center;
@@ -148,10 +150,11 @@ void txtToHist() {
         localR = sqrt(shiftedZ * shiftedZ + shiftedX * shiftedX);
         dhR_alpha_det_2->Fill(genTheta*180.0 / TMath::Pi(), localR);
         dh2D_xz[1]->Fill(shiftedZ, shiftedX);
+        dhphi_alpha_det_2->Fill(phi3, genTheta*180.0 / TMath::Pi());
 
         continue;
       }
-      else if(postX >= det_1_x_min && postX <= det_1_x_max) //vbpw34s_1
+      else if(det_num == 1) //vbpw34s_1
       {
         // Translate to local origin
         double shiftedX = postX - det_1_x_center;
@@ -160,6 +163,7 @@ void txtToHist() {
         localR = sqrt(shiftedZ * shiftedZ + shiftedX * shiftedX);
         dhR_alpha_det_1->Fill(genTheta*180.0 / TMath::Pi(), localR);
         dh2D_xz[0]->Fill(shiftedZ, shiftedX);
+        dhphi_alpha_det_1->Fill(phi3, genTheta*180.0 / TMath::Pi());
 
         continue;
       }
@@ -198,7 +202,6 @@ void txtToHist() {
       dhTheta->Fill(theta3);
       dhGenTheta->Fill(genTheta);
       dhXSect->Fill(theta3);
-      dhtheta_alpha->Fill(theta3, alpha);
     }
     //  dh2D_yz->GetZaxis()->SetRangeUser(0,10);
     TF1* oneoversin = new TF1("oneoversin","1/sin(x)");
@@ -287,7 +290,8 @@ void txtToHist() {
     dh2D_xz[0]->Write();
     dh2D_xz[1]->Write();
     dhR_alpha_det_2->Write();
-    dhtheta_alpha->Write();
+    dhphi_alpha_det_1->Write();
+    dhphi_alpha_det_2->Write();
     dh2D_rx_tantheta->Write();
     dh3D_xyz->Write();
 
