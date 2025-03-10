@@ -505,7 +505,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[10] = lensMaterial;
   // LA_mirror
   argosz_mat[11] = mirrorMaterial;
-  // LA_HA_mirror
+  // LA_HA_separator_
   argosz_mat[12] = shieldMaterial;
   // Direct_beam_stop_0.75
   argosz_mat[13] = shieldMaterial;
@@ -726,7 +726,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4LogicalBorderSurface* mirrorSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface_1", world_phys, argosz_phys[0], opticalSurfaceMirror);
   G4LogicalBorderSurface* mirrorSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface_2", world_phys, argosz_phys[1], opticalSurfaceMirror);
   G4LogicalBorderSurface* mirrorSurface_11 = new G4LogicalBorderSurface("MirrorBorderSurface_11", world_phys, argosz_phys[11], opticalSurfaceMirror);
-  G4LogicalBorderSurface* mirrorSurface_12 = new G4LogicalBorderSurface("MirrorBorderSurface_12", world_phys, argosz_phys[12], opticalSurfaceMirror);
   G4LogicalBorderSurface* mirrorSurface_14 = new G4LogicalBorderSurface("MirrorBorderSurface_14", world_phys, argosz_phys[14], opticalSurfaceMirror);
 
   // Lens
