@@ -376,8 +376,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  //auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250226_small_detectors.obj");
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250307.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -395,7 +394,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("vbpw34s_2"));
   solids.push_back(mesh->GetSolid("LB1258-A"));
   solids.push_back(mesh->GetSolid("LA_mirror"));
-  solids.push_back(mesh->GetSolid("LA_HA_separator")); //FIXME its name is misleading, this is a separator
+  solids.push_back(mesh->GetSolid("LA_HA_separator")); 
   //solids.push_back(mesh->GetSolid("Direct_beam_stop")); //currently disabled
   solids.push_back(mesh->GetSolid("Direct_beam_stop_0.75"));
   solids.push_back(mesh->GetSolid("HA_mirror"));
@@ -415,8 +414,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
   solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
   solids.push_back(mesh->GetSolid("BST04_BeamSplitter_underpart"));
-  solids.push_back(mesh->GetSolid("vbpw34s_1_sensor_cable"));
-  solids.push_back(mesh->GetSolid("vbpw34s_2_sensor_cable"));
   solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing"));
   solids.push_back(mesh->GetSolid("camera_outer_window"));
   solids.push_back(mesh->GetSolid("sensor_package_window"));
@@ -535,20 +532,16 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[25] = shieldMaterial;
   // BST04_BeamSplitter_underpart
   argosz_mat[26] = shieldMaterial;
-  // vbpw34s_1_sensor
-  argosz_mat[27] = shieldMaterial;
-  // vbpw34s_2_sensor
-  argosz_mat[28] = shieldMaterial;
   // GS3-U3-23S6M-C_sensor_housing
-  argosz_mat[29] = shieldMaterial;
+  argosz_mat[27] = shieldMaterial;
   // camera_outer_window
-  argosz_mat[30] = lensMaterial;
+  argosz_mat[28] = lensMaterial;
   // sensor_package_window
-  argosz_mat[31] = lensMaterial;
+  argosz_mat[29] = lensMaterial;
   // vbpw34s_1_sensor001
-  argosz_mat[32] = sil;
+  argosz_mat[30] = sil;
   // vbpw34s_2_sensor001
-  argosz_mat[33] = sil;
+  argosz_mat[31] = sil;
 
   int isolid = 0;
   for (auto solid : solids)
@@ -576,21 +569,21 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
           , false, 0
           );
       break;
-    case 32:
+    case 30:
       argosz_phys[isolid] = new G4PVPlacement( 0
           , G4ThreeVector(0.0, 0, 0)
           , argosz_log[isolid]
           , solid->GetName()
-          , argosz_log[8]
+          , world_log 
           , false, 0 
           );
       break;
-    case 33:
+    case 31:
       argosz_phys[isolid] = new G4PVPlacement( 0
           , G4ThreeVector(0.0, 0, 0)
           , argosz_log[isolid]
           , solid->GetName()
-          , argosz_log[9]
+          , world_log
           , false, 0
           );
       break;
