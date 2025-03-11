@@ -112,9 +112,9 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	G4double preZ = step->GetPreStepPoint()->GetPosition().z();
 
 	// Fixed preStep position
-	preX = 0.0;
-	preY = 0.0;
-	preZ = 0.0;
+	//preX = 0.0;
+	//preY = 0.0;
+	//preZ = 0.0;
 
 	// post step porsition
   G4ThreeVector postPos = step->GetPostStepPoint()->GetPosition();
@@ -149,6 +149,8 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 
 	G4double phi2;
 	G4double phi3;
+	G4double phi4;
+	G4double phi5;
 	G4double theta2;
 
 	if (abs(postX - preX) < 0.00001)
@@ -187,7 +189,12 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	{
 		genTheta = ((G4OpMieHG *)pds)->radThetaGen;
 		phi3 = atan((postZ - preZ) / (postY - preY)) / M_PI * 360;
+		phi4 = atan((postY - preY) / (postZ - preZ)) / M_PI * 360;
 	}
+  if(prevolume->GetName() == "Bubble_dis_bnd_proc" && postvolume->GetName() == "Saltywater") {
+	  G4cout << "Zero point based preZ, postZ, preY, postY: " << preZ << " | " << postZ << " | " << preY << " | " << postY << G4endl;
+    G4cout << "phi: " << atan((postY/postZ)) / M_PI * 180.0 << G4endl;
+  }
   /*
 	std::cout << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID() << " " << prevolume->GetName() << " "
 			  << postvolume->GetName() << " momdir: " << momentumdirection.x() << " " << momentumdirection.y() << " "
@@ -243,9 +250,9 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 		ss.str("");
 		double theta3 = asin(sqrt(postY * postY + postZ * postZ) / sqrt(postX * postX + postY * postY + postZ * postZ));
     double r = sqrt(postY * postY + postZ * postZ);
-//    G4cout << "Zero point based theta and phi: " << theta3 << " | " << theta3 << G4endl;
-		G4cout << "Zero point based x, y, z: " << postX << " | " << postY << " | " << postZ << G4endl;
-		G4cout << "Prim vertex based x, y, z: " << gunPosX << " | " << gunPosY << " | " << gunPosZ << G4endl;
+    G4cout << "Zero point based theta and phi: " << theta3 << " | " << phi3 << " | " << phi4 << G4endl;
+		//G4cout << "Zero point based x, y, z: " << postX << " | " << postY << " | " << postZ << G4endl;
+		//G4cout << "Prim vertex based x, y, z: " << gunPosX << " | " << gunPosY << " | " << gunPosZ << G4endl;
     //G4cout << "Angle between prim vertex and mie: " << gunPosition.angle(posAfterBubble) * 180 / CLHEP::pi <<G4endl;
     //G4cout << "Angle between momdir prim vertex and mie: " << momdir.angle(momentumdirection) * 180 / CLHEP::pi <<G4endl;
     //G4cout << "Angle between prim vertex and mie manual 2: " << angleMan <<G4endl;
