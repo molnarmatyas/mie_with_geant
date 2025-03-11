@@ -147,8 +147,7 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 
 	//G4cout << "MomentumDirTheta Phi: " << theta << " | " << phi << G4endl;
 
-	G4double phi2;
-	G4double phi3;
+	G4double phi2 = 0.0;
 	G4double theta2;
 
 	if (abs(postX - preX) < 0.00001)
@@ -188,8 +187,9 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 		genTheta = ((G4OpMieHG *)pds)->radThetaGen;
 	}
   if(prevolume->GetName() == "Bubble_dis_bnd_proc" && postvolume->GetName() == "Saltywater") {
-	  G4cout << "Zero point based preZ, postZ, preY, postY: " << preZ << " | " << postZ << " | " << preY << " | " << postY << G4endl;
-    G4cout << "phi: " << atan((postY/postZ)) / M_PI * 180.0 << G4endl;
+	  //G4cout << "Zero point based preZ, postZ, preY, postY: " << preZ << " | " << postZ << " | " << preY << " | " << postY << G4endl;
+		phi3 = atan((postZ - preZ) / (postY - preY)) / M_PI * 360;
+    G4cout << "phi3: " << phi3 << G4endl;
   }
   /*
 	std::cout << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID() << " " << prevolume->GetName() << " "
@@ -246,7 +246,6 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 		ss.str("");
 		double theta3 = asin(sqrt(postY * postY + postZ * postZ) / sqrt(postX * postX + postY * postY + postZ * postZ));
     double r = sqrt(postY * postY + postZ * postZ);
-		phi3 = atan((postZ - preZ) / (postY - preY)) / M_PI * 360;
     G4cout << "Zero point based theta and phi3: " << theta3 << " | " << phi3 << G4endl;
 		//G4cout << "Zero point based x, y, z: " << postX << " | " << postY << " | " << postZ << G4endl;
 		//G4cout << "Prim vertex based x, y, z: " << gunPosX << " | " << gunPosY << " | " << gunPosZ << G4endl;

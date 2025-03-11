@@ -56,6 +56,7 @@ class NormaSteppingAction : public G4UserSteppingAction
 
   double genTheta = 0.0;
   double angleMan = 0.0;
+  double phi3 = 0.0;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
