@@ -188,7 +188,8 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	}
   if(prevolume->GetName() == "Bubble_dis_bnd_proc" && postvolume->GetName() == "Saltywater") {
 	  //G4cout << "Zero point based preZ, postZ, preY, postY: " << preZ << " | " << postZ << " | " << preY << " | " << postY << G4endl;
-		phi3 = atan((postZ - preZ) / (postY - preY)) / M_PI * 360;
+		phi3 = atan2((postY - preY),(postZ - preZ)) / M_PI * 180.0;
+    G4cout << "genTheta: " << genTheta * 180.0 / M_PI;
     G4cout << "phi3: " << phi3 << G4endl;
   }
   /*
@@ -246,7 +247,7 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 		ss.str("");
 		double theta3 = asin(sqrt(postY * postY + postZ * postZ) / sqrt(postX * postX + postY * postY + postZ * postZ));
     double r = sqrt(postY * postY + postZ * postZ);
-    G4cout << "Zero point based theta and phi3: " << theta3 << " | " << phi3 << G4endl;
+    G4cout << "Zero point based theta and phi3: " << genTheta*180.0 / M_PI << " | " << phi3 << G4endl;
 		//G4cout << "Zero point based x, y, z: " << postX << " | " << postY << " | " << postZ << G4endl;
 		//G4cout << "Prim vertex based x, y, z: " << gunPosX << " | " << gunPosY << " | " << gunPosZ << G4endl;
     //G4cout << "Angle between prim vertex and mie: " << gunPosition.angle(posAfterBubble) * 180 / CLHEP::pi <<G4endl;
