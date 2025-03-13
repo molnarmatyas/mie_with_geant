@@ -208,7 +208,7 @@ int main(int argc, char **argv)
 	}
 
 	// Construct the default run manager
-	auto runManager = G4RunManagerFactory::CreateRunManager();
+	auto runManager = G4RunManagerFactory::CreateRunManager(/*G4RunManagerType::SerialOnly*/);
 #ifdef G4MULTITHREADED
 	if (nThreads > 0)
 		runManager->SetNumberOfThreads(nThreads);
