@@ -1,0 +1,215 @@
+diff --git a/source/processes/optical/include/G4OpMieHG.hh b/source/processes/optical/include/G4OpMieHG.hh
+index 278b49a..f2d07df 100644
+--- a/source/processes/optical/include/G4OpMieHG.hh
++++ b/source/processes/optical/include/G4OpMieHG.hh
+@@ -111,7 +111,9 @@ private:
+   int line_count;
+ 	std::mt19937 fGen;
+ 	std::piecewise_linear_distribution<> fDist;
++	std::discrete_distribution<int> fDist_disc;
+ 	double generate();
++	double discgenerate(std::vector<double> &);
+ 
+ 	std::vector<double> fMieXSect;
+ 	std::vector<double> fTheta;
+diff --git a/source/processes/optical/src/G4OpBoundaryProcess.cc b/source/processes/optical/src/G4OpBoundaryProcess.cc
+index aa1878a..8013eb8 100644
+--- a/source/processes/optical/src/G4OpBoundaryProcess.cc
++++ b/source/processes/optical/src/G4OpBoundaryProcess.cc
+@@ -155,7 +155,8 @@ G4VParticleChange *G4OpBoundaryProcess::PostStepDoIt(const G4Track &aTrack,
+ 	// Check if the particle is in the specific volume you want to bypass
+ 	if (volName.find("dis_bnd_proc") != std::string::npos)
+ 	{
+-		G4cout << "G4OpBoundaryProcess is disabled for " << volName << G4endl;
++    //NOTE:to remove clutter
++		//G4cout << "G4OpBoundaryProcess is disabled for " << volName << G4endl;
+ 
+ 		G4ThreeVector oldMomDir;
+ 		G4ThreeVector oldPol;
+diff --git a/source/processes/optical/src/G4OpMieHG.cc b/source/processes/optical/src/G4OpMieHG.cc
+index 5134340..c2d1765 100644
+--- a/source/processes/optical/src/G4OpMieHG.cc
++++ b/source/processes/optical/src/G4OpMieHG.cc
+@@ -104,7 +104,10 @@ G4OpMieHG::G4OpMieHG(const G4String &processName, G4ProcessType type)
+         colNum = 9;
+         break;
+       case 75:
+-        colNum = 10;
++        //FIXME
++        //to be set back to 10
++        //
++        colNum = 0;
+         break;
+       default:
+         colNum = 1;
+@@ -125,6 +128,7 @@ G4OpMieHG::G4OpMieHG(const G4String &processName, G4ProcessType type)
+ 
+ 		fGen = std::mt19937(time(0));
+ 		fDist = std::piecewise_linear_distribution<>(fTheta.begin(), fTheta.end(), fWeights.begin());
++		fDist_disc = std::discrete_distribution<>(fWeights.begin(), fWeights.end());
+ 		fGen.seed(time(0)); // if you want different results from different runs
+ 	}
+ 	if (verboseLevel > 0)
+@@ -188,8 +192,7 @@ void G4OpMieHG::setXSect(const char *filename)
+ 		useNumericSimulationData = true;
+ 	}
+ }
+-
+-double G4OpMieHG::generate()
++double G4OpMieHG::generate() // piecewise_linear
+ {
+   /*
+   if (values.empty()) {
+@@ -208,6 +211,21 @@ double G4OpMieHG::generate()
+ 	return value; // Draw a number from the values vector
+ }
+ 
++double G4OpMieHG::discgenerate(std::vector<double> &values) // discrete
++{
++  if (values.empty()) {
++    G4cerr << "Error: Values vector is empty!" << G4endl;
++    return -1;
++  }
++
++  int index = fDist_disc(fGen);
++  if (index < 0 || index >= values.size()) {
++    G4cerr << "Error: Generated index out of bounds!" << G4endl;
++    return -1;
++  }
++	return values[index]; // Draw a number from the values vector
++}
++
+ void G4OpMieHG::ResetMieCounter()
+ {
+ 	currentNumOfMie = 0;
+@@ -291,7 +309,7 @@ G4VParticleChange *G4OpMieHG::PostStepDoIt(const G4Track &aTrack,
+ 	}
+ 	else if (fPreviousVolume == currentVolume)
+ 	{
+-		G4cout << "Same volume: " << prevName << " | " << postName << G4endl;
++		//G4cout << "Same volume: " << prevName << " | " << postName << G4endl;
+ 		if (currentNumOfMie == 0)
+ 		{
+ 			needToGenerate = true;
+@@ -357,33 +375,28 @@ G4VParticleChange *G4OpMieHG::PostStepDoIt(const G4Track &aTrack,
+ 	{
+ 		if (currentNumOfMie < maxNumOfMie)
+ 		{
+-			int genThetaCounter = 0;
+-			while (theta == 0.0)
++			G4cout << "Generating theta..." << G4endl;
++			//theta = discgenerate(fTheta);
++			theta = generate();
++			degThetaGen = theta;
++			G4cout << "Theta: " << theta << "deg" << G4endl;
++			theta = theta / 180 * pi;
++			radThetaGen = theta;
++			G4cout << "Theta: " << theta << "rad" << G4endl;
++			generated = true;
++      /*
++			if (theta == 0.0)
+ 			{
+-				G4cout << "Generating theta..." << G4endl;
+-				theta = generate();
+-				degThetaGen = theta;
+-				G4cout << "Theta: " << theta << "deg" << G4endl;
+-				theta = theta / 180 * pi;
+-				radThetaGen = theta;
+-				G4cout << "Theta: " << theta << "rad" << G4endl;
+-				genThetaCounter++;
+-				generated = true;
+-				if (genThetaCounter >= 10)
+-				{
+-					G4cout << "Theta generation failed" << G4endl;
+-					theta = 1.0;
+-					generated = false;
+-					break;
+-				}
++	      return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
+ 			}
++      */
+ 
+ 			// theta = (theta * 180) / pi;
+ 		}
+ 		else
+ 		{
+ 			generated = false;
+-			theta = 1.0;
++			theta = 190.0;
+ 		}
+ 		if (verboseLevel > 0)
+ 		{
+@@ -520,8 +533,10 @@ G4VParticleChange *G4OpMieHG::PostStepDoIt(const G4Track &aTrack,
+ 		// return &fParticleChange;
+ 		// return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
+ 	}
++  /*
+ 	else
+ 	{
++  */
+ 		/*
+ 		if (newPol.mag() == 0.)
+ 		{
+@@ -537,10 +552,12 @@ G4VParticleChange *G4OpMieHG::PostStepDoIt(const G4Track &aTrack,
+ 			newPol = -newPol;
+ 		}
+ 		*/
++  /*
+ 		// aParticleChange.ProposePolarization(oldPol);
+ 		// aParticleChange.ProposeMomentumDirection(oldMomDir);
+ 		G4cout << "OpMie::Keeping old polarization and momentum" << std::endl;
+ 	}
++*/
+ 
+ 	if (verboseLevel > 1)
+ 	{
+diff --git a/source/processes/optical/src/ThreadSafeWriter.cc b/source/processes/optical/src/ThreadSafeWriter.cc
+index 7626b89..30c48a6 100644
+--- a/source/processes/optical/src/ThreadSafeWriter.cc
++++ b/source/processes/optical/src/ThreadSafeWriter.cc
+@@ -1,24 +1,32 @@
+ #include "ThreadSafeWriter.hh"
++#include "G4Threading.hh"
++#include "G4AutoLock.hh"
++
++namespace { G4Mutex myMutex = G4MUTEX_INITIALIZER; }
+ 
+ ThreadSafeWriter::ThreadSafeWriter(const std::string &filename) : outFile(filename, std::ios::app)
+ {
+-	outFile = std::ofstream(filename, std::ios::app);
+-	if (!outFile.is_open())
+-	{
+-		throw std::ios_base::failure("Failed to open file");
+-	}
++  outFile = std::ofstream(filename, std::ios::app);
++  if (!outFile.is_open())
++  {
++    throw std::ios_base::failure("Failed to open file");
++  }
+ }
+ 
+ ThreadSafeWriter::~ThreadSafeWriter()
+ {
+-	if (outFile.is_open())
+-	{
+-		outFile.close();
+-	}
++  G4AutoLock lock(&myMutex);
++  if (outFile.is_open())
++  {
++    outFile.close();
++  }
+ }
+ 
+ void ThreadSafeWriter::write(const std::string &message)
+ {
+-	std::lock_guard<std::mutex> guard(fileMutex);
+-	outFile << message << std::endl;
+-}
+\ No newline at end of file
++  G4AutoLock lock(&myMutex);
++//  std::lock_guard<std::mutex> guard(fileMutex);
++  outFile << message << std::endl;
++  outFile.flush();
++}
++
