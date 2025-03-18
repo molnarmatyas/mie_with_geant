@@ -298,6 +298,18 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   NDglass->SetMaterialPropertiesTable(ND_MPT);
 
+  // Steel
+  G4Material* steel = G4NistManager::Instance()->FindOrBuildMaterial("G4_STAINLESS-STEEL");
+  std::vector<G4double> steelreflectivity = {0.7, 0.7, 0.7 , 0.7}; // Approximate steel reflectivity
+  std::vector<G4double> steelabsorption = {0.1 * mm, 0.1 * mm, 0.1 * mm, 0.1 * mm}; // Very high absorption
+
+  G4MaterialPropertiesTable* steelMPT = new G4MaterialPropertiesTable();
+  steelMPT->AddProperty("REFLECTIVITY", photonEnergyMirror, steelreflectivity, nEntries);
+  steelMPT->AddProperty("ABSLENGTH", photonEnergyMirror, steelabsorption, nEntries);
+  steel->SetMaterialPropertiesTable(steelMPT);
+
+
+
 
 
 
@@ -376,7 +388,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2-oldbeamsplitter.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -501,13 +513,13 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // LB1258-A
   argosz_mat[10] = lensMaterial;
   // LA_mirror
-  argosz_mat[11] = mirrorMaterial;
+  argosz_mat[11] = steel; //mirrorMaterial;
   // LA_HA_separator_
   argosz_mat[12] = shieldMaterial;
   // Direct_beam_stop_0.75
   argosz_mat[13] = shieldMaterial;
   // HA_mirror
-  argosz_mat[14] = mirrorMaterial;
+  argosz_mat[14] = steel; //mirrorMaterial;
   // Saltywater
   argosz_mat[15] = saltwater;
   // lense_outer_housing
