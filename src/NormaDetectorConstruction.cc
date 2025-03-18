@@ -193,6 +193,17 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   std::vector<G4double> photonEnergyMirror = {1.8*eV, 1.85*eV, 1.9*eV, 1.95*eV };
   mirrorMaterial->SetMaterialPropertiesTable(myMPT3);
 
+  // Steel
+  G4Material* steel = G4NistManager::Instance()->FindOrBuildMaterial("G4_STAINLESS-STEEL");
+  std::vector<G4double> steelreflectivity = {0.7, 0.7, 0.7 , 0.7}; // Approximate steel reflectivity
+  std::vector<G4double> steelabsorption = {0.1 * mm, 0.1 * mm, 0.1 * mm, 0.1 * mm}; // Very high absorption
+
+  G4MaterialPropertiesTable* steelMPT = new G4MaterialPropertiesTable();
+  //steelMPT->AddProperty("REFLECTIVITY", photonEnergyMirror, steelreflectivity, nEntries);
+  //steelMPT->AddProperty("ABSLENGTH", photonEnergyMirror, steelabsorption, nEntries);
+  steel->SetMaterialPropertiesTable(steelMPT);
+
+
   // Shielding
   auto shieldMaterial = new G4Material("BlackPlastic", 0.94*g/cm3, 1);
   shieldMaterial->AddMaterial(nist->FindOrBuildMaterial("G4_POLYETHYLENE"), 1.0);
@@ -297,16 +308,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   ND_MPT->AddProperty("TRANSMITTANCE", photonEnergyMirror, transmittanceND, false, false);
 
   NDglass->SetMaterialPropertiesTable(ND_MPT);
-
-  // Steel
-  G4Material* steel = G4NistManager::Instance()->FindOrBuildMaterial("G4_STAINLESS-STEEL");
-  std::vector<G4double> steelreflectivity = {0.7, 0.7, 0.7 , 0.7}; // Approximate steel reflectivity
-  std::vector<G4double> steelabsorption = {0.1 * mm, 0.1 * mm, 0.1 * mm, 0.1 * mm}; // Very high absorption
-
-  G4MaterialPropertiesTable* steelMPT = new G4MaterialPropertiesTable();
-  steelMPT->AddProperty("REFLECTIVITY", photonEnergyMirror, steelreflectivity, nEntries);
-  steelMPT->AddProperty("ABSLENGTH", photonEnergyMirror, steelabsorption, nEntries);
-  steel->SetMaterialPropertiesTable(steelMPT);
 
 
 
