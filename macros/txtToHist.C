@@ -43,7 +43,7 @@ void txtToHist() {
   {
     TH2D* dh2D_xz[2];
     //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string filename = "../build/1M_updated_complete_model_15um_poli_withphi3_.txt";
+    std::string filename = "../build/outputcrosssection_radians_poli_15_10000.txt7500_990_0.txt";
     //std::string outputprefix = Form("1M_3D_modell_fixed_flowcell_saltywater_surface_point_source_degbydeg_%i", ideg);
     std::string outputprefix = "1M_3D_updated_complete_model_with_phi3_all_sensors_polistirol_15um_";
 
@@ -231,7 +231,7 @@ void txtToHist() {
     gStyle->SetOptStat(0);
     dhR_alpha->Draw("COLZ");
     //Ltanalpha->Draw("same");
-    c1->SaveAs(Form("figs/%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
+    c1->SaveAs(Form("../figs/%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
 
     //gStyle->SetCanvasDefH(550);
     //gStyle->SetCanvasDefW(650);
@@ -242,7 +242,7 @@ void txtToHist() {
     dh2D_xy->GetXaxis()->SetTitle("X [mm]");
     dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
     dh2D_xy->Draw("COLZ");
-    c1->SaveAs(Form("figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
+    c1->SaveAs(Form("../figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
     dh2D_xy->Write();
 
     dh2D_xz[0]->SetTitle(Form("2D scattering, deg=%i, vbpw34s_1", ideg));
@@ -266,7 +266,7 @@ void txtToHist() {
     dh2D_xy->GetXaxis()->SetTitle("X [pixel]");
     dh2D_xy->GetYaxis()->SetTitle("Y [pixel]");
     dh2D_xy->Draw("COLZ");
-    c2->SaveAs(Form("figs/%s_dh2D_xy_discrete.png", outputprefix.c_str()));
+    c2->SaveAs(Form("../figs/%s_dh2D_xy_discrete.png", outputprefix.c_str()));
 
 
     // R vs alpha

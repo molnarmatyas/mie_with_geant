@@ -389,7 +389,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2-oldbeamsplitter.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -557,6 +557,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[31] = sil;
 
   int isolid = 0;
+  G4double dbshift = -0.050 * mm; // shift direct beam stop to make CCD image symmetrical
   for (auto solid : solids)
   {
     /*
@@ -573,9 +574,19 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
         );
     switch(isolid) {
     case 3:
+    case 13: // Direct_beam_stop_0.75
+      argosz_phys[isolid] = new G4PVPlacement( 0
+          , G4ThreeVector(0.8660254038*dbshift, 0, 0.5*dbshift)
+          , argosz_log[isolid]
+          , solid->GetName()
+          , world_log
+          , false, 0
+          );
+      break;
     case 15:
       argosz_phys[isolid] = new G4PVPlacement( 0
-          , G4ThreeVector(-0.40, 0, 0)
+          //, G4ThreeVector(-0.40, 0, 0) // why was this even here in a commit?
+          , G4ThreeVector(0, 0, 0)
           , argosz_log[isolid]
           , solid->GetName()
           , world_log
