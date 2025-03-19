@@ -574,19 +574,18 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
         );
     switch(isolid) {
     case 3:
-    case 13: // Direct_beam_stop_0.75
+    case 15:
       argosz_phys[isolid] = new G4PVPlacement( 0
-          , G4ThreeVector(0.8660254038*dbshift, 0, 0.5*dbshift)
+          , G4ThreeVector(-0.40, 0, 0)
           , argosz_log[isolid]
           , solid->GetName()
           , world_log
           , false, 0
           );
       break;
-    case 15:
+    case 13: // Direct_beam_stop_0.75
       argosz_phys[isolid] = new G4PVPlacement( 0
-          //, G4ThreeVector(-0.40, 0, 0) // why was this even here in a commit?
-          , G4ThreeVector(0, 0, 0)
+          , G4ThreeVector(0.8660254038*dbshift, 0, 0.5*dbshift)
           , argosz_log[isolid]
           , solid->GetName()
           , world_log
