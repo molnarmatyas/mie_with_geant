@@ -649,7 +649,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   if (isPolycone)
   {
     // old position 14.09 * mm, 96.2425 * mm, -137.51 * mm 
-    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift), bubbleWP_log,
+    // 14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm
+    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.0999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift), bubbleWP_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
   }
   else
