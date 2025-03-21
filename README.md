@@ -7,7 +7,7 @@ mkdir Norma && cd Norma
 ```
 Clone this repository:
 ```
-git clone -b custom_mie https://github.com/molnarmatyas/mie_with_geant
+git clone -b master https://github.com/molnarmatyas/mie_with_geant
 ```
 
 
@@ -30,40 +30,24 @@ tar -xzf v11.2.0.tar.gz
 cd geant4-11.2.0
 ```
 
-Apply the [patch](patch/numeric_mie.patch):
-Before applying, one needs to copy one of the dependencies to the geant4-11.2.0 directory
+Apply the [patch](patch/numeric_mie_v4.patch):
+Before applying, one needs to copy the patch to the `geant4-11.2.0` directory.
+You should be on the level where you see both `geant4-11.2.0` directory as well as `mie_with_geant`.
 ```
-cp src/ThreadSafeWriter.cc geant4-11.2.0/source/processes/optical/src/
-cp include/ThreadSafeWriter.hh geant4-11.2.0/source/processes/optical/include/
-cp patch/numeric_mie_v2.patch geant4-11.2.0/
+cp mie_with_geant/patch/numeric_mie_v4.patch geant4-11.2.0/
 cd geant4-11.2.0
-patch -p1 --fuzz=3 --ignore-whitespace --merge --verbose < numeric_mie.patch
-```
-Older methods
-```
-git apply ../mie_with_geant/patch/numeric_mie.patch
-```
-or, if in this directory (make sure geant4-* is in the .gitignore):
-```
-git apply ../patch/numeric_mie.patch
+patch -p1 --fuzz=3 --ignore-whitespace --merge --verbose < numeric_mie_v4.patch
 ```
 
 
-
-Now everything is ready to build Geant4:
+Now everything is ready to build Geant4. Be one level above the `geant4-11.2.0` directory:
 ```
-cd ../
-mkdir GeantBuild && cd GeantBuild
-```
-or:
-```
-mkdir geant4-install
-mkdir geant4-build && cd geant4-build
+mkdir GeantBuild && mkdir GeantInstall && cd GeantBuild
 ```
 
 Run CMake:
 ```
-cmake -DCMAKE_INSTALL_PREFIX=../geant4-install -DGEANT4_USE_GDML=ON -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_QT=ON -DGEANT4_USE_OPENGL_X11=ON -DGEANT4_USE_RAYTRACER_X11=ON -DGEANT4_USE_SYSTEM_CLHEP=ON -DCLHEP_INCLUDE_DIR=../../../GEANT/CLHEP/install/include/ -DCLHEP_LIBRARY=../../../GEANT/CLHEP/install/include/lib -DGEANT4_INSTALL_EXAMPLES=ON -DCLHEP_ROOT_DIR=../../../GEANT/CLHEP/install/ -DGEANT4_BUILD_MULTITHREADED=ON $geant_extra_args ../geant4-11.2.0
+cmake -DCMAKE_INSTALL_PREFIX=../geant4-install -DGEANT4_USE_GDML=OFF -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_QT=ON -DGEANT4_USE_OPENGL_X11=ON -DGEANT4_USE_RAYTRACER_X11=ON -DGEANT4_USE_SYSTEM_CLHEP=OFF -DGEANT4_INSTALL_EXAMPLES=ON -DGEANT4_BUILD_MULTITHREADED=ON $geant_extra_args ../geant4-11.2.0
 ```
 alternatively, if you have CLHEP in /opt, for example in Docker or other VM:
 ```
@@ -82,11 +66,11 @@ sudo make install
 
 If you prefer, add Geant4 source script to your `bash.bashrc`. If you skip this part, you must call this source script everytime when you want to use the modded version.
 ```
-sudo grep -q "source /opt/geant4/bin/geant4.sh" /etc/bash.bashrc
+sudo grep -q "source /PATH/TO/FOLDER/GeantInstall/bin/geant4.sh" /etc/bash.bashrc
 ```
 or just call from `mie_with_geant` folder:
 ```
-source geant4-install/bin/geant4.sh
+source /PATH/TO/FOLDER/GeantInstall/bin/geant4.sh
 ```
 
 If you make any changes in Geant4 source, repeat the `make -jN` and `sudo make install` steps. Build your simulation too.
@@ -101,9 +85,9 @@ make -j8
 ```
 
 ## Using the simulation
-After a successful build of Geant4 and simulation you must need the numeric simulation's result file. Set `NUMERIC_MIE_FPATH` environment variable to the file path which you want to use, set `CELL_RADIUS_UM` environment variable to set the radius for the numerical simulation selection, then run the software:
+After a successful build of Geant4 and simulation you must need the numeric simulation's result file. Set `NUMERIC_MIE_FPATH` environment variable to the file path which you want to use. Set then the  `CELL_RADIUS_UM` environment variable to the radius of the cell for the numerical simulation selection, then say:
 ```
-NUMERIC_MIE_FPATH=diff_cross_0-180_10000pt.txt CELL_RADIUS_UM=3.0 ./Norma
+NUMERIC_MIE_FPATH=diff_cross_0-180_10000pt.txt CELL_RADIUS_UM=3.0 ./Norma -m run2.mac
 ```
 
 If `NUMERIC_MIE_FPATH` is not set, it will use the original `OPMieHG` process.
@@ -111,12 +95,13 @@ If `NUMERIC_MIE_FPATH` is not set, it will use the original `OPMieHG` process.
 ### Command line arguments:
 - `-m [MACRO_PATH]` - Specify a macro to run
 - `-r [SEED]` - Sets a new seed
-- `-b [BUBBLE_RADIUS]` - Sets the bubble radius (nm)
+- `-b [BUBBLE_RADIUS]` - Sets the bubble radius (um)
+- `-t [THREADS]` - Sets number of threads to use
 
 ### Output
 Currently it is using [ThreadSafeWriter](include/ThreadSafeWriter.hh) to write the calculated theta and generated theta to a file in the following format:
 ```
-[calculated_theta], [generated_theta], [distance on 2D plane], [detector hit position X],  [detector hit position Y],  [detector hit position Z], [momentum direction at the cell - alpha angle (not used anymore)], [manually calculated alpha angle (not used anymore)] 
+[calculated_theta], [generated_theta], [distance on 2D plane], [detector hit position X],  [detector hit position Y],  [detector hit position Z], [momentum direction at the cell - alpha angle (not used anymore)], [manually calculated alpha angle (not used anymore)], [phi angle], [detector number: 0 - CCD, 1 - LA, 2 - HA] 
 ...
-[calculated_theta], [generated_theta], [distance on 2D plane], [detector hit position X],  [detector hit position Y],  [detector hit position Z], [momentum direction at the cell - alpha angle (not used anymore)], [manually calculated alpha angle (not used anymore)] 
+[calculated_theta], [generated_theta], [distance on 2D plane], [detector hit position X],  [detector hit position Y],  [detector hit position Z], [momentum direction at the cell - alpha angle (not used anymore)], [manually calculated alpha angle (not used anymore)], [phi angle], [detector number: 0 - CCD, 1 - LA, 2 - HA] 
 ```
