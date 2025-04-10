@@ -63,6 +63,19 @@ private:
   G4ParticleGun* fParticleGun = nullptr;
   NormaPrimaryGeneratorMessenger* fGunMessenger = nullptr;
   double LEDSize = 5 * CLHEP::um;
+  // For intensity profile
+  void InitializeIntensityProfile(const std::string& filename, const G4ThreeVector& centerWorld, double pixelSizeMM);
+  void LoadIntensityCSV(const std::string& filename);
+  void NormalizeAndBuildCDF();
+  G4ThreeVector ComputeProfileCenter();
+  std::pair<int, int> SamplePixel();
+
+  std::vector<double> intensityMap;
+  std::vector<double> cumulativeProb;
+  int numRows = 0;
+  int numCols = 0;
+  double pixelSize = 0.0045 * CLHEP::mm; // CinCam CMOS-1203
+  G4ThreeVector profileCenterWorld = G4ThreeVector(); // Where the center should be in Geant4
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

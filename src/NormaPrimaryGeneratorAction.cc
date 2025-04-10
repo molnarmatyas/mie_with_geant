@@ -39,6 +39,8 @@
 #include "G4SystemOfUnits.hh"
 #include "NormaPrimaryGeneratorMessenger.hh"
 #include "Randomize.hh"
+#include <numeric>  // for std::accumulate
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGeneratorAction(), fParticleGun(nullptr)
@@ -60,7 +62,7 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 	//fParticleGun->SetParticlePosition(G4ThreeVector(-17 * CLHEP::um, y, 0*mm));
   //fParticleGun->SetParticlePosition(G4ThreeVector(-29.35 * CLHEP::mm, 96.076 * CLHEP::mm, -157.841 * CLHEP::mm)); //laser
   G4double shift = .0;//0.035 * mm; // to make resulting CCD image symmetrical
-	fParticleGun->SetParticlePosition(G4ThreeVector(4.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift)); //14.49 //center of cell
+	//fParticleGun->SetParticlePosition(G4ThreeVector(4.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift)); //14.49 //center of cell
 		
   /*
 	G4double dy = (G4UniformRand() - 0.5) * 0.1;
@@ -73,6 +75,13 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 
   //fParticleGun->SetParticlePosition(G4ThreeVector(0,0,0));
   //fParticleGun->GeneratePrimaryVertex(anEvent);
+
+  // Initialize intensity profile
+  std::string intensityFile = "RayCi8_180mm.csv"; // You can pass this via a macro later
+  G4ThreeVector profileCenterWorld = G4ThreeVector(4.4999505 * mm, 96.250088 * mm, -137.4700015 * mm);
+  //double pixelSize = 0.0045 * CLHEP::mm; // CinCam CMOS-1203
+
+  InitializeIntensityProfile(intensityFile, profileCenterWorld, pixelSize);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -85,19 +94,29 @@ NormaPrimaryGeneratorAction::~NormaPrimaryGeneratorAction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void NormaPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
 {
-  /*
-  G4double t = 2*CLHEP::pi  * G4UniformRand();
-  G4double r = std::sqrt(0.1/CLHEP::pi) * (G4UniformRand());
-  G4double x0 = 14.09 * CLHEP::mm;
-  G4double y0 = r * std::cos(t) + 96.2425 * CLHEP::mm;
-  G4double z0 = r * std::sin(t) + -137.51 * CLHEP::mm;
-  //G4cerr << "Gun from " << x0 << ", " << y0 << ", " << z0 << G4endl; 
-  fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0)*CLHEP::mm); // so then 0.1 mm^2 is the source
-	G4double dy = 0.0;//(G4UniformRand() - 0.5) * 0.1;
-	G4double dz = 0.0;//(G4UniformRand() - 0.5) * 0.1;
-	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., dy, dz));
-  */
-	fParticleGun->GeneratePrimaryVertex(anEvent);
+	/*
+	G4double t = 2*CLHEP::pi  * G4UniformRand();
+	G4double r = std::sqrt(0.1/CLHEP::pi) * (G4UniformRand());
+	G4double x0 = 14.09 * CLHEP::mm;
+	G4double y0 = r * std::cos(t) + 96.2425 * CLHEP::mm;
+	G4double z0 = r * std::sin(t) + -137.51 * CLHEP::mm;
+	//G4cerr << "Gun from " << x0 << ", " << y0 << ", " << z0 << G4endl; 
+	fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0)*CLHEP::mm); // so then 0.1 mm^2 is the source
+		G4double dy = 0.0;//(G4UniformRand() - 0.5) * 0.1;
+		G4double dz = 0.0;//(G4UniformRand() - 0.5) * 0.1;
+		fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., dy, dz));
+	  */
+	
+	auto [i, j] = SamplePixel();
+	double localZ = (j - numCols / 2.0) * pixelSize;
+	double localY = (i - numRows / 2.0) * pixelSize; //z-y plane!
+	G4ThreeVector emissionPoint = G4ThreeVector(0, localY, localZ) + profileCenterWorld;
+	
+	fParticleGun->SetParticlePosition(emissionPoint);
+	// Set direction etc.
+		
+ 
+    fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -138,3 +157,93 @@ void NormaPrimaryGeneratorAction::SetParameters(Parameters p)
 	std::cout << "LEDSzize " << LEDSize << std::endl;
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+// For csv intensity profile
+void NormaPrimaryGeneratorAction::LoadIntensityCSV(const std::string& filename) {
+    std::ifstream file(filename);
+    std::string line;
+
+    // Skip the first (header) line
+    std::getline(file, line);
+
+    std::vector<double> tempData;
+    numRows = 0;
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string cell;
+        int colCount = 0;
+
+        while (std::getline(ss, cell, ',')) {
+            double val = std::stod(cell);
+            tempData.push_back(val);
+            ++colCount;
+        }
+
+        if (colCount > 0) {
+            ++numRows;
+            numCols = colCount; // assume consistent width
+        }
+    }
+
+    intensityMap = std::move(tempData);
+}
+
+
+void NormaPrimaryGeneratorAction::NormalizeAndBuildCDF() {
+    double sum = std::accumulate(intensityMap.begin(), intensityMap.end(), 0.0);
+    for (auto& val : intensityMap) val /= sum;
+
+    cumulativeProb.resize(intensityMap.size());
+    cumulativeProb[0] = intensityMap[0];
+    for (size_t i = 1; i < intensityMap.size(); ++i) {
+        cumulativeProb[i] = cumulativeProb[i - 1] + intensityMap[i];
+    }
+}
+
+
+G4ThreeVector NormaPrimaryGeneratorAction::ComputeProfileCenter() {
+	// Find center of mass of the intensity profile
+    double xSum = 0, ySum = 0, total = 0;
+    for (int i = 0; i < numRows; ++i) {
+        for (int j = 0; j < numCols; ++j) {
+            double w = intensityMap[i * numCols + j];
+            xSum += j * w;
+            ySum += i * w;
+            total += w;
+        }
+    }
+
+    double cx = xSum / total;
+    double cy = ySum / total;
+
+    // Convert to world coordinates
+    double worldX = profileCenterWorld.x(); // X is fixed
+	double worldZ = (cx - numCols / 2.0) * pixelSize; // in z-y plane!
+    double worldY = (cy - numRows / 2.0) * pixelSize;
+
+    return G4ThreeVector(worldX, worldY, worldZ) + profileCenterWorld;
+}
+
+std::pair<int, int> NormaPrimaryGeneratorAction::SamplePixel() {
+	// Sampling from the 2D intensity map
+    double r = G4UniformRand();
+    auto it = std::lower_bound(cumulativeProb.begin(), cumulativeProb.end(), r);
+    int idx = std::distance(cumulativeProb.begin(), it);
+    int i = idx / numCols;
+    int j = idx % numCols;
+    return {i, j};
+}
+
+void NormaPrimaryGeneratorAction::InitializeIntensityProfile(const std::string& filename, const G4ThreeVector& centerWorld, double pixelSizeMM) {
+    profileCenterWorld = centerWorld;
+    pixelSize = pixelSizeMM * CLHEP::mm;
+
+    LoadIntensityCSV(filename);
+    NormalizeAndBuildCDF();
+    G4ThreeVector beamCenter = ComputeProfileCenter();
+
+    G4cout << "→ Laser profile loaded from: " << filename << G4endl;
+    G4cout << "→ Profile dimensions: " << numCols << " × " << numRows << G4endl;
+    G4cout << "→ Computed center of mass: " << beamCenter / mm << " mm" << G4endl;
+}
