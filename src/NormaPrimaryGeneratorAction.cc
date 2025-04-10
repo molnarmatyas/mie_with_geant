@@ -78,7 +78,7 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 
   // Initialize intensity profile
   std::string intensityFile = "RayCi8_180mm.csv"; // You can pass this via a macro later
-  G4ThreeVector profileCenterWorld = G4ThreeVector(4.4999505 * mm, 96.250088 * mm, -137.4700015 * mm);
+  G4ThreeVector profileCenterWorld = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm);
   //double pixelSize = 0.0045 * CLHEP::mm; // CinCam CMOS-1203
 
   InitializeIntensityProfile(intensityFile, profileCenterWorld, pixelSize);
@@ -191,7 +191,19 @@ void NormaPrimaryGeneratorAction::LoadIntensityCSV(const std::string& filename) 
 
 
 void NormaPrimaryGeneratorAction::NormalizeAndBuildCDF() {
+    // First, zero out values below threshold (e.g., 0.01)
+    double threshold = 2e-05;
+    for (auto& val : intensityMap) {
+        if (val < threshold) val = 0.0;
+    }
+    // Normalize
     double sum = std::accumulate(intensityMap.begin(), intensityMap.end(), 0.0);
+    if (sum == 0.0) {
+        G4Exception("NormaPrimaryGeneratorAction::NormalizeAndBuildCDF",
+                    "ZeroIntensityMap", FatalException,
+                    "All intensity values are zero after thresholding.");
+    }
+
     for (auto& val : intensityMap) val /= sum;
 
     cumulativeProb.resize(intensityMap.size());
@@ -212,6 +224,12 @@ G4ThreeVector NormaPrimaryGeneratorAction::ComputeProfileCenter() {
             ySum += i * w;
             total += w;
         }
+    }
+
+    if (total == 0.0) {
+        G4Exception("NormaPrimaryGeneratorAction::ComputeProfileCenter",
+                    "ZeroIntensityMap", FatalException,
+                    "Cannot compute center of mass: all intensity values are zero.");
     }
 
     double cx = xSum / total;
