@@ -38,6 +38,7 @@
 #include "G4ParticleGun.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "ParametersStruct.hh"
+#include <random>
 
 class G4Event;
 class NormaPrimaryGeneratorMessenger;
@@ -72,9 +73,13 @@ private:
 
   std::vector<double> intensityMap;
   std::vector<double> cumulativeProb;
+	std::mt19937 fGen;
+	std::discrete_distribution<int> fDist_disc;
+	double discgenerate(std::vector<double> &);
+  std::map<double, int> map_test;
   int numRows = 0;
   int numCols = 0;
-  double pixelSize = 0.0045 * CLHEP::mm; // CinCam CMOS-1203
+  double pixelSize = 4.5 * CLHEP::um; // CinCam CMOS-1203
   G4ThreeVector profileCenterWorld = G4ThreeVector(); // Where the center should be in Geant4
 };
 
