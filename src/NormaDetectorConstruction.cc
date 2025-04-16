@@ -160,7 +160,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   myMPT1->AddConstProperty("MIEHG_FORWARD_RATIO", mie_water_const[2]);
 
   G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
-  myMPT1->DumpTable();
+  //myMPT1->DumpTable();
 
   water->SetMaterialPropertiesTable(myMPT1);
 
@@ -181,7 +181,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
    */
 
   G4cout << "Air G4MaterialPropertiesTable:" << G4endl;
-  myMPT0->DumpTable();
+  //myMPT0->DumpTable();
 
   air->SetMaterialPropertiesTable(myMPT0);
 
