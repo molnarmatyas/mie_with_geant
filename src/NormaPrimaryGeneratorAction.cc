@@ -246,16 +246,17 @@ G4ThreeVector NormaPrimaryGeneratorAction::ComputeProfileCenter() {
 
 std::pair<int, int> NormaPrimaryGeneratorAction::SamplePixel() {
 	// Sampling from the 2D intensity map
-		double r = discgenerate(cumulativeProb);
-    //to see how many of each were generated
-    ++map_test[r];
+    //this directly returns the idx based on the intensity map
+    int idx = fDist_disc(fGen);
+    
+    // logging
+    ++map_test[idx];
     for (const auto& [num, count] : map_test)
         std::cout << num << " generated " << std::setw(4) << count << " times\n";
-
-    //double r = G4UniformRand();
-    auto it = std::lower_bound(cumulativeProb.begin(), cumulativeProb.end(), r);
-    int idx = std::distance(cumulativeProb.begin(), it);
-    G4cout << "r: " << r << "\tidx: " << idx << G4endl;
+    
+    G4cout << "idx: " << idx << G4endl;
+    
+    // to coordinates
     int i = idx / numCols;
     int j = idx % numCols;
     return {i, j};
@@ -276,19 +277,4 @@ void NormaPrimaryGeneratorAction::InitializeIntensityProfile(const std::string& 
     G4cout << "→ Laser profile loaded from: " << filename << G4endl;
     G4cout << "→ Profile dimensions: " << numCols << " × " << numRows << G4endl;
     G4cout << "→ Computed center of mass: " << beamCenter / mm << " mm" << G4endl;
-}
-
-double NormaPrimaryGeneratorAction::discgenerate(std::vector<double> &values) // discrete
-{
-  if (values.empty()) {
-    G4cerr << "Error: Values vector is empty!" << G4endl;
-    return -1;
-  }
-
-  int index = fDist_disc(fGen);
-  if (index < 0 || index >= values.size()) {
-    G4cerr << "Error: Generated index out of bounds!" << G4endl;
-    return -1;
-  }
-	return values[index]; // Draw a number from the values vector
 }

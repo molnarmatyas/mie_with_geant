@@ -75,7 +75,6 @@ private:
   std::vector<double> cumulativeProb;
 	std::mt19937 fGen;
 	std::discrete_distribution<int> fDist_disc;
-	double discgenerate(std::vector<double> &);
   std::map<double, int> map_test;
   int numRows = 0;
   int numCols = 0;
