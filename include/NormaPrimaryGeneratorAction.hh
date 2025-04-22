@@ -65,14 +65,13 @@ private:
   NormaPrimaryGeneratorMessenger* fGunMessenger = nullptr;
   double LEDSize = 5 * CLHEP::um;
   // For intensity profile
-  void InitializeIntensityProfile(const std::string& filename, const G4ThreeVector& centerWorld, double pixelSizeMM);
+  void InitializeIntensityProfile(const std::string& filename, double pixelSizeMM);
   void LoadIntensityCSV(const std::string& filename);
   void NormalizeAndBuildCDF();
   G4ThreeVector ComputeProfileCenter();
   std::pair<int, int> SamplePixel();
 
   std::vector<double> intensityMap;
-  std::vector<double> cumulativeProb;
 	std::mt19937 fGen;
 	std::discrete_distribution<int> fDist_disc;
   std::map<double, int> map_test;

@@ -78,9 +78,9 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 
   // Initialize intensity profile
   std::string intensityFile = "RayCi8_180mm.csv"; // You can pass this via a macro later
-  G4ThreeVector profileCenterWorld = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm);
+  profileCenterWorld = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm);
 
-  InitializeIntensityProfile(intensityFile, profileCenterWorld, pixelSize);
+  InitializeIntensityProfile(intensityFile, pixelSize);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -111,7 +111,9 @@ void NormaPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
 	double localY = (i - numRows / 2.0) * pixelSize; //z-y plane!
   G4cout << "selected index: " << i << "\t" << j << G4endl;
   G4cout << "selected pixel: " << localZ << "\t" << localY << G4endl;
-	G4ThreeVector emissionPoint = G4ThreeVector(0, localY, localZ) + profileCenterWorld;
+	G4ThreeVector emissionPoint = profileCenterWorld - G4ThreeVector(0, localY, localZ);
+  G4cout << "profileCentterWorld: " << profileCenterWorld << G4endl;
+  G4cout << "Emission point: " << emissionPoint << G4endl;
 	
 	fParticleGun->SetParticlePosition(emissionPoint);
 	// Set direction etc.
@@ -193,11 +195,21 @@ void NormaPrimaryGeneratorAction::LoadIntensityCSV(const std::string& filename) 
 
 void NormaPrimaryGeneratorAction::NormalizeAndBuildCDF() {
     // First, zero out values below threshold (e.g., 0.01)
-    double threshold = 2e-05;
+    double threshold = 0.05;
     for (auto& val : intensityMap) {
         if (val < threshold) val = 0.0;
     }
     // Normalize
+    // Find the maximum value for normalization
+    double maxValue = *std::max_element(intensityMap.begin(), intensityMap.end());
+    
+    // Renormalize only if max value is greater than zero
+    if (maxValue > 0.0) {
+        for (auto& value : intensityMap) {
+            value /= maxValue;
+        }
+    }
+    /*
     double sum = std::accumulate(intensityMap.begin(), intensityMap.end(), 0.0);
     if (sum == 0.0) {
         G4Exception("NormaPrimaryGeneratorAction::NormalizeAndBuildCDF",
@@ -206,12 +218,7 @@ void NormaPrimaryGeneratorAction::NormalizeAndBuildCDF() {
     }
 
     for (auto& val : intensityMap) val /= sum;
-
-    cumulativeProb.resize(intensityMap.size());
-    cumulativeProb[0] = intensityMap[0];
-    for (size_t i = 1; i < intensityMap.size(); ++i) {
-        cumulativeProb[i] = cumulativeProb[i - 1] + intensityMap[i];
-    }
+    */
 }
 
 
@@ -237,9 +244,10 @@ G4ThreeVector NormaPrimaryGeneratorAction::ComputeProfileCenter() {
     double cy = ySum / total;
 
     // Convert to world coordinates
-    double worldX = profileCenterWorld.x(); // X is fixed
-	double worldZ = (cx - numCols / 2.0) * pixelSize; // in z-y plane!
+    double worldX = 0.0; // X is fixed
+    double worldZ = (cx - numCols / 2.0) * pixelSize; // in z-y plane!
     double worldY = (cy - numRows / 2.0) * pixelSize;
+    G4cout << "Y: " << worldY << "\tZ: " << worldZ << G4endl;
 
     return G4ThreeVector(worldX, worldY, worldZ) + profileCenterWorld;
 }
@@ -262,8 +270,7 @@ std::pair<int, int> NormaPrimaryGeneratorAction::SamplePixel() {
     return {i, j};
 }
 
-void NormaPrimaryGeneratorAction::InitializeIntensityProfile(const std::string& filename, const G4ThreeVector& centerWorld, double pixelSizeMM) {
-    profileCenterWorld = centerWorld;
+void NormaPrimaryGeneratorAction::InitializeIntensityProfile(const std::string& filename, double pixelSizeMM) {
     //pixelSize = pixelSizeMM * CLHEP::mm;
     G4cout << "pixelSize normal: " << pixelSize << G4endl;
 
