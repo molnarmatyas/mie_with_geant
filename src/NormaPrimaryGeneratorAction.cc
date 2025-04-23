@@ -78,7 +78,7 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 
   // Initialize intensity profile
   std::string intensityFile = "RayCi8_180mm.csv"; // You can pass this via a macro later
-  profileCenterWorld = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm);
+  profileCenterWorld = G4ThreeVector(14.4999505 * mm + -0.4*mm, 96.250088 * mm - 0.23*mm, -137.4700015 * mm - 0.9*mm);
 
   InitializeIntensityProfile(intensityFile, pixelSize);
 }
@@ -111,7 +111,7 @@ void NormaPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
 	double localY = (i - numRows / 2.0) * pixelSize; //z-y plane!
   G4cout << "selected index: " << i << "\t" << j << G4endl;
   G4cout << "selected pixel: " << localZ << "\t" << localY << G4endl;
-	G4ThreeVector emissionPoint = profileCenterWorld - G4ThreeVector(0, localY, localZ);
+	G4ThreeVector emissionPoint = profileCenterWorld + G4ThreeVector(0, localY, localZ);
   G4cout << "profileCentterWorld: " << profileCenterWorld << G4endl;
   G4cout << "Emission point: " << emissionPoint << G4endl;
 	
@@ -247,7 +247,11 @@ G4ThreeVector NormaPrimaryGeneratorAction::ComputeProfileCenter() {
     double worldX = 0.0; // X is fixed
     double worldZ = (cx - numCols / 2.0) * pixelSize; // in z-y plane!
     double worldY = (cy - numRows / 2.0) * pixelSize;
+    G4cout << "Coordinates of profile center in profile's coordinates: " << G4endl;
     G4cout << "Y: " << worldY << "\tZ: " << worldZ << G4endl;
+    
+    worldZ = cx * pixelSize;
+    worldY = cy * pixelSize;
 
     return G4ThreeVector(worldX, worldY, worldZ) + profileCenterWorld;
 }
@@ -278,8 +282,10 @@ void NormaPrimaryGeneratorAction::InitializeIntensityProfile(const std::string& 
     LoadIntensityCSV(filename);
     NormalizeAndBuildCDF();
     G4ThreeVector beamCenter = ComputeProfileCenter();
-		fDist_disc = std::discrete_distribution<>(intensityMap.begin(), intensityMap.end());
-		fGen.seed(time(0)); // if you want different results from different runs
+
+	fDist_disc = std::discrete_distribution<>(intensityMap.begin(), intensityMap.end());
+	//fDist_disc = std::piecewise_linear_distribution<>(intensityMap.begin(), intensityMap.end(), intensityMap.begin());
+	fGen.seed(time(0)); // if you want different results from different runs
 
     G4cout << "→ Laser profile loaded from: " << filename << G4endl;
     G4cout << "→ Profile dimensions: " << numCols << " × " << numRows << G4endl;
