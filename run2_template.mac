@@ -1,0 +1,25 @@
+# Macro file for MieNorma
+# 
+# To be run preferably in batch, without graphics:
+# % mieNorma run2.mac
+
+/process/optical/processActivation OpBoundary true
+/process/optical/processActivation OpRayleigh true
+/process/optical/processActivation OpWLS true
+/process/optical/processActivation OpWLS2 true
+/Norma/DetectorConstruction/enableVerbose true
+
+
+/run/initialize
+/control/verbose 0
+/run/verbose 0
+
+/gun/particle opticalphoton
+/gun/energy 1.884 eV
+
+/gun/polarization 1. 0. 0.
+
+/run/printProgress 100000
+
+/Norma/DetectorConstruction/Cell/setOffset 3.2 3.2 3.2 um
+/run/beamOn 10
