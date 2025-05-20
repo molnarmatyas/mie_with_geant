@@ -53,6 +53,17 @@ NormaDetectorConstruction::NormaDetectorConstruction() : G4VUserDetectorConstruc
 {
   // create a messenger for this class
   fDetectorMessenger = new NormaDetectorMessenger(this);
+  fBubble_additional_offset = G4ThreeVector(0, 0, 0);
+}
+
+void NormaDetectorConstruction::SetCellOffset(G4double x, G4double y, G4double z) 
+{
+  fBubble_additional_offset.set(x, y, z);
+}
+
+void NormaDetectorConstruction::UpdateGeometry() 
+{
+  G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -160,7 +171,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   myMPT1->AddConstProperty("MIEHG_FORWARD_RATIO", mie_water_const[2]);
 
   G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
-  //myMPT1->DumpTable();
+  myMPT1->DumpTable();
 
   water->SetMaterialPropertiesTable(myMPT1);
 
@@ -181,7 +192,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
    */
 
   G4cout << "Air G4MaterialPropertiesTable:" << G4endl;
-  //myMPT0->DumpTable();
+  myMPT0->DumpTable();
 
   air->SetMaterialPropertiesTable(myMPT0);
 
@@ -650,16 +661,23 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   {
     // old position 14.09 * mm, 96.2425 * mm, -137.51 * mm 
     // 14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm
-    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.0999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift), bubbleWP_log,
+    fBubble_def_pos = G4ThreeVector(14.0999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift);
+    bubble_phys = new G4PVPlacement(nullptr, fBubble_def_pos + fBubble_additional_offset, bubbleWP_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
   }
   else
   {
-    bubble_phys = new G4PVPlacement(nullptr, G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift), bubbleW_log,
+    fBubble_def_pos = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift);
+    bubble_phys = new G4PVPlacement(nullptr, fBubble_def_pos + fBubble_additional_offset, bubbleW_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
   }
 
-
+  if (IsVerbose())
+  {
+    std::cout << "Cell default position: " << fBubble_def_pos << std::endl;
+    std::cout << "Cell offset: " << fBubble_additional_offset << std::endl;
+    std::cout << "Cell current position: " << fBubble_additional_offset + fBubble_def_pos << std::endl;
+  }
 
   /*
   //   -----  DETECTOR ARRAY  -----

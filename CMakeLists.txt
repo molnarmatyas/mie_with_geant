@@ -54,10 +54,12 @@ set(Norma_SCRIPTS
     vis.mac
     simplevis.mac
     run2.mac
+    run2_template.mac
+    offset_runner.sh
     diff_cross_0-180_10000pt.txt
     dhkm_7_1592_1.txt
     crosssection_radians_poli_15_10000.txt
-    RayCi8_180mm.csv
+    Argosz_250307.obj
     Argosz_250311_2.obj
   )
 

@@ -38,6 +38,7 @@
 #include "G4NistManager.hh"
 #include "G4Polycone.hh"
 #include "G4Ellipsoid.hh"
+#include "G4RunManager.hh"
 
 //#include "NormaSensor.hh"
 
@@ -57,6 +58,8 @@ public:
   G4bool IsVerbose() const;
 
   void SetParameters(Parameters p);
+  void SetCellOffset(G4double x, G4double y, G4double z);
+  void UpdateGeometry();
 
 private:
   void PrintError(G4String);
@@ -84,6 +87,8 @@ private:
   */
 
   G4double fBubble_r = 3 * CLHEP::um;
+  G4ThreeVector fBubble_def_pos; //Cell default position
+  G4ThreeVector fBubble_additional_offset;
   G4double mieFg = 0.99;
   G4int isPolycone = 0;
   G4bool fVerbose = false;

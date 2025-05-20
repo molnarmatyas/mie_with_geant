@@ -34,6 +34,7 @@
 
 #include "globals.hh"
 #include "G4UImessenger.hh"
+#include "G4UIcmdWith3VectorAndUnit.hh"
 
 class G4VUserDetectorConstruction;
 class G4UIdirectory;
@@ -53,6 +54,7 @@ private:
     G4VUserDetectorConstruction *fNormaDetCon = nullptr;
     G4UIdirectory *fDetConDir = nullptr;
     G4UIcmdWithABool *fVerboseCmd = nullptr;
+    G4UIcmdWith3VectorAndUnit* setOffsetCmd;
 };
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 #endif

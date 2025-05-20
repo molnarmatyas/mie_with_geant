@@ -42,6 +42,12 @@ NormaDetectorMessenger::NormaDetectorMessenger(G4VUserDetectorConstruction *detc
 	fVerboseCmd->SetGuidance("Set flag for enabling verbose diagnostic printout");
 	fVerboseCmd->SetDefaultValue(false);
 	fVerboseCmd->AvailableForStates(G4State_PreInit);
+
+	setOffsetCmd = new G4UIcmdWith3VectorAndUnit("/Norma/DetectorConstruction/Cell/setOffset", this);
+    setOffsetCmd->SetGuidance("Set X/Y/Z offsets for the Cell.");
+    setOffsetCmd->SetParameterName("x", "y", "z", false);
+    setOffsetCmd->SetUnitCategory("Length");
+    setOffsetCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -60,7 +66,16 @@ void NormaDetectorMessenger::SetNewValue(G4UIcommand *command, G4String newValue
 	if (dc1 != nullptr)
 	{
 		if (command == fVerboseCmd)
+		{
 			dc1->SetVerbose(fVerboseCmd->GetNewBoolValue(newValue));
+		}
+		if (command == setOffsetCmd) 
+		{
+			G4ThreeVector offset = setOffsetCmd->GetNew3VectorValue(newValue);
+			dc1->SetCellOffset(offset.x(), offset.y(), offset.z());
+			dc1->UpdateGeometry();  // Rebuild geometry
+		}
 	}
+	
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

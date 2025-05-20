@@ -7,7 +7,7 @@ mkdir Norma && cd Norma
 ```
 Clone this repository:
 ```
-git clone -b master https://github.com/molnarmatyas/mie_with_geant
+git clone -b 3D_complete_custom_mie https://github.com/molnarmatyas/mie_with_geant
 ```
 
 
@@ -104,4 +104,51 @@ Currently it is using [ThreadSafeWriter](include/ThreadSafeWriter.hh) to write t
 [calculated_theta], [generated_theta], [distance on 2D plane], [detector hit position X],  [detector hit position Y],  [detector hit position Z], [momentum direction at the cell - alpha angle (not used anymore)], [manually calculated alpha angle (not used anymore)], [phi angle], [detector number: 0 - CCD, 1 - LA, 2 - HA] 
 ...
 [calculated_theta], [generated_theta], [distance on 2D plane], [detector hit position X],  [detector hit position Y],  [detector hit position Z], [momentum direction at the cell - alpha angle (not used anymore)], [manually calculated alpha angle (not used anymore)], [phi angle], [detector number: 0 - CCD, 1 - LA, 2 - HA] 
+```
+
+### Running with offsets
+#### Using script
+Use the [offset_runner](offset_runner.sh) script for automatic scanning:
+```
+./offset_runner <start_x> <end_x> <step_x> <start_y> <end_y> <step_y> <z_value> <num_events>
+```
+- `<start_x>` - X start value
+- `<end_x>` - X end value
+- `<step_x>` - X steps
+- `<start_y>` - Y start value
+- `<end_y>` - Y end value
+- `<step_y>` - Y steps
+- `<z_value>` - Z offset (only a single value)
+- `<num_events>` - Number of events (for /run/beamOn)
+
+For example, both in the X and Y directions from -0.3 to 0.3 with 0.1 step spacing running 1000 event per simulation you can use the following command:
+```
+./offset_runner.sh -0.3 0.3 0.1 -0.3 0.3 0.1 0.0 1000
+```
+
+#### Manual
+Add the offset values to your macro directly before `/run/beamOn n`:
+```
+/Norma/DetectorConstruction/Cell/setOffset 3.2 3.2 0 um
+/run/beamOn 1
+```
+
+Multiple offset values can be used (only a single output file generated):
+```
+/Norma/DetectorConstruction/Cell/setOffset 3.2 3.2 0 um
+/run/beamOn 1000
+
+/Norma/DetectorConstruction/Cell/setOffset -1.2 -1.2 0 um
+/run/beamOn 1000
+```
+
+Offsets are calculated from the center of the cell in both cases.
+
+If verbosity enabled for DetectorConstruction using `/Norma/DetectorConstruction/enableVerbose true` in a macro file it will print out the details of the cell position and offset. 
+
+Note: The values are included twice in the output (first with 0, 0, 0), since DetectorConstruction is initialized first and then updated when the macro is run.
+```
+Cell default position: (14.5,96.2501,-137.47)
+Cell offset: (-0.0003,-0.0002,0)
+Cell current position: (14.4997,96.2499,-137.47)
 ```
