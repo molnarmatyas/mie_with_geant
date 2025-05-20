@@ -7,7 +7,7 @@ mkdir Norma && cd Norma
 ```
 Clone this repository:
 ```
-git clone -b 3D_complete_custom_mie https://github.com/molnarmatyas/mie_with_geant
+git clone -b master https://github.com/molnarmatyas/mie_with_geant
 ```
 
 
