@@ -62,7 +62,7 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 	//fParticleGun->SetParticlePosition(G4ThreeVector(-17 * CLHEP::um, y, 0*mm));
   //fParticleGun->SetParticlePosition(G4ThreeVector(-29.35 * CLHEP::mm, 96.076 * CLHEP::mm, -157.841 * CLHEP::mm)); //laser
   G4double shift = .0;//0.035 * mm; // to make resulting CCD image symmetrical
-	//fParticleGun->SetParticlePosition(G4ThreeVector(4.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift)); //14.49 //center of cell
+	fParticleGun->SetParticlePosition(G4ThreeVector(4.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift)); //14.49 //center of cell
 		
   /*
 	G4double dy = (G4UniformRand() - 0.5) * 0.1;
@@ -109,12 +109,15 @@ void NormaPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
 	auto [i, j] = SamplePixel();
 	double localZ = (j - numCols / 2.0) * pixelSize;
 	double localY = (i - numRows / 2.0) * pixelSize; //z-y plane!
+  /*
   G4cout << "selected index: " << i << "\t" << j << G4endl;
   G4cout << "selected pixel: " << localZ << "\t" << localY << G4endl;
+  */
 	G4ThreeVector emissionPoint = profileCenterWorld + G4ThreeVector(0, localY, localZ);
+  /*
   G4cout << "profileCentterWorld: " << profileCenterWorld << G4endl;
   G4cout << "Emission point: " << emissionPoint << G4endl;
-	
+	*/
 	fParticleGun->SetParticlePosition(emissionPoint);
 	// Set direction etc.
 		
@@ -247,8 +250,10 @@ G4ThreeVector NormaPrimaryGeneratorAction::ComputeProfileCenter() {
     double worldX = 0.0; // X is fixed
     double worldZ = (cx - numCols / 2.0) * pixelSize; // in z-y plane!
     double worldY = (cy - numRows / 2.0) * pixelSize;
+    /*
     G4cout << "Coordinates of profile center in profile's coordinates: " << G4endl;
     G4cout << "Y: " << worldY << "\tZ: " << worldZ << G4endl;
+    */
     
     worldZ = cx * pixelSize;
     worldY = cy * pixelSize;
@@ -262,11 +267,13 @@ std::pair<int, int> NormaPrimaryGeneratorAction::SamplePixel() {
     int idx = fDist_disc(fGen);
     
     // logging
+    /*
     ++map_test[idx];
     for (const auto& [num, count] : map_test)
         std::cout << num << " generated " << std::setw(4) << count << " times\n";
     
     G4cout << "idx: " << idx << G4endl;
+    */
     
     // to coordinates
     int i = idx / numCols;
@@ -276,7 +283,7 @@ std::pair<int, int> NormaPrimaryGeneratorAction::SamplePixel() {
 
 void NormaPrimaryGeneratorAction::InitializeIntensityProfile(const std::string& filename, double pixelSizeMM) {
     //pixelSize = pixelSizeMM * CLHEP::mm;
-    G4cout << "pixelSize normal: " << pixelSize << G4endl;
+    //G4cout << "pixelSize normal: " << pixelSize << G4endl;
 
 
     LoadIntensityCSV(filename);
@@ -287,7 +294,7 @@ void NormaPrimaryGeneratorAction::InitializeIntensityProfile(const std::string& 
 	//fDist_disc = std::piecewise_linear_distribution<>(intensityMap.begin(), intensityMap.end(), intensityMap.begin());
 	fGen.seed(time(0)); // if you want different results from different runs
 
-    G4cout << "→ Laser profile loaded from: " << filename << G4endl;
-    G4cout << "→ Profile dimensions: " << numCols << " × " << numRows << G4endl;
-    G4cout << "→ Computed center of mass: " << beamCenter / mm << " mm" << G4endl;
+   // G4cout << "→ Laser profile loaded from: " << filename << G4endl;
+   // G4cout << "→ Profile dimensions: " << numCols << " × " << numRows << G4endl;
+   // G4cout << "→ Computed center of mass: " << beamCenter / mm << " mm" << G4endl;
 }
