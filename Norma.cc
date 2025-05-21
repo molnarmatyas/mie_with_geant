@@ -198,7 +198,7 @@ int main(int argc, char **argv)
 	// std::stringstream -el lehet sztringet csinálni és beleírni
 //  ThreadSafeWriter *writer = new ThreadSafeWriter(availableFilename);
 	ThreadSafeWriter writer(availableFilename);
-  	//G4AutoDelete::Register(&writer);
+  	G4AutoDelete::Register(&writer);
 
 	// Instantiate G4UIExecutive if interactive mode
 	G4UIExecutive *ui = nullptr;
