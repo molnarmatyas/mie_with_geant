@@ -163,12 +163,12 @@ for ((i=0; i<=x_steps; i++)); do
         printf "Running %d/%d: X=%-10s Y=%-10s Z=%-10s\n" \
                "$current_iteration" "$total_iterations" "$current_x" "$current_y" "$z_value"
         
-        NUMERIC_MIE_FPATH=diff_cross_0-180_10000pt.txt CELL_RADIUS_UM=3.0 ./Norma -m "$output_macro"
+        NUMERIC_MIE_FPATH=crosssection_radians_poli_15_10000.txt CELL_RADIUS_UM=7.5 ./Norma -b 7.5 -m "$output_macro"
         
-        if [ $? -ne 0 ]; then
-            echo "Error: Command failed for X=$current_x, Y=$current_y"
-            exit 1
-        fi
+        #if [ $? -ne 0 ]; then
+        #    echo "Error: Command failed for X=$current_x, Y=$current_y"
+        #    exit 1
+        #fi
     done
 done
 
