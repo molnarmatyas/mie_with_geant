@@ -60,7 +60,7 @@ set(Norma_SCRIPTS
     dhkm_7_1592_1.txt
     crosssection_radians_poli_15_10000.txt
     RayCi8_180mm.csv
-    Argosz_250311_2.obj
+    Argosz_250311_2_wBP.obj
   )
 
 foreach(_script ${Norma_SCRIPTS})

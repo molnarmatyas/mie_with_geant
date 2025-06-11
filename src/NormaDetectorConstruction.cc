@@ -398,7 +398,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2_wBP.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -441,6 +441,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("sensor_package_window"));
   solids.push_back(mesh->GetSolid("vbpw34s_1_sensor"));
   solids.push_back(mesh->GetSolid("vbpw34s_2_sensor"));
+  solids.push_back(mesh->GetSolid("BeamProfiler")); // FIXME only for beam profile testing
 
   std::vector<G4LogicalVolume*> argosz_log(solids.size());
   std::vector<G4VPhysicalVolume*> argosz_phys(solids.size());
@@ -564,6 +565,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[30] = sil;
   // vbpw34s_2_sensor001
   argosz_mat[31] = sil;
+  // BeamProfiler (CCD also) FIXME only for beam profile testing
+  argosz_mat[32] = air;
 
   int isolid = 0;
   G4double dbshift = -0.050 * mm; // shift direct beam stop to make CCD image symmetrical
