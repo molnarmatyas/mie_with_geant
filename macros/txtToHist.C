@@ -41,11 +41,17 @@ void txtToHist() {
   // Input text file path
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
+    std::string background_file =
+        "../fs4_results/no_cell_measurement_backgrond_extended_source.txt";
     TH2D* dh2D_xz[2];
-    //std::string filename = Form("../build/output%i_deg3500_990_0.txt", ideg);
-    std::string filename = "../build/outputcrosssection_radians_poli_15_10000.txt7500_990_0.txt";
-    //std::string outputprefix = Form("1M_3D_modell_fixed_flowcell_saltywater_surface_point_source_degbydeg_%i", ideg);
-    std::string outputprefix = "3D_updated_complete_model_with_phi3_all_sensors_polistirol_15um_";
+    //std::string filename =
+    //    Form("../fs4_results/outputcrosssection_radians_poli_15_10000.txt7500_990_0_%i.txt", ideg);
+    std::string filename =
+        "../fs4_results/standard_100M_measurement_15_poli_extended_source.txt";
+    //std::string outputprefix =
+    //    Form("1M_3D_modell_homogeneous_cell_beamprofiler_source_y_shift_%i", ideg);
+    std::string outputprefix =
+        "100M_3D_modell_cell_in_cell_beamprofiler_source_all_sensors_polistirol_15um_normalized_background_removed";
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);
@@ -58,6 +64,7 @@ void txtToHist() {
     dh2D_xz[0] = new TH2D("dh2D_xz_det_1", "; X [mm]; Z [mm]", 500, -2, 2, 500, -2, 2);
     dh2D_xz[1] = new TH2D("dh2D_xz_det_2", "; X [mm]; Z [mm]", 500, -2, 2, 500, -2, 2);
     TH2D* dh2D_xy = new TH2D("dh2D_xy", "; CCD X [pixel]; Y [pixel]", 150, -6/pixel, 6/pixel, 120, -4/pixel, 4/pixel);
+    TH2D* dh2D_xy_ccd_background = new TH2D("dh2D_xy_ccd_background", "; CCD background X [pixel]; Y [pixel]", 150, -6/pixel, 6/pixel, 120, -4/pixel, 4/pixel);
     TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha [deg] ; R [pixel]", 1000, -1, 180, 1000/pixel, 0, 7.5/pixel);
     TH2D* dhR_alpha_det_1 = new TH2D("dhR_alpha_det_1", "vbpw34s_1 #alpha vs R; #alpha [deg] ; R [pixel]", 100, -1, 30, 1000, 0, 3);
     TH2D* dhR_alpha_det_2 = new TH2D("dhR_alpha_det_2", "vbpw34s_2 #alpha vs R; #alpha [deg] ; R [pixel]", 100, -1, 30, 1000, 0, 3);
@@ -65,12 +72,16 @@ void txtToHist() {
     TH2D* dhphi_alpha_det_2 = new TH2D("dhphi_alpha_det_2", "#phi vs #alpha; #phi; #alpha", 1000, -1.0*180, 180, 1000, 0.0, 180);
     TH2D* dh2D_rx_tantheta = new TH2D("dh2D_rx_tantheta", "dh2D_rx_tantheta", 1000, 0, 3, 1000, 0, 3);
     TH3D* dh3D_xyz = new TH3D("dh3D_xyz", "; CCD X [mm]; Y [mm]; Z [mm]", 100,5,20, 100,90,100, 100,-110,-100);
-    TH2D* beamprofiler_zy = new TH2D("beamprofiler_zy", "; CCD Z [pixel]; Y [pixel]", 1500, -6/pixel, 6/pixel, 1200, -4/pixel, 4/pixel);
 
     // Open the input file
     std::ifstream infile(filename);
     if (!infile.is_open()) {
       std::cerr << "Error opening file: " << filename << std::endl;
+      return;
+    }
+    std::ifstream bkg_file(background_file);
+    if (!bkg_file.is_open()) {
+      std::cerr << "Error opening file: " << background_file << std::endl;
       return;
     }
     /*
@@ -122,6 +133,64 @@ void txtToHist() {
     double cosTheta = TMath::Cos(theta);
     double sinTheta = TMath::Sin(theta);
 
+    std::string bkg_line;
+    while (std::getline(bkg_file, bkg_line)) {
+      // Skip empty lines
+      if (bkg_line.empty()) continue;
+
+      std::replace(bkg_line.begin(), bkg_line.end(), ',', ' ');
+
+      // Parse the line
+      std::istringstream iss(bkg_line);
+      double theta3, genTheta, R, postX, postY, postZ, alpha, alpha_man, phi3;
+      double localR, localpostX, localpostY, localpostZ;
+      double shiftedX, shiftedY, shiftedZ;
+      int det_num;
+
+      // Read all 6 columns
+      if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ >> alpha >> alpha_man >> phi3 >> det_num)) {
+        std::cerr << "Error parsing line: " << bkg_line << std::endl;
+        continue;
+      }
+      if(det_num == 2) //vbpw34s_2
+      {
+        // Translate to local origin
+        double shiftedX = postX - det_2_x_center;
+        double shiftedY = postY - det_2_y_center;
+        double shiftedZ = postZ - det_2_z_center;
+
+        continue;
+      }
+      else if(det_num == 1) //vbpw34s_1
+      {
+        // Translate to local origin
+        double shiftedX = postX - det_1_x_center;
+        double shiftedY = postY - det_1_y_center;
+        double shiftedZ = postZ - det_1_z_center;
+
+        continue;
+      }
+      else  // CCD
+      {
+        // Translate to local origin
+        double shiftedX = postX - x_center;
+        double shiftedY = postY - y_center;
+        double shiftedZ = postZ - z_center;
+        // Apply 2D rotation in the XZ plane
+        localpostX = cosTheta * shiftedX + sinTheta * shiftedZ;
+        localpostZ = -sinTheta * shiftedX + cosTheta * shiftedZ;
+        // Y is not affected by rotation
+        localpostY = postY - y_center;
+
+        //localpostX = (x_center - postX);
+        //localpostY = (y_center - postY);
+        //localpostZ = (z_center - postZ);
+
+        dh2D_xy_ccd_background->Fill(localpostX/pixel, localpostY/pixel);
+
+      }
+    }
+
     // Read file line by line
     std::string line;
     while (std::getline(infile, line)) {
@@ -168,7 +237,7 @@ void txtToHist() {
 
         continue;
       }
-      else if(det_num ==0)  // CCD
+      else  // CCD
       {
         // Translate to local origin
         double shiftedX = postX - x_center;
@@ -196,28 +265,6 @@ void txtToHist() {
         dh2D_rx_tantheta->Fill(localR / localpostX, std::tan(theta3));
 
       }
-      else // BeamProfiler
-      {
-        //Boundings of BeamProfiler: Min=<8.22955,92.734,-106.676> Max=<18.2223,99.764,-100.618> ??? how on earth
-        // Boundings of BeamProfiler: Min=<25.8143,92.734,-143.044> Max=<26.3143,99.764,-131.794> looks better?
-        double x_minBP = 25.8143;
-        double y_minBP = 92.734;
-        double z_minBP = -143.044;
-        double x_maxBP = 26.3143;
-        double y_maxBP = 99.764;
-        double z_maxBP = -131.794;
-        double x_centerBP = (x_minBP + x_maxBP ) / 2.0;
-        double y_centerBP = (y_minBP + y_maxBP ) / 2.0;
-        double z_centerBP = (z_minBP + z_maxBP ) / 2.0;
-
-        double localpostX = postX - x_centerBP;
-        double localpostY = postY - y_centerBP;
-        double localpostZ = postZ - z_centerBP;
-        // Not rotated in x-z plane
-
-        beamprofiler_zy->Fill(localpostZ / pixel, localpostY / pixel);
-      }
-
 
 
 
@@ -247,14 +294,15 @@ void txtToHist() {
      */
 
     // Create a ROOT output file to save the histogram
-    TFile* outfile = new TFile(Form("%s_alpha_output.root", outputprefix.c_str()), "RECREATE");
+    TFile* outfile = new TFile(Form("%s_%i_alpha_output.root",
+                                    outputprefix.c_str(), ideg), "RECREATE");
 
     // Optional: draw and save as image
     TCanvas* c1 = new TCanvas("c1", "", 800, 800);
     gStyle->SetOptStat(0);
     dhR_alpha->Draw("COLZ");
     //Ltanalpha->Draw("same");
-    c1->SaveAs(Form("../figs/%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
+    c1->SaveAs(Form("figs/%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
 
     //gStyle->SetCanvasDefH(550);
     //gStyle->SetCanvasDefW(650);
@@ -265,7 +313,7 @@ void txtToHist() {
     dh2D_xy->GetXaxis()->SetTitle("X [mm]");
     dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
     dh2D_xy->Draw("COLZ");
-    c1->SaveAs(Form("../figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
+    c1->SaveAs(Form("figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
     dh2D_xy->Write();
 
     dh2D_xz[0]->SetTitle(Form("2D scattering, deg=%i, vbpw34s_1", ideg));
@@ -284,20 +332,18 @@ void txtToHist() {
     SetGrayscalePalette(c2, dh2D_xy); // Apply grayscale palette
     //c2->SetLogz(1);
 
+    //dh2D_xy_ccd_background->Scale(1.0/dh2D_xy_ccd_background->Integral());
+    //dh2D_xy->Scale(1.0/dh2D_xy->Integral());
 
     dh2D_xy->SetTitle(Form("2D scattering, deg=%i, n = 1.592, 3D model, d = 7 #mu m", ideg));
+
     dh2D_xy->GetXaxis()->SetTitle("X [pixel]");
     dh2D_xy->GetYaxis()->SetTitle("Y [pixel]");
     dh2D_xy->Draw("COLZ");
-    c2->SaveAs(Form("../figs/%s_dh2D_xy_discrete.png", outputprefix.c_str()));
+    c2->SaveAs(Form("figs/%s_dh2D_xy_bw.png", outputprefix.c_str()));
+    dh2D_xy->Add(dh2D_xy_ccd_background, -1.0);
+    c2->SaveAs(Form("figs/%s_dh2D_xy_bw_bg_removed.png", outputprefix.c_str()));
 
-    c2->Clear();
-    SetGrayscalePalette(c2, beamprofiler_zy); 
-    beamprofiler_zy->SetTitle(Form("2D beam profiler %s collimator lens","after"));
-    beamprofiler_zy->GetXaxis()->SetTitle("Z [pixel]");
-    beamprofiler_zy->GetYaxis()->SetTitle("Y [pixel]");
-    beamprofiler_zy->Draw("COLZ");
-    c2->SaveAs(Form("../figs/%s_beamprofiler_zy.png", outputprefix.c_str()));
 
     // R vs alpha
     TProfile* prof = dhR_alpha->ProfileX("_prof_max", 1, -1, "");
@@ -324,7 +370,6 @@ void txtToHist() {
     dhphi_alpha_det_2->Write();
     dh2D_rx_tantheta->Write();
     dh3D_xyz->Write();
-    beamprofiler_zy->Write();
 
     outfile->Close();
   }
