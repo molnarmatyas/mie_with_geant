@@ -341,7 +341,31 @@ void txtToHist() {
     dh2D_xy->GetYaxis()->SetTitle("Y [pixel]");
     dh2D_xy->Draw("COLZ");
     c2->SaveAs(Form("figs/%s_dh2D_xy_bw.png", outputprefix.c_str()));
+    // Subtract background
     dh2D_xy->Add(dh2D_xy_ccd_background, -1.0);
+
+    // NORMALISATION
+    // Option 1: Set negative bins to zero
+    for (int ix = 1; ix <= dh2D_xy->GetNbinsX(); ++ix) {
+      for (int iy = 1; iy <= dh2D_xy->GetNbinsY(); ++iy) {
+        double val = dh2D_xy->GetBinContent(ix, iy);
+        if (val < 0.0) dh2D_xy->SetBinContent(ix, iy, 0.0);
+      }
+    }
+
+    // Option 2: Normalise so that 0.0 is the smallest value
+    // (Uncomment if you want this option)
+    /*
+    double minVal = dh2D_xy->GetMinimum();
+    if (minVal != 0.0) {
+      for (int ix = 1; ix <= dh2D_xy->GetNbinsX(); ++ix) {
+        for (int iy = 1; iy <= dh2D_xy->GetNbinsY(); ++iy) {
+          double val = dh2D_xy->GetBinContent(ix, iy);
+          dh2D_xy->SetBinContent(ix, iy, val - minVal);
+        }
+      }
+    }
+    */
     c2->SaveAs(Form("figs/%s_dh2D_xy_bw_bg_removed.png", outputprefix.c_str()));
 
 
