@@ -241,8 +241,8 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 	if (
       ( prevolume->GetName() == "world" && postvolume->GetName() == "GS3-U3-23S6M-C_sensor") || 
       ( prevolume->GetName() == "vbpw34s_1" && postvolume->GetName() == "vbpw34s_1_sensor") ||
-      ( prevolume->GetName() == "vbpw34s_2" && postvolume->GetName() == "vbpw34s_2_sensor") ||
-      ( prevolume->GetName() == "world" && postvolume->GetName() == "BeamProfiler") // FIXME beam profiler testing
+      ( prevolume->GetName() == "vbpw34s_2" && postvolume->GetName() == "vbpw34s_2_sensor") //||
+      //( prevolume->GetName() == "world" && postvolume->GetName() == "BeamProfiler") // FIXME beam profiler testing
      ) 
 	{
 		ss.str("");
@@ -259,7 +259,7 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
     if(postvolume->GetName() == "GS3-U3-23S6M-C_sensor") det_num = 0;
     if(postvolume->GetName() == "vbpw34s_1_sensor") det_num = 1;
     if(postvolume->GetName() == "vbpw34s_2_sensor") det_num = 2;
-    if(postvolume->GetName() == "BeamProfiler") det_num = 3;
+    //if(postvolume->GetName() == "BeamProfiler") det_num = 3;
 
 		if (((G4OpMieHG *)pds)->generated)
 		{
