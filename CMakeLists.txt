@@ -59,6 +59,7 @@ set(Norma_SCRIPTS
     diff_cross_0-180_10000pt.txt
     dhkm_7_1592_1.txt
     crosssection_radians_poli_15_10000.txt
+    neutrofil_rad.txt
     RayCi8_180mm.csv
     Argosz_250311_2_wBP.obj
   )

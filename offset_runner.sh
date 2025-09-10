@@ -15,7 +15,7 @@ format_number()
 # Function to display usage information
 usage() 
 {
-    echo "Usage: $0 <start_x> <end_x> <step_x> <start_y> <end_y> <step_y> <z_value> <num_events>"
+    echo "Usage: $0 <start_x> <end_x> <step_x> <start_y> <end_y> <step_y> <z_value> <num_events> <crossection_inputfile>"
     echo "  All coordinate values (start/end/z) must be floats between -100 and 100"
     echo "  Step sizes must be positive floats"
     echo "  Number of events must be positive integer"
@@ -23,7 +23,7 @@ usage()
 }
 
 # Validate argument count
-if [ $# -ne 8 ]; then
+if [ $# -ne 9 ]; then
     echo "Error: Incorrect number of arguments"
     usage
 fi
@@ -37,6 +37,7 @@ end_y=$5
 step_y=$6
 z_value=$7
 num_events=$8
+inputxsection="$9"
 
 # Function to validate floats with range check
 validate_float() {
@@ -163,7 +164,7 @@ for ((i=0; i<=x_steps; i++)); do
         printf "Running %d/%d: X=%-10s Y=%-10s Z=%-10s\n" \
                "$current_iteration" "$total_iterations" "$current_x" "$current_y" "$z_value"
         
-        NUMERIC_MIE_FPATH=crosssection_radians_poli_15_10000.txt CELL_RADIUS_UM=7.5 ./Norma -b 7.5 -m "$output_macro"
+        NUMERIC_MIE_FPATH=${inputxsection} CELL_RADIUS_UM=7.5 ./Norma -b 6.5 -m "$output_macro" > /dev/null # FIXME use correct cell size!!!
         
         #if [ $? -ne 0 ]; then
         #    echo "Error: Command failed for X=$current_x, Y=$current_y"
