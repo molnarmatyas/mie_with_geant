@@ -37,21 +37,21 @@ void SetGrayscalePalette(TCanvas* c, TH2D* hCCD) {
     hCCD->GetZaxis()->SetTitleColor(kWhite);
 }
 // --- MAIN ---
-void txtToHist() {
+void txtToHist(std::string outputname = "no_cell_measurement2_backgrond_extended_source") {
   // Input text file path
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
     std::string background_file =
-        "../fs4_results/no_cell_measurement_backgrond_extended_source.txt";
+        "../fs4_results/no_cell_measurement2_backgrond_extended_source.txt";
     TH2D* dh2D_xz[2];
     //std::string filename =
     //    Form("../fs4_results/outputcrosssection_radians_poli_15_10000.txt7500_990_0_%i.txt", ideg);
     std::string filename =
-        "../fs4_results/standard_100M_measurement_15_poli_extended_source.txt";
+        "../build/" + outputname + ".txt";
     //std::string outputprefix =
     //    Form("1M_3D_modell_homogeneous_cell_beamprofiler_source_y_shift_%i", ideg);
     std::string outputprefix =
-        "100M_3D_modell_cell_in_cell_beamprofiler_source_all_sensors_polistirol_15um_normalized_background_removed";
+        "100M_3D_modell_cell_in_cell_beamprofiler_source_all_sensors_neutrofil_13um_normalized_background_removed";
 
     TH1D* dhTheta = new TH1D("dhTheta", "dhTheta", 1000, 0, TMath::Pi());
     TH1D* dhGenTheta = new TH1D("dhGenTheta", "dhGenTheta", 1000, 0, TMath::Pi()/2);

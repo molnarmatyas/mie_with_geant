@@ -35,6 +35,7 @@ build/*
 figs/*
 geant4-*
 .vscode/*
+macros/figs/*
 #other
 *_deg
 
