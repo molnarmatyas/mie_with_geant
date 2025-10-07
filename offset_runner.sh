@@ -133,6 +133,7 @@ echo "Y range: $start_y to $end_y in steps of $step_y ($y_steps steps)"
 echo "Z value: $z_value"
 echo "Total iterations: $total_iterations"
 
+# This is where the fun begins!!!
 for ((i=0; i<=x_steps; i++)); do
     current_x=$(echo "scale=10; $start_x + $i * $step_x" | bc)
     current_x=$(format_number "$current_x")
