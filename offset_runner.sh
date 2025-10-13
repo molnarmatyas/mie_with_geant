@@ -38,6 +38,8 @@ step_y=$6
 z_value=$7
 num_events=$8
 inputxsection="$9"
+CELLSIZE=$(python3 ../macros/calc_r_effective.py ${inputxsection})
+echo "Using cellsize: " $CELLSIZE
 
 # Function to validate floats with range check
 validate_float() {
@@ -165,7 +167,7 @@ for ((i=0; i<=x_steps; i++)); do
         printf "Running %d/%d: X=%-10s Y=%-10s Z=%-10s\n" \
                "$current_iteration" "$total_iterations" "$current_x" "$current_y" "$z_value"
         
-        NUMERIC_MIE_FPATH=${inputxsection} CELL_RADIUS_UM=7.5 ./Norma -b 6.5 -m "$output_macro" > /dev/null # FIXME use correct cell size!!!
+        NUMERIC_MIE_FPATH=${inputxsection} CELL_RADIUS_UM=${CELLSIZE} ./Norma -b ${CELLSIZE} -m "$output_macro" > /dev/null # FIXME use correct cell size!!!
         
         #if [ $? -ne 0 ]; then
         #    echo "Error: Command failed for X=$current_x, Y=$current_y"
