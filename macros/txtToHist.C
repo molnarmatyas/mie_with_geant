@@ -37,17 +37,16 @@ void SetGrayscalePalette(TCanvas* c, TH2D* hCCD) {
     hCCD->GetZaxis()->SetTitleColor(kWhite);
 }
 // --- MAIN ---
-void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_extended_source", std::string outputprefix = "cell_in_cell_beamprofiler_all_sensors_background_removed") {
+void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_extended_source.txt", std::string outputprefix = "cell_in_cell_beamprofiler_all_sensors_background_removed") {
   // Input text file path
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
     std::string background_file =
-        "../fs4_results/no_cell_measurement2_backgrond_extended_source.txt";
+        "../no_cell_measurement_backgrond_extended_source.txt";
     TH2D* dh2D_xz[2];
     //std::string filename =
     //    Form("../fs4_results/outputcrosssection_radians_poli_15_10000.txt7500_990_0_%i.txt", ideg);
-    std::string filename =
-        "../build/" + geantoutputname + ".txt";
+    std::string filename = geantoutputname;
     //std::string outputprefix =
     //    Form("1M_3D_modell_homogeneous_cell_beamprofiler_source_y_shift_%i", ideg);
 
@@ -298,9 +297,9 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     // Optional: draw and save as image
     TCanvas* c1 = new TCanvas("c1", "", 800, 800);
     gStyle->SetOptStat(0);
-    dhR_alpha->Draw("COLZ");
+    //dhR_alpha->Draw("COLZ");
     //Ltanalpha->Draw("same");
-    c1->SaveAs(Form("figs/%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
+    //c1->SaveAs(Form("figs/%s_mirror_dhR_alpha_output3500_um_pointsource_1M_pld_1592_ver_thetafix.pdf", outputprefix.c_str()));
 
     //gStyle->SetCanvasDefH(550);
     //gStyle->SetCanvasDefW(650);
@@ -310,19 +309,19 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     dh2D_xy->SetTitle(Form("2D scattering, deg=%i, n = 1.592, 3D model, d = 7 #mu m", ideg));
     dh2D_xy->GetXaxis()->SetTitle("X [mm]");
     dh2D_xy->GetYaxis()->SetTitle("Y [mm]");
-    dh2D_xy->Draw("COLZ");
-    c1->SaveAs(Form("figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
+    //dh2D_xy->Draw("COLZ");
+    //c1->SaveAs(Form("figs/%s_dh2D_xy_colorful.png", outputprefix.c_str()));
     dh2D_xy->Write();
 
     dh2D_xz[0]->SetTitle(Form("2D scattering, deg=%i, vbpw34s_1", ideg));
     dh2D_xz[0]->GetXaxis()->SetTitle("X [mm]");
     dh2D_xz[0]->GetYaxis()->SetTitle("Z [mm]");
-    dh2D_xz[0]->Draw("COLZ");
+    //dh2D_xz[0]->Draw("COLZ");
 
     dh2D_xz[1]->SetTitle(Form("2D scattering, deg=%i, vbpw34s_2", ideg));
     dh2D_xz[1]->GetXaxis()->SetTitle("X [mm]");
     dh2D_xz[1]->GetYaxis()->SetTitle("Z [mm]");
-    dh2D_xz[1]->Draw("COLZ");
+    //dh2D_xz[1]->Draw("COLZ");
     //c1->SaveAs(Form("../figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
 
     // Black & white image of CCD screen (black=min, white=max)
@@ -337,8 +336,8 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
 
     dh2D_xy->GetXaxis()->SetTitle("X [pixel]");
     dh2D_xy->GetYaxis()->SetTitle("Y [pixel]");
-    dh2D_xy->Draw("COLZ");
-    c2->SaveAs(Form("figs/%s_dh2D_xy_bw.png", outputprefix.c_str()));
+    //dh2D_xy->Draw("COLZ");
+    //c2->SaveAs(Form("figs/%s_dh2D_xy_bw.png", outputprefix.c_str()));
     // Subtract background
     dh2D_xy->Add(dh2D_xy_ccd_background, -1.0);
 
