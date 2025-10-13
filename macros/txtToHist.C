@@ -336,7 +336,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
 
     dh2D_xy->GetXaxis()->SetTitle("X [pixel]");
     dh2D_xy->GetYaxis()->SetTitle("Y [pixel]");
-    //dh2D_xy->Draw("COLZ");
+    dh2D_xy->Draw("COLZ");
     //c2->SaveAs(Form("figs/%s_dh2D_xy_bw.png", outputprefix.c_str()));
     // Subtract background
     dh2D_xy->Add(dh2D_xy_ccd_background, -1.0);
