@@ -27,7 +27,7 @@ thetas_rad = data[:,0]
 #get cross section from diff cross section
 sin_theta = np.sin(thetas_rad)
 integrand = I_vals * sin_theta
-sigma_tot = 2 * np.pi * np.trapezoid(integrand, thetas_rad) #same unit as input
+sigma_tot = 2 * np.pi * np.trapz(integrand, thetas_rad) #same unit as input
 r_eff = np.sqrt(sigma_tot / np.pi)  # same unit as input
 
 print(np.round(r_eff*1e6,3))#,np.round(sigma_tot*1e12,3))
