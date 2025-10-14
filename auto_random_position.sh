@@ -21,8 +21,9 @@ cp `ls -d "$INP_DIR/"* | shuf -n $NUM_TO_SHUF` "$BUILD_DIR/."
 
 cd "$BUILD_DIR"
 
+#FIXME
 for file in limfo*.txt; do
-  for i in $(seq 1 10);
+  for i in $(seq 1 1);
   do
       x=$(seq -15 0.01 15 | shuf | head -n1)
       y=$(seq -15 0.01 15 | shuf | head -n1)
