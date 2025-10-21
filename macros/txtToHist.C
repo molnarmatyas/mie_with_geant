@@ -4,6 +4,8 @@
 #include <TH2D.h>
 #include <TFile.h>
 #include <TMath.h>
+#include <iostream>
+#include <iomanip>
 
 #define NDEG 1
 double pixel = 0.02256; // in mm
@@ -42,7 +44,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
     std::string background_file =
-        "../no_cell_measurement_backgrond_extended_source.txt";
+        "../fs4_results/no_cell_measurement2_backgrond_extended_source.txt";
     TH2D* dh2D_xz[2];
     //std::string filename =
     //    Form("../fs4_results/outputcrosssection_radians_poli_15_10000.txt7500_990_0_%i.txt", ideg);
@@ -340,6 +342,27 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     //c2->SaveAs(Form("figs/%s_dh2D_xy_bw.png", outputprefix.c_str()));
     // Subtract background
     dh2D_xy->Add(dh2D_xy_ccd_background, -1.0);
+
+    // Write non-normalised intensity map to CSV (pixels coordinates)
+    {
+      std::string csvname = Form("%s_%i_intensity_map_non_normalized.csv", outputprefix.c_str(), ideg);
+      std::ofstream csv(csvname);
+      if (!csv.is_open()) {
+        std::cerr << "Error opening CSV file: " << csvname << std::endl;
+      } else {
+        csv << "x_pixel,y_pixel,intensity\n";
+        for (int ix = 1; ix <= dh2D_xy->GetNbinsX(); ++ix) {
+          double x = dh2D_xy->GetXaxis()->GetBinCenter(ix);
+          for (int iy = 1; iy <= dh2D_xy->GetNbinsY(); ++iy) {
+            double y = dh2D_xy->GetYaxis()->GetBinCenter(iy);
+            double val = dh2D_xy->GetBinContent(ix, iy);
+            csv << std::fixed << std::setprecision(6) << x << "," << y << "," << val << "\n";
+          }
+        }
+        csv.close();
+        std::cout << "Wrote non-normalised intensity map of "<<dh2D_xy->GetNbinsX()<<"x"<<dh2D_xy->GetNbinsY()<<" CCD to " << csvname << std::endl;
+      }
+    }
 
     // NORMALISATION
     // Option 1: Set negative bins to zero
