@@ -30,4 +30,4 @@ integrand = I_vals * sin_theta
 sigma_tot = 2 * np.pi * np.trapz(integrand, thetas_rad) #same unit as input
 r_eff = np.sqrt(sigma_tot / np.pi)  # same unit as input
 
-print(np.round(r_eff*1e6,3))#,np.round(sigma_tot*1e12,3))
+print(np.round(r_eff*1e6,5))#,np.round(sigma_tot*1e12,3))
