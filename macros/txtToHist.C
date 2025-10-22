@@ -9,6 +9,7 @@
 
 #define NDEG 1
 double pixel = 0.02256; // in mm
+pixel = 4*5.86 / 1000.0; // from notes, in mm
 
 
 void SetGrayscalePalette(TCanvas* c, TH2D* hCCD) {
@@ -44,7 +45,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
     std::string background_file =
-        "../fs4_results/no_cell_measurement2_backgrond_extended_source.txt";
+        "../no_cell_measurement_backgrond_extended_source.txt";
     TH2D* dh2D_xz[2];
     //std::string filename =
     //    Form("../fs4_results/outputcrosssection_radians_poli_15_10000.txt7500_990_0_%i.txt", ideg);
@@ -62,8 +63,8 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 500, -10, 10, 500, -10, 10);
     dh2D_xz[0] = new TH2D("dh2D_xz_det_1", "; X [mm]; Z [mm]", 500, -2, 2, 500, -2, 2);
     dh2D_xz[1] = new TH2D("dh2D_xz_det_2", "; X [mm]; Z [mm]", 500, -2, 2, 500, -2, 2);
-    TH2D* dh2D_xy = new TH2D("dh2D_xy", "; CCD X [pixel]; Y [pixel]", 150, -6/pixel, 6/pixel, 120, -4/pixel, 4/pixel);
-    TH2D* dh2D_xy_ccd_background = new TH2D("dh2D_xy_ccd_background", "; CCD background X [pixel]; Y [pixel]", 150, -6/pixel, 6/pixel, 120, -4/pixel, 4/pixel);
+    TH2D* dh2D_xy = new TH2D("dh2D_xy", "; CCD X [pixel]; Y [pixel]", 480, -11.25/2.0/pixel, 11.25/2.0/pixel, 300, -7.03/2.0/pixel, 7.03/2.0/pixel);
+    TH2D* dh2D_xy_ccd_background = new TH2D("dh2D_xy_ccd_background", "; CCD background X [pixel]; Y [pixel]", 480, -11.25/2.0/pixel, 11.25/2.0/pixel, 300, -7.03/2.0/pixel, 7.03/2.0/pixel);
     TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha [deg] ; R [pixel]", 1000, -1, 180, 1000/pixel, 0, 7.5/pixel);
     TH2D* dhR_alpha_det_1 = new TH2D("dhR_alpha_det_1", "vbpw34s_1 #alpha vs R; #alpha [deg] ; R [pixel]", 100, -1, 30, 1000, 0, 3);
     TH2D* dhR_alpha_det_2 = new TH2D("dhR_alpha_det_2", "vbpw34s_2 #alpha vs R; #alpha [deg] ; R [pixel]", 100, -1, 30, 1000, 0, 3);
@@ -184,6 +185,15 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
         //localpostX = (x_center - postX);
         //localpostY = (y_center - postY);
         //localpostZ = (z_center - postZ);
+        //std::cout << "x min: " << cosTheta * x_min + sinTheta * z_min << std::endl;
+        //std::cout << "x max: " << cosTheta * x_max + sinTheta * z_max << std::endl;
+
+        //std::cout << "z min: " << cosTheta * z_min - sinTheta * x_min << std::endl;
+        //std::cout << "z max: " << cosTheta * z_max - sinTheta * x_max << std::endl;
+
+        //std::cout << "y min: " << y_min << std::endl;
+        //std::cout << "y max: " << y_max << std::endl;
+        //sleep(5);
 
         dh2D_xy_ccd_background->Fill(localpostX/pixel, localpostY/pixel);
 
@@ -334,7 +344,6 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     //dh2D_xy_ccd_background->Scale(1.0/dh2D_xy_ccd_background->Integral());
     //dh2D_xy->Scale(1.0/dh2D_xy->Integral());
 
-    dh2D_xy->SetTitle(Form("2D scattering, deg=%i, n = 1.592, 3D model, d = 7 #mu m", ideg));
 
     dh2D_xy->GetXaxis()->SetTitle("X [pixel]");
     dh2D_xy->GetYaxis()->SetTitle("Y [pixel]");
