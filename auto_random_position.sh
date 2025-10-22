@@ -8,6 +8,7 @@ MACRO_DIR="$HOME/macros"
 INP_DIR="$HOME/poli_xsections"
 NUM_TO_SHUF=$1
 OUTPUT_NAME="$2"
+RAND_POS_NUM=$3
 
 
 # sanity check
@@ -23,7 +24,7 @@ cd "$BUILD_DIR"
 
 #FIXME
 for file in limfo*.txt; do
-  for i in $(seq 1 1);
+  for i in $(seq 1 $RAND_POS_NUM);
   do
       x=$(seq -15 0.01 15 | shuf | head -n1)
       y=$(seq -15 0.01 15 | shuf | head -n1)
