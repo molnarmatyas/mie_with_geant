@@ -352,7 +352,17 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     // Subtract background
     dh2D_xy->Add(dh2D_xy_ccd_background, -1.0);
 
-    // Write non-normalised intensity map to CSV (pixels coordinates)
+
+    // NORMALISATION
+    // Option 1: Set negative bins to zero
+    for (int ix = 1; ix <= dh2D_xy->GetNbinsX(); ++ix) {
+      for (int iy = 1; iy <= dh2D_xy->GetNbinsY(); ++iy) {
+        double val = dh2D_xy->GetBinContent(ix, iy);
+        if (val < 0.0) dh2D_xy->SetBinContent(ix, iy, 0.0);
+      }
+    }
+
+    // Write non-negative intensity map to CSV (pixels coordinates)
     {
       std::string csvname = Form("%s_%i_intensity_map_non_normalized.csv", outputprefix.c_str(), ideg);
       std::ofstream csv(csvname);
@@ -369,16 +379,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
           }
         }
         csv.close();
-        std::cout << "Wrote non-normalised intensity map of "<<dh2D_xy->GetNbinsX()<<"x"<<dh2D_xy->GetNbinsY()<<" CCD to " << csvname << std::endl;
-      }
-    }
-
-    // NORMALISATION
-    // Option 1: Set negative bins to zero
-    for (int ix = 1; ix <= dh2D_xy->GetNbinsX(); ++ix) {
-      for (int iy = 1; iy <= dh2D_xy->GetNbinsY(); ++iy) {
-        double val = dh2D_xy->GetBinContent(ix, iy);
-        if (val < 0.0) dh2D_xy->SetBinContent(ix, iy, 0.0);
+        std::cout << "Wrote non-negative intensity map of "<<dh2D_xy->GetNbinsX()<<"x"<<dh2D_xy->GetNbinsY()<<" CCD to " << csvname << std::endl;
       }
     }
 
