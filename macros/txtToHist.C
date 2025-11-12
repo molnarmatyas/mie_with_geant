@@ -383,6 +383,26 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
       }
     }
 
+    // Write non-negative pixel map to CSV (pixel indices corresp. to table indices)
+    {
+      std::string csvname = Form("%s_%i_pixel_map_non_normalized.csv", outputprefix.c_str(), ideg);
+      std::ofstream csv(csvname);
+      if (!csv.is_open()) {
+        std::cerr << "Error opening CSV file: " << csvname << std::endl;
+      } else {
+        for (int iy = dh2D_xy->GetNbinsY(); iy>1; iy--) { // Reverse Y for image-like orientation
+          for (int ix = 1; ix <= dh2D_xy->GetNbinsX(); ++ix) {
+            double val = dh2D_xy->GetBinContent(ix, iy);
+            csv << std::fixed << std::setprecision(6) << val;
+            if (ix < dh2D_xy->GetNbinsX()) csv << ",";
+          }
+          csv << "\n";
+        }
+        csv.close();
+        std::cout << "Wrote non-negative pixel map of "<<dh2D_xy->GetNbinsX()<<"x"<<dh2D_xy->GetNbinsY()<<" CCD to " << csvname << std::endl;
+      }
+    }
+
     // Option 2: Normalise so that 0.0 is the smallest value
     // (Uncomment if you want this option)
     /*

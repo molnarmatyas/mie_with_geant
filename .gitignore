@@ -36,6 +36,7 @@ figs/*
 geant4-*
 .vscode/*
 macros/figs/*
+macros/*.csv
 #other
 *_deg
 
@@ -75,3 +76,5 @@ Thumbs.db
 *.root
 #*.txt
 *.out
+**/*.root
+**/*.png
