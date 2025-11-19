@@ -5,7 +5,7 @@ HOME="/home/bporfy/Norma"
 
 BUILD_DIR="$HOME/build"
 MACRO_DIR="$HOME/macros"
-INP_DIR="$HOME/poli_xsections"
+INP_DIR="/opt/cell_crosssections/neu"
 NUM_TO_SHUF=$1
 OUTPUT_NAME="$2"
 RAND_POS_NUM=$3
@@ -23,7 +23,7 @@ cp `ls -d "$INP_DIR/"* | shuf -n $NUM_TO_SHUF` "$BUILD_DIR/."
 cd "$BUILD_DIR"
 
 #FIXME
-for file in limfo*.txt; do
+for file in run*gran*.txt; do
   for i in $(seq 1 $RAND_POS_NUM);
   do
       x=$(seq -15 0.01 15 | shuf | head -n1)
@@ -37,7 +37,7 @@ done
 
 #select the last N outputs
 cd "$MACRO_DIR"
-GEANT_OUTPUT=$(ls -t ../build/output*.txt | head -n $NUM_TO_SHUF)
+GEANT_OUTPUT=$(ls -t ../build/output*.txt | head -n $(( $NUM_TO_SHUF*$RAND_POS_NUM )))
 
 #run txtToHist on the outputs
 j=0
