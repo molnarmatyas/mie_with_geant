@@ -390,7 +390,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
       if (!csv.is_open()) {
         std::cerr << "Error opening CSV file: " << csvname << std::endl;
       } else {
-        for (int iy = dh2D_xy->GetNbinsY(); iy>1; iy--) { // Reverse Y for image-like orientation
+        for (int iy = dh2D_xy->GetNbinsY(); iy>=1; iy--) { // Reverse Y for image-like orientation
           for (int ix = 1; ix <= dh2D_xy->GetNbinsX(); ++ix) {
             double val = dh2D_xy->GetBinContent(ix, iy);
             csv << std::fixed << std::setprecision(6) << val;
