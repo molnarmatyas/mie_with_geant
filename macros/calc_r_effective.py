@@ -20,7 +20,7 @@ data = np.array(data)
 I_vals = data[:,1]
 #in case theta is in rad, comment below
 thetas_rad = data[:,0]
-#uncomment here
+#uncomment here - BUT MAKE SURE GEANT IS CONFIGURED PROPERLY
 #thetas_deg = data[:,0]
 #thetas_rad = np.deg2rad(thetas_deg)
 
@@ -30,4 +30,8 @@ integrand = I_vals * sin_theta
 sigma_tot = 2 * np.pi * np.trapz(integrand, thetas_rad) #same unit as input
 r_eff = np.sqrt(sigma_tot / np.pi)  # same unit as input
 
-print(np.round(r_eff*1e6,5))#,np.round(sigma_tot*1e12,3))
+#cell_in_cell
+#print(np.round(r_eff*1e6,5))#,np.round(sigma_tot*1e12,3))
+#adda:
+print(np.round(r_eff*1e0,5))#,np.round(sigma_tot*1e12,3))
+
