@@ -84,6 +84,11 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
       std::cerr << "Error opening file: " << background_file << std::endl;
       return;
     }
+    geantoutputname.erase(geantoutputname.begin(), geantoutputname.begin() + geantoutputname.find("out", 5));
+    geantoutputname.erase(geantoutputname.end()-4, geantoutputname.end());
+    std::cout << geantoutputname << std::endl;
+
+    outputprefix = geantoutputname + "_" + outputprefix;
     /*
       Simple model sensor location
     double x_min = 8.478684;
