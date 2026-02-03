@@ -668,7 +668,9 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   }
   else
   {
-    fBubble_def_pos = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift);
+    //old model
+    //fBubble_def_pos = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift);
+    fBubble_def_pos = G4ThreeVector(-33.96995 * mm, 11.0412 * mm, -1.99995 * mm + shift);
     bubble_phys = new G4PVPlacement(nullptr, fBubble_def_pos + fBubble_additional_offset, bubbleW_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
   }
