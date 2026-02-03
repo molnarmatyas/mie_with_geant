@@ -398,7 +398,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2_wBP.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./I5R_GEANT_20260119_1.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
