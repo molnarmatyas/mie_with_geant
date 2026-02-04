@@ -433,7 +433,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("beam_splitter"));
   solids.push_back(mesh->GetSolid("mirror"));
   solids.push_back(mesh->GetSolid("COHERENT_MINI-701L-660S"));
-  solids.push_back(mesh->GetSolid("Hellma_flowcell_131-814-40_notube"));
+  solids.push_back(mesh->GetSolid("Flowcell"));
   solids.push_back(mesh->GetSolid("ACL12708U"));
   solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor"));
   solids.push_back(mesh->GetSolid("BST04_BeamSplitter"));
@@ -469,7 +469,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("vbpw34s_2_sensor"));
   solids.push_back(mesh->GetSolid("injector"));
   solids.push_back(mesh->GetSolid("catcher_tube"));
-  solids.push_back(mesh->GetSolid("Flowcell"));
   solids.push_back(mesh->GetSolid("capillary"));
   solids.push_back(mesh->GetSolid("Flowcellwater-backsheath"));
   solids.push_back(mesh->GetSolid("Flowcellwater-frontsheath"));
@@ -485,7 +484,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
      1  solid name: beam_splitter
      2  solid name: mirror
      3  solid name: COHERENT_MINI-701L-660S
-     4  solid name: Hellma_flowcell_131-814-40
+     4  solid name: Flowcell
      5  solid name: ACL12708U
      6  solid name: GS3-U3-23S6M-C_sensor
      7  solid name: BST04_BeamSplitter
@@ -532,11 +531,10 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
      28  solid name: GS3-U3-23S6M-C_sensor_housing
      29  solid name: injector
      30  solid name: catcher_tube
-     31  solid name: Flowcell
-     32  solid name: capillary
-     33  solid name: Flowcellwater-backsheath
-     34  solid name: Flowcellwater-frontsheath
-     35  solid name: Saltywater
+     31  solid name: capillary
+     32  solid name: Flowcellwater-backsheath
+     33  solid name: Flowcellwater-frontsheath
+     34  solid name: Saltywater
    */
 
 
@@ -546,8 +544,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[1] = mirrorMaterial;
   // COHERENT_MINI-701L-660S
   argosz_mat[2] = mirrorMaterial;
-  // Hellma_flowcell_131-814-40_notube
-  argosz_mat[3] = flowcellMaterial; 
+  // Flowcell
+  argosz_mat[3] = PMMA; 
   // ACL12708U
   argosz_mat[4] = lensMaterial;
   // GS3-U3-23S6M-C_sensor
@@ -610,14 +608,12 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[32] = PMMA;
   // catcher_tube
   argosz_mat[33] = PMMA;
-  // Flowcell
-  argosz_mat[34] = PMMA;
   // capillary
-  argosz_mat[35] = ruby;
+  argosz_mat[34] = ruby;
   // Flowcellwater-backsheath
-  argosz_mat[36] = saltwater_frontbacksheat;
+  argosz_mat[35] = saltwater_frontbacksheat;
   // Flowcellwater-frontsheath
-  argosz_mat[37] = saltwater_frontbacksheat;
+  argosz_mat[36] = saltwater_frontbacksheat;
 
   int isolid = 0;
   G4double dbshift = -0.050 * mm; // shift direct beam stop to make CCD image symmetrical
