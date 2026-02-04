@@ -295,7 +295,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4Material* saltwater = nist->FindOrBuildMaterial("G4_WATER");
   G4MaterialPropertiesTable* saline_MPT = new G4MaterialPropertiesTable();
 
-  std::vector<G4double> rindexSaline = {1.34, 1.34, 1.34, 1.34}; // FIXME more precise!
+  //std::vector<G4double> rindexSaline = {1.34, 1.34, 1.34, 1.34}; // FIXME more precise!
+  std::vector<G4double> rindexSaline = {1.3309, 1.3309, 1.3309, 1.3309}; //new values, more precise
   saline_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexSaline, nEntries);
 
   std::vector<G4double> absLengthSaline = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
@@ -318,7 +319,32 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   NDglass->SetMaterialPropertiesTable(ND_MPT);
 
+  // PMMA for injector, catcher tube and flowcella
+  G4Material* PMMA = nist->FindOrBuildMaterial("G4_PLEXIGLASS");
 
+  // ruby for capillary based on https://en.wikipedia.org/wiki/Corundum and https://en.wikipedia.org/wiki/Ruby
+  auto ruby = new G4Material("Ruby", density = 4.02 * g / cm3, nelements = 2);
+  auto Al = new G4Element("Aluminium", "Al", z = 13, a = 26.98 * g / mole);
+  ruby -> AddElement(Al, 2);
+  ruby -> AddElement(O, 3);
+
+  G4MaterialPropertiesTable* ruby_MPT = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexRUBY = {1.768, 1.768, 1.768, 1.768};
+  ruby_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexRUBY, nEntries);
+
+  ruby->SetMaterialPropertiesTable(ruby_MPT);
+
+  // salty water for flowcell-front- and backsheat
+  G4Material* saltwater_frontbacksheat = nist->FindOrBuildMaterial("G4_WATER");
+  G4MaterialPropertiesTable* saline_frontbacksheat_MPT = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexSaline_frontbacksheat = {1.332, 1.332, 1.332, 1.332};
+  saline_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexSaline_frontbacksheat, nEntries);
+
+  saline_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthSaline, false, false);
+
+  saltwater->SetMaterialPropertiesTable(saline_frontbacksheat_MPT);
 
 
 
@@ -441,6 +467,12 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("sensor_package_window"));
   solids.push_back(mesh->GetSolid("vbpw34s_1_sensor"));
   solids.push_back(mesh->GetSolid("vbpw34s_2_sensor"));
+  solids.push_back(mesh->GetSolid("injector"));
+  solids.push_back(mesh->GetSolid("catcher_tube"));
+  solids.push_back(mesh->GetSolid("Flowcell"));
+  solids.push_back(mesh->GetSolid("capillary"));
+  solids.push_back(mesh->GetSolid("Flowcellwater-backsheath"));
+  solids.push_back(mesh->GetSolid("Flowcellwater-frontsheath"));
   //solids.push_back(mesh->GetSolid("BeamProfiler")); // FIXME only for beam profile testing
 
   std::vector<G4LogicalVolume*> argosz_log(solids.size());
@@ -498,6 +530,13 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
      26  solid name: vbpw34s_1
      27  solid name: vbpw34s_2
      28  solid name: GS3-U3-23S6M-C_sensor_housing
+     29  solid name: injector
+     30  solid name: catcher_tube
+     31  solid name: Flowcell
+     32  solid name: capillary
+     33  solid name: Flowcellwater-backsheath
+     34  solid name: Flowcellwater-frontsheath
+     35  solid name: Saltywater
    */
 
 
@@ -567,6 +606,18 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[31] = sil;
   // BeamProfiler (CCD also) FIXME only for beam profile testing
   //argosz_mat[32] = air;
+  // injector
+  argosz_mat[32] = PMMA;
+  // catcher_tube
+  argosz_mat[33] = PMMA;
+  // Flowcell
+  argosz_mat[34] = PMMA;
+  // capillary
+  argosz_mat[35] = ruby;
+  // Flowcellwater-backsheath
+  argosz_mat[36] = saltwater_frontbacksheat;
+  // Flowcellwater-frontsheath
+  argosz_mat[37] = saltwater_frontbacksheat;
 
   int isolid = 0;
   G4double dbshift = -0.050 * mm; // shift direct beam stop to make CCD image symmetrical
