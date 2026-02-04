@@ -458,10 +458,10 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("LA_HA_housing"));
   solids.push_back(mesh->GetSolid("LA_HA_holder"));
   solids.push_back(mesh->GetSolid("ND_filter"));
-  solids.push_back(mesh->GetSolid("LA_HA_separator_underpart"));
-  solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
-  solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
-  solids.push_back(mesh->GetSolid("BST04_BeamSplitter_underpart"));
+  //solids.push_back(mesh->GetSolid("LA_HA_separator_underpart"));
+  //solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
+  //solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
+  //solids.push_back(mesh->GetSolid("BST04_BeamSplitter_underpart"));
   solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing"));
   solids.push_back(mesh->GetSolid("camera_outer_window"));
   solids.push_back(mesh->GetSolid("sensor_package_window"));
@@ -516,25 +516,21 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
      13  solid name: Direct_beam_stop
      14  solid name: beam_splitter_1
      15  solid name: mirror_1
-     16  solid name: LA_HA_mirror_underpart
-     17  solid name: HA_mirror_underpart
-     18  solid name: LA_mirror_underpart
-     19  solid name: BST04_BeamSplitter_underpart
-     20  solid name: Hellma_flowcell_131-814-40
-     21  solid name: HA_mirror
-     22  solid name: LA_mirror
-     23  solid name: vbpw34s_1_sensor
-     24  solid name: vbpw34s_2_sensor
-     25  solid name: Direct_beam_stop_2
-     26  solid name: vbpw34s_1
-     27  solid name: vbpw34s_2
-     28  solid name: GS3-U3-23S6M-C_sensor_housing
-     29  solid name: injector
-     30  solid name: catcher_tube
-     31  solid name: capillary
-     32  solid name: Flowcellwater-backsheath
-     33  solid name: Flowcellwater-frontsheath
-     34  solid name: Saltywater
+     16  solid name: Flowcell
+     17  solid name: HA_mirror
+     18  solid name: LA_mirror
+     19  solid name: vbpw34s_1_sensor
+     20  solid name: vbpw34s_2_sensor
+     21  solid name: Direct_beam_stop_2
+     22  solid name: vbpw34s_1
+     23  solid name: vbpw34s_2
+     24  solid name: GS3-U3-23S6M-C_sensor_housing
+     25  solid name: injector
+     26  solid name: catcher_tube
+     27  solid name: capillary
+     28  solid name: Flowcellwater-backsheath
+     29  solid name: Flowcellwater-frontsheath
+     30  solid name: Saltywater
    */
 
 
@@ -584,36 +580,30 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[21] = shieldMaterial;
   // ND_filter
   argosz_mat[22] = NDglass;
-  // LA_HA_mirror_underpart
-  argosz_mat[23] = shieldMaterial;
-  // HA_mirror_underpart
-  argosz_mat[24] = shieldMaterial;
-  // LA_mirror_underpart
-  argosz_mat[25] = shieldMaterial;
   // BST04_BeamSplitter_underpart
-  argosz_mat[26] = shieldMaterial;
+  //argosz_mat[23] = shieldMaterial;
   // GS3-U3-23S6M-C_sensor_housing
-  argosz_mat[27] = shieldMaterial;
+  argosz_mat[23] = shieldMaterial;
   // camera_outer_window
-  argosz_mat[28] = lensMaterial;
+  argosz_mat[24] = lensMaterial;
   // sensor_package_window
-  argosz_mat[29] = lensMaterial;
+  argosz_mat[25] = lensMaterial;
   // vbpw34s_1_sensor001
-  argosz_mat[30] = sil;
+  argosz_mat[26] = sil;
   // vbpw34s_2_sensor001
-  argosz_mat[31] = sil;
+  argosz_mat[27] = sil;
   // BeamProfiler (CCD also) FIXME only for beam profile testing
   //argosz_mat[32] = air;
   // injector
-  argosz_mat[32] = PMMA;
+  argosz_mat[28] = PMMA;
   // catcher_tube
-  argosz_mat[33] = PMMA;
+  argosz_mat[29] = PMMA;
   // capillary
-  argosz_mat[34] = ruby;
+  argosz_mat[30] = ruby;
   // Flowcellwater-backsheath
-  argosz_mat[35] = saltwater_frontbacksheat;
+  argosz_mat[31] = saltwater_frontbacksheat;
   // Flowcellwater-frontsheath
-  argosz_mat[36] = saltwater_frontbacksheat;
+  argosz_mat[32] = saltwater_frontbacksheat;
 
   int isolid = 0;
   G4double dbshift = -0.050 * mm; // shift direct beam stop to make CCD image symmetrical
