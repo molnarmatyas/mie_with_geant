@@ -295,7 +295,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4Material* saltwater = nist->FindOrBuildMaterial("G4_WATER");
   G4MaterialPropertiesTable* saline_MPT = new G4MaterialPropertiesTable();
 
-  //std::vector<G4double> rindexSaline = {1.34, 1.34, 1.34, 1.34}; // FIXME more precise!
   std::vector<G4double> rindexSaline = {1.3309, 1.3309, 1.3309, 1.3309}; //new values, more precise
   saline_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexSaline, nEntries);
 
@@ -322,6 +321,16 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // PMMA for injector, catcher tube and flowcella
   G4Material* PMMA = nist->FindOrBuildMaterial("G4_PLEXIGLASS");
 
+  G4MaterialPropertiesTable* PMMA_MPT = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexPMMA = {1.4878, 1.4878, 1.4878, 1.4878};
+  PMMA_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexPMMA, nEntries);
+
+  std::vector<G4double> absLengthPMMA = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
+  PMMA_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthPMMA, false, false);
+
+  PMMA->SetMaterialPropertiesTable(PMMA_MPT);
+
   // ruby for capillary based on https://en.wikipedia.org/wiki/Corundum and https://en.wikipedia.org/wiki/Ruby
   auto ruby = new G4Material("Ruby", density = 4.02 * g / cm3, nelements = 2);
   auto Al = new G4Element("Aluminium", "Al", z = 13, a = 26.98 * g / mole);
@@ -340,13 +349,11 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4MaterialPropertiesTable* saline_frontbacksheat_MPT = new G4MaterialPropertiesTable();
 
   std::vector<G4double> rindexSaline_frontbacksheat = {1.332, 1.332, 1.332, 1.332};
-  saline_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexSaline_frontbacksheat, nEntries);
+  saline_frontbacksheat_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexSaline_frontbacksheat, nEntries);
 
-  saline_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthSaline, false, false);
+  saline_frontbacksheat_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthSaline, false, false);
 
-  saltwater->SetMaterialPropertiesTable(saline_frontbacksheat_MPT);
-
-
+  saltwater_frontbacksheat->SetMaterialPropertiesTable(saline_frontbacksheat_MPT);
 
 
 
