@@ -431,7 +431,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./I5R_GEANT_20260119_1.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./I5R_GEANT_20260119_w_screen_at_cell.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -479,7 +479,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("capillary"));
   solids.push_back(mesh->GetSolid("Flowcellwater-backsheath"));
   solids.push_back(mesh->GetSolid("Flowcellwater-frontsheath"));
-  //solids.push_back(mesh->GetSolid("BeamProfiler")); // FIXME only for beam profile testing
+  solids.push_back(mesh->GetSolid("Screen-at-cell")); // FIXME only for beam profile testing
 
   std::vector<G4LogicalVolume*> argosz_log(solids.size());
   std::vector<G4VPhysicalVolume*> argosz_phys(solids.size());
@@ -599,8 +599,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[26] = sil;
   // vbpw34s_2_sensor001
   argosz_mat[27] = sil;
-  // BeamProfiler (CCD also) FIXME only for beam profile testing
-  //argosz_mat[32] = air;
   // injector
   argosz_mat[28] = PMMA;
   // catcher_tube
@@ -611,6 +609,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[31] = saltwater_frontbacksheat;
   // Flowcellwater-frontsheath
   argosz_mat[32] = saltwater_frontbacksheat;
+  // BeamProfiler (CCD also) FIXME only for beam profile testing
+  argosz_mat[33] = air;
 
   int isolid = 0;
   G4double dbshift = -0.050 * mm; // shift direct beam stop to make CCD image symmetrical
@@ -704,9 +704,10 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   {
     //old model
     //fBubble_def_pos = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift);
-    fBubble_def_pos = G4ThreeVector(-33.96995 * mm, 11.0412 * mm, -1.99995 * mm + shift);
+    //fBubble_def_pos = G4ThreeVector(-33.96995 * mm, 11.0412 * mm, -1.99995 * mm + shift);
+    fBubble_def_pos = G4ThreeVector(33.96995 * mm, -11.0412 * mm, 1.99995 * mm + shift);
     bubble_phys = new G4PVPlacement(nullptr, fBubble_def_pos + fBubble_additional_offset, bubbleW_log,
-        "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
+        "Bubble_dis_bnd_proc", world_log, false, 0);
   }
 
   if (IsVerbose())
@@ -770,12 +771,12 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   opWaterSurface = new G4OpticalSurface("WaterSurface", glisur, polished, x_ray);
 
   //auto waterSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
-  auto waterSurface = new G4LogicalBorderSurface("WaterSurface", argosz_phys[17], bubble_phys, opWaterSurface); // in SALINE SOLUTION
+  //auto waterSurface = new G4LogicalBorderSurface("WaterSurface", argosz_phys[17], bubble_phys, opWaterSurface); // in SALINE SOLUTION
 
-  auto opticalSurface =
-    dynamic_cast<G4OpticalSurface *>(waterSurface->GetSurface(argosz_phys[17], bubble_phys)->GetSurfaceProperty()); // in SALINE SOLUTION
-  if (opticalSurface)
-    opticalSurface->DumpInfo();
+  //auto opticalSurface =
+  //  dynamic_cast<G4OpticalSurface *>(waterSurface->GetSurface(argosz_phys[17], bubble_phys)->GetSurfaceProperty()); // in SALINE SOLUTION
+  //if (opticalSurface)
+  //  opticalSurface->DumpInfo();
 
   // Mirror
 
