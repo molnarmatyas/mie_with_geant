@@ -109,10 +109,12 @@ void NormaPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
 	
 	fParticleGun->SetParticlePosition(emissionPoint);
 	fParticleGun->SetParticleMomentumDirection(emissionDirection);
+  /*
     G4cout << "Emitting photon from pixel (" << i << ", " << j << ") at " 
            << emissionPoint.x() << ", " << emissionPoint.y() << ", " << emissionPoint.z() 
            << " with direction " << emissionDirection.x() << ", " << emissionDirection.y() << ", " << emissionDirection.z() 
            << G4endl;
+   */
  
     fParticleGun->GeneratePrimaryVertex(anEvent);
 }
