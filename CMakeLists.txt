@@ -60,6 +60,7 @@ set(Norma_SCRIPTS
     dhkm_7_1592_1.txt
     crosssection_radians_poli_15_10000.txt
     RayCi8_180mm.csv
+    N958260004_10.csv
     I5R_GEANT_20260119_1.obj
   )
 

@@ -70,8 +70,13 @@ private:
   void NormalizeAndBuildCDF();
   G4ThreeVector ComputeProfileCenter();
   std::pair<int, int> SamplePixel();
+  // For photon directions
+  void LoadDirectionsCSV(const std::string& filename);
+  G4ThreeVector GetDirectionForPixel(int idx);
 
   std::vector<double> intensityMap;
+  std::vector<double> directionMap;  // Store x, y, z for each pixel
+  bool directionsLoaded = false;  // Track if directions were successfully loaded
 	std::mt19937 fGen;
 	std::discrete_distribution<int> fDist_disc;
   std::map<double, int> map_test;

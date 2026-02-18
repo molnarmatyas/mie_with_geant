@@ -40,6 +40,8 @@
 #include "NormaPrimaryGeneratorMessenger.hh"
 #include "Randomize.hh"
 #include <numeric>  // for std::accumulate
+#include <fstream>
+#include <sstream>
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -77,7 +79,7 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
   //fParticleGun->GeneratePrimaryVertex(anEvent);
 
   // Initialize intensity profile
-  std::string intensityFile = "RayCi8_180mm.csv"; // You can pass this via a macro later
+  std::string intensityFile = "N958260004_10.csv"; //"RayCi8_180mm.csv"; // You can pass this via a macro later
   G4double leftrightZ = 0.0*mm;
   //old model
   //profileCenterWorld = G4ThreeVector(14.4999505 * mm + -0.4*mm, 96.250088 * mm - 0.23*mm, -137.4700015 * mm - 0.9*mm + leftrightZ);
@@ -98,34 +100,22 @@ NormaPrimaryGeneratorAction::~NormaPrimaryGeneratorAction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 void NormaPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent)
 {
-	/*
-	G4double t = 2*CLHEP::pi  * G4UniformRand();
-	G4double r = std::sqrt(0.1/CLHEP::pi) * (G4UniformRand());
-	G4double x0 = 14.09 * CLHEP::mm;
-	G4double y0 = r * std::cos(t) + 96.2425 * CLHEP::mm;
-	G4double z0 = r * std::sin(t) + -137.51 * CLHEP::mm;
-	//G4cerr << "Gun from " << x0 << ", " << y0 << ", " << z0 << G4endl; 
-	fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0)*CLHEP::mm); // so then 0.1 mm^2 is the source
-		G4double dy = 0.0;//(G4UniformRand() - 0.5) * 0.1;
-		G4double dz = 0.0;//(G4UniformRand() - 0.5) * 0.1;
-		fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., dy, dz));
-	  */
-	
 	auto [i, j] = SamplePixel();
+	int idx = i * numCols + j;
 	double localZ = (j - numCols / 2.0) * pixelSize;
 	double localY = (i - numRows / 2.0) * pixelSize; //z-y plane!
-  /*
-  G4cout << "selected index: " << i << "\t" << j << G4endl;
-  G4cout << "selected pixel: " << localZ << "\t" << localY << G4endl;
-  */
+  
 	G4ThreeVector emissionPoint = profileCenterWorld + G4ThreeVector(0, localY, localZ);
-  /*
-  G4cout << "profileCentterWorld: " << profileCenterWorld << G4endl;
-  G4cout << "Emission point: " << emissionPoint << G4endl;
-	*/
+	G4ThreeVector emissionDirection = GetDirectionForPixel(idx);
+	
 	fParticleGun->SetParticlePosition(emissionPoint);
-	// Set direction etc.
-		
+	fParticleGun->SetParticleMomentumDirection(emissionDirection);
+  /*
+    G4cout << "Emitting photon from pixel (" << i << ", " << j << ") at " 
+           << emissionPoint.x() << ", " << emissionPoint.y() << ", " << emissionPoint.z() 
+           << " with direction " << emissionDirection.x() << ", " << emissionDirection.y() << ", " << emissionDirection.z() 
+           << G4endl;
+   */
  
     fParticleGun->GeneratePrimaryVertex(anEvent);
 }
@@ -198,6 +188,39 @@ void NormaPrimaryGeneratorAction::LoadIntensityCSV(const std::string& filename) 
     }
 
     intensityMap = std::move(tempData);
+}
+
+
+void NormaPrimaryGeneratorAction::LoadDirectionsCSV(const std::string& filename) {
+    std::ifstream file(filename);
+    
+    if (!file.is_open()) {
+        G4cout << "Warning: Could not open photon directions file: " << filename << G4endl;
+        G4cout << "Falling back to default direction (1., 0., 0.)" << G4endl;
+        directionsLoaded = false;
+        return;
+    }
+    
+    std::string line;
+
+    // Skip the first (header) line
+    std::getline(file, line);
+
+    std::vector<double> tempData;
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string cell;
+
+        while (std::getline(ss, cell, ',')) {
+            double val = std::stod(cell);
+            tempData.push_back(val);
+        }
+    }
+
+    file.close();
+    directionMap = std::move(tempData);
+    directionsLoaded = true;
 }
 
 
@@ -286,6 +309,26 @@ std::pair<int, int> NormaPrimaryGeneratorAction::SamplePixel() {
     return {i, j};
 }
 
+G4ThreeVector NormaPrimaryGeneratorAction::GetDirectionForPixel(int idx) {
+    // If directions were not loaded, return default direction
+    if (!directionsLoaded) {
+        return G4ThreeVector(1., 0., 0.);
+    }
+    
+    // Each pixel has 3 direction components (x, y, z)
+    if (idx < 0 || (idx * 3 + 2) >= static_cast<int>(directionMap.size())) {
+        G4Exception("NormaPrimaryGeneratorAction::GetDirectionForPixel",
+                    "InvalidPixelIndex", FatalException,
+                    "Pixel index out of range for direction map.");
+    }
+
+    double dx = directionMap[idx * 3];
+    double dy = directionMap[idx * 3 + 1];
+    double dz = directionMap[idx * 3 + 2];
+
+    return G4ThreeVector(dx, dy, dz);
+}
+
 void NormaPrimaryGeneratorAction::InitializeIntensityProfile(const std::string& filename, double pixelSizeMM) {
     //pixelSize = pixelSizeMM * CLHEP::mm;
     //G4cout << "pixelSize normal: " << pixelSize << G4endl;
@@ -298,6 +341,9 @@ void NormaPrimaryGeneratorAction::InitializeIntensityProfile(const std::string& 
 	fDist_disc = std::discrete_distribution<>(intensityMap.begin(), intensityMap.end());
 	//fDist_disc = std::piecewise_linear_distribution<>(intensityMap.begin(), intensityMap.end(), intensityMap.begin());
 	fGen.seed(time(0)); // if you want different results from different runs
+
+    // Load directions from the corresponding CSV file
+    LoadDirectionsCSV("photon_directions_full_matrix_sequential.csv");
 
    // G4cout << "→ Laser profile loaded from: " << filename << G4endl;
    // G4cout << "→ Profile dimensions: " << numCols << " × " << numRows << G4endl;
