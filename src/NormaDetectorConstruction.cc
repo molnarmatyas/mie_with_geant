@@ -610,7 +610,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // Flowcellwater-frontsheath
   argosz_mat[32] = saltwater_frontbacksheat;
   // BeamProfiler (CCD also) FIXME only for beam profile testing
-  argosz_mat[33] = air;
+  argosz_mat[33] = shieldMaterial;
 
   int isolid = 0;
   G4double dbshift = -0.050 * mm; // shift direct beam stop to make CCD image symmetrical

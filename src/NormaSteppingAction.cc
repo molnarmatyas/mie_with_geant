@@ -238,11 +238,13 @@ void NormaSteppingAction::UserSteppingAction(const G4Step *step)
 
   int det_num = 0;
 
+  //std::cout << "Pre volume: " << prevolume->GetName() << " | Post volume: " << postvolume->GetName() << G4endl;
+
 	if (
       ( prevolume->GetName() == "world" && postvolume->GetName() == "GS3-U3-23S6M-C_sensor") || 
       ( prevolume->GetName() == "vbpw34s_1" && postvolume->GetName() == "vbpw34s_1_sensor") ||
       ( prevolume->GetName() == "vbpw34s_2" && postvolume->GetName() == "vbpw34s_2_sensor") ||
-      ( prevolume->GetName() == "Saltywater" && postvolume->GetName() == "Screen-at-cell") // FIXME beam profiler testing
+      ( (prevolume->GetName() == "Flowcellwater-backsheath" || prevolume->GetName() == "world" || prevolume->GetName() == "Saltywater") && postvolume->GetName() == "Screen-at-cell") // FIXME beam profiler testing
      ) 
 	{
 		ss.str("");
