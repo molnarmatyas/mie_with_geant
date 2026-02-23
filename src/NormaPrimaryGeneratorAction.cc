@@ -80,12 +80,13 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 
   // Initialize intensity profile
   std::string intensityFile = "N958260004_10.csv"; //"RayCi8_180mm.csv"; // You can pass this via a macro later
-  G4double leftrightZ = 0.0*mm;
+  G4double leftrightZ = 0.6022*mm;
+  G4double updownY = -0.105 *mm;
   //old model
   //profileCenterWorld = G4ThreeVector(14.4999505 * mm + -0.4*mm, 96.250088 * mm - 0.23*mm, -137.4700015 * mm - 0.9*mm + leftrightZ);
   //new model
   //profileCenterWorld = G4ThreeVector(-33.96995 * mm + -0.4*mm, 11.0412  * mm - 0.23*mm, -1.99995 * mm - 0.9*mm + leftrightZ);
-  profileCenterWorld = G4ThreeVector(-39.96995 * mm + -0.4*mm, 11.0412  * mm - 0.23*mm, -1.99995 * mm - 0.9*mm + leftrightZ);
+  profileCenterWorld = G4ThreeVector(-43.96995 *mm, 11.0412  * mm + updownY, -1.99995 * mm + leftrightZ);
 
   InitializeIntensityProfile(intensityFile, pixelSize);
 }
