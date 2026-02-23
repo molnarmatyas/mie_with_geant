@@ -76,5 +76,7 @@ Thumbs.db
 *.root
 #*.txt
 *.out
+*.pdf
 **/*.root
 **/*.png
+output*.txt
