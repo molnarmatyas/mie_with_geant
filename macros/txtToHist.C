@@ -45,7 +45,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
   for(int ideg = 0; ideg < NDEG; ideg++)
   {
     std::string background_file =
-        "../no_cell_measurement_backgrond_extended_source.txt";
+        "../no_cell_measurement_backgrond_new_model_extended_source.txt";
     TH2D* dh2D_xz[2];
     //std::string filename =
     //    Form("../fs4_results/outputcrosssection_radians_poli_15_10000.txt7500_990_0_%i.txt", ideg);
@@ -101,12 +101,12 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     /*
       complete model sensor location
     */
-    double x_min = 8.22955;
-    double y_min = 92.734;
-    double z_min = -106.676;
-    double x_max = 18.2223;
-    double y_max = 99.764;
-    double z_max = -100.618;
+    double x_min = -37.7737;
+    double y_min = 7.484;
+    double z_min = 28.7942;
+    double x_max = -27.7809;
+    double y_max = 14.514;
+    double z_max = 34.8522;
     double x_center = (x_min + x_max ) / 2.0;
     double y_center = (y_min + y_max ) / 2.0;
     double z_center = (z_min + z_max ) / 2.0;
@@ -353,7 +353,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     dh2D_xy->GetXaxis()->SetTitle("X [pixel]");
     dh2D_xy->GetYaxis()->SetTitle("Y [pixel]");
     dh2D_xy->Draw("COLZ");
-    //c2->SaveAs(Form("figs/%s_dh2D_xy_bw.png", outputprefix.c_str()));
+    c2->SaveAs(Form("figs/%s_dh2D_xy_bw.png", outputprefix.c_str()));
     // Subtract background
     dh2D_xy->Add(dh2D_xy_ccd_background, -1.0);
 
