@@ -631,7 +631,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
     switch(isolid) {
     case 13: // Direct_beam_stop_0.75
       argosz_phys[isolid] = new G4PVPlacement( 0
-          , G4ThreeVector(0.8660254038*dbshift, 0, 0.5*dbshift)
+          //, G4ThreeVector(0.8660254038*dbshift, 0, 0.5*dbshift)
+          , G4ThreeVector(0.0, 0.0, 0.0)
           , argosz_log[isolid]
           , solid->GetName()
           , world_log
@@ -707,6 +708,9 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
     fBubble_def_pos = G4ThreeVector(-33.96995 * mm, 11.0412 * mm, -1.99995 * mm + shift);
     bubble_phys = new G4PVPlacement(nullptr, fBubble_def_pos + fBubble_additional_offset, bubbleW_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
+    //fBubble_def_pos = G4ThreeVector(250 * mm, 250 * mm, 250 * mm + shift);
+    //bubble_phys = new G4PVPlacement(nullptr, fBubble_def_pos + fBubble_additional_offset, bubbleW_log,
+    //    "Bubble_dis_bnd_proc", world_log, false, 0);
   }
 
   if (IsVerbose())
@@ -716,53 +720,6 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
     std::cout << "Cell current position: " << fBubble_additional_offset + fBubble_def_pos << std::endl;
   }
 
-  /*
-  //   -----  DETECTOR ARRAY  -----
-  //
-
-  // SENSITIVE DETECTOR MATERIAL PROPERTIES
-  G4Material* detectorMaterial = nist->FindOrBuildMaterial("G4_Si");
-  G4MaterialPropertiesTable* mptDetector = new G4MaterialPropertiesTable();
-
-  // Define absorption length for optical photons
-  const G4int detNumEntries = 2;
-  G4double detPhotonEnergy[detNumEntries] = {1.5*eV, 2.0*eV}; // Photon energies
-  G4double detAbsorptionLength[detNumEntries] = {.00001*mm, .00001*mm}; // Absorption length at those energies
-
-  // Assign the material properties table to the detector material
-  detectorMaterial->SetMaterialPropertiesTable(mptDetector);
-  //mptDetector->AddProperty("ABSLENGTH", detPhotonEnergy, absorptionLength, detNumEntries);
-
-  // SENSITIVE DETECTOR CONSTRUCTION
-  G4double fullDetectorWidth = 1*mm;   // Width of the full detector
-  G4double fullDetectorHeight = 1*mm;  // Height of the full detector
-  G4double fullDetectorThickness = 0.1*mm; // Thickness of the detector
-                                           // Number of pixels in X and Y directions
-                                           G4int nPixelsZ = 10;
-                                           G4int nPixelsY = 10;
-  // Therefore, the pixel dimensions:
-  G4double pixelWidth = fullDetectorWidth / nPixelsZ;
-  G4double pixelHeight = fullDetectorHeight / nPixelsY;
-  G4double pixelThickness = fullDetectorThickness;  // Same thickness for each pixe
-
-  // Single pixel definition
-  G4Box *solidDetector = new G4Box("solidDetector", fullDetectorWidth/(2*nPixelsZ), fullDetectorHeight/(2*nPixelsY), fullDetectorThickness/2);
-  logicDetector = new G4LogicalVolume(solidDetector, detectorMaterial, "logicDetector");
-  // Creating individual physical pixel instances
-  for(G4int iz=0; iz<nPixelsZ; iz++)
-  {
-  for(G4int iy=0; iy<nPixelsY; iy++)
-  {
-  // X, Y, and Z position of the pixel
-  G4double posX = 5*CLHEP::mm; // so far the whole plane at the same Z pos.
-  G4double posY = -fullDetectorHeight/2 + pixelWidth*(iy +0.5);
-  G4double posZ = -fullDetectorWidth/2 + pixelWidth*(iz +0.5);
-  // Pixel placement
-  G4VPhysicalVolume * physDetector = new G4PVPlacement(0, G4ThreeVector(posX, posY, posZ),
-  logicDetector, "physDetector", world_log, false, iz+iy*nPixelsZ, true); // or logicWorld???
-  }
-  }
-   */
   // ------------- Surfaces --------------
 
   // Water Tank
