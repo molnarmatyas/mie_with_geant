@@ -574,7 +574,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // Saltywater
   argosz_mat[15] = saltwater;
   // lense_outer_housing
-  argosz_mat[16] = lensMaterial;
+  argosz_mat[16] = shieldMaterial; // changed from lensMaterial to shieldMaterial to make it opaque, as in reality
   // filter_adapter
   argosz_mat[17] = shieldMaterial;
   // ND_filter_housing
@@ -721,10 +721,10 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   }
 
   // ------------- Surfaces --------------
-
+  
+  /* Deprecated, what were these even for?
   // Water Tank
-  auto opWaterSurface = new G4OpticalSurface("WaterSurface");
-  opWaterSurface = new G4OpticalSurface("WaterSurface", glisur, polished, x_ray);
+  G4OpticalSurface* opWaterSurface = new G4OpticalSurface("WaterSurface", glisur, polished, x_ray);
 
   //auto waterSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
   auto waterSurface = new G4LogicalBorderSurface("WaterSurface", argosz_phys[17], bubble_phys, opWaterSurface); // in SALINE SOLUTION
@@ -733,8 +733,9 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
     dynamic_cast<G4OpticalSurface *>(waterSurface->GetSurface(argosz_phys[17], bubble_phys)->GetSurfaceProperty()); // in SALINE SOLUTION
   if (opticalSurface)
     opticalSurface->DumpInfo();
+  */
 
-  // Mirror
+  // Mirror -----
 
   // Create optical surface
   G4OpticalSurface* opticalSurfaceMirror = new G4OpticalSurface("MirrorSurface");
@@ -752,12 +753,13 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   opticalSurfaceMirror->SetMaterialPropertiesTable(SMPT);
 
-  G4LogicalBorderSurface* mirrorSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface_1", world_phys, argosz_phys[0], opticalSurfaceMirror);
+  G4LogicalBorderSurface* mirrorSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface_1", world_phys, argosz_phys[0], opticalSurfaceMirror); // prbly enough in one direction: mirror, so it does not go IN the material
   G4LogicalBorderSurface* mirrorSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface_2", world_phys, argosz_phys[1], opticalSurfaceMirror);
+  G4LogicalBorderSurface* mirrorSurface_3 = new G4LogicalBorderSurface("MirrorBorderSurface_3", world_phys, argosz_phys[2], opticalSurfaceMirror);
   G4LogicalBorderSurface* mirrorSurface_11 = new G4LogicalBorderSurface("MirrorBorderSurface_11", world_phys, argosz_phys[11], opticalSurfaceMirror);
   G4LogicalBorderSurface* mirrorSurface_14 = new G4LogicalBorderSurface("MirrorBorderSurface_14", world_phys, argosz_phys[14], opticalSurfaceMirror);
 
-  // Lens
+  // Lens ----- 
   // Create optical surface
   G4OpticalSurface* opticalSurfaceLens = new G4OpticalSurface("LensSurface");
   opticalSurfaceLens = new G4OpticalSurface("LensSurface", unified, polished, dielectric_dielectric);
@@ -770,7 +772,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4LogicalBorderSurface* lensSurface2_in = new G4LogicalBorderSurface("LensBorderSurface2", world_phys, argosz_phys[10], opticalSurfaceLens);
   G4LogicalBorderSurface* lensSurface2_out = new G4LogicalBorderSurface("LensBorderSurface2_1", argosz_phys[10], world_phys, opticalSurfaceLens);
 
-  // Beam splitter
+  // Beam splitter -----
   // BST04_BeamSplitter
   G4OpticalSurface* splitterSurface_front = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
   G4OpticalSurface* splitterSurface_back = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
@@ -788,17 +790,31 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   splitterSurface_front->SetMaterialPropertiesTable(surfaceMPT_front);
   splitterSurface_back->SetMaterialPropertiesTable(surfaceMPT_back);
-  //this is not used now in the simulation
-  //G4LogicalBorderSurface* splitterSurface1 = new G4LogicalBorderSurface("splitterBorderSurface1", world_phys, argosz_phys[0], opticalSurfaceLens);
+  //G4LogicalBorderSurface* splitterSurface1 = new G4LogicalBorderSurface("splitterBorderSurface1", world_phys, argosz_phys[0], opticalSurfaceLens); //this is not used now in the simulation
   G4LogicalBorderSurface* splitterBorderSurface_front = new G4LogicalBorderSurface("splitterBorderSurface_front", world_phys, argosz_phys[6], splitterSurface_front);
   G4LogicalBorderSurface* splitterBorderSurface_back = new G4LogicalBorderSurface("splitterBorderSurface_back", argosz_phys[6], world_phys, splitterSurface_back);
 
-  //flowcell - seems to be acceptable?
+  // Flowcell -----
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
-  G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
-  G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+  // If flowcell and cell (bubble) were in air, this would do it:
+  //G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back); // could be flowcellSurface, but we do not want to deal with reflections here
+  //G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+  // However, now need to deal with the ocmplex system: -- FIXME are 100% transmission right? will it cause discrepancy with the surface border properties (i.e. no Snell--Descartes law applied?)
+  G4LogicalBorderSurface* flowcellBorderSurface_world_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_world_to_flowcell", world_phys, argosz_phys[3], splitterSurface_back); // from world to flowcell
+  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_world = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_world", argosz_phys[3], world_phys, splitterSurface_back); // from flowcell to world
+  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_backsheath", argosz_phys[3], argosz_phys[31], splitterSurface_back); // from flowcell to back sheath
+  G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_flowcell", argosz_phys[31], argosz_phys[3], splitterSurface_back); // from back sheath to flowcell
+  G4LogicalBorderSurface* flowcellBorderSurface_frontsheath_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_frontsheath_to_backsheath", argosz_phys[32], argosz_phys[31], splitterSurface_back); // from front sheath to back sheath - same material, is this needed?
+  G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_frontsheath = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_frontsheath", argosz_phys[31], argosz_phys[32], splitterSurface_back);
+  G4LogicalBorderSurface* flowcellBorderSurface_frontsheath_to_saltywater = new G4LogicalBorderSurface("flowcellBorderSurface_frontsheath_to_saltywater", argosz_phys[32], argosz_phys[15], splitterSurface_back); // from front sheath to salty water
+  G4LogicalBorderSurface* flowcellBorderSurface_saltywater_to_frontsheath = new G4LogicalBorderSurface("flowcellBorderSurface_saltywater_to_frontsheath", argosz_phys[15], argosz_phys[32], splitterSurface_back);
+  // probably no need to deal with injector, catcher_tube and capillary, as they are not in the direct path of the beam
   
-  // ND filter
+  // And finally, bubble (cell) - these should be OK with 100% transmission, as here only Mie scattering is relevant, no surface effects
+  G4LogicalBorderSurface* flowcellBorderSurface_saltywater_to_bubble = new G4LogicalBorderSurface("flowcellBorderSurface_saltywater_to_bubble", argosz_phys[15], bubble_phys, splitterSurface_back); // or maybe the opWaterSurface instead of splitterSurface_back? 
+  G4LogicalBorderSurface* flowcellBorderSurface_bubble_to_saltywater = new G4LogicalBorderSurface("flowcellBorderSurface_bubble_to_saltywater", bubble_phys, argosz_phys[15], splitterSurface_back); 
+  
+  // ND filter -----
   G4OpticalSurface* NDFilterSurface = new G4OpticalSurface("NDFilterSurface");
   NDFilterSurface->SetType(dielectric_dielectric);
   NDFilterSurface->SetFinish(polished); // or ground if it’s a diffusing ND filter
