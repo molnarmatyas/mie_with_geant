@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #SET IT TO YOUR OWN!
-HOME="/home/bporfy/Norma"
+HOME="${PWD}" # should be where this script is located, and where the build and macro directories are located
 
 BUILD_DIR="$HOME/build"
 MACRO_DIR="$HOME/macros"
-INP_DIR="/opt/cell_crosssections/neu"
+INP_DIR="/opt/cell_crosssections/mon/adda/high_fid"
 NUM_TO_SHUF=$1
 OUTPUT_NAME="$2"
 RAND_POS_NUM=$3
@@ -23,7 +23,7 @@ cp `ls -d "$INP_DIR/"* | shuf -n $NUM_TO_SHUF` "$BUILD_DIR/."
 cd "$BUILD_DIR"
 
 #FIXME
-for file in run*gran*.txt; do
+for file in intensity_results_MON*.txt; do
   for i in $(seq 1 $RAND_POS_NUM);
   do
       x=$(seq -15 0.01 15 | shuf | head -n1)
