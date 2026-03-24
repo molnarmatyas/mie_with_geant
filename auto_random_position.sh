@@ -21,6 +21,9 @@ cp `ls -d "$INP_DIR/"* | shuf -n $NUM_TO_SHUF` "$BUILD_DIR/."
 
 
 cd "$BUILD_DIR"
+cmake ..
+make -j2
+
 
 #FIXME
 for file in intensity_results_MON*.txt; do
