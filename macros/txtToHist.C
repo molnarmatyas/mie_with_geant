@@ -111,23 +111,22 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     double y_center = (y_min + y_max ) / 2.0;
     double z_center = (z_min + z_max ) / 2.0;
 
-      
-    double det_1_x_min = 48.3132;
-    double det_1_y_min = 106.42;
-    double det_1_z_min = -139.75;
-    double det_1_x_max = 51.3132;
-    double det_1_y_max = 106.56;
-    double det_1_z_max = -136.75;
+    double det_1_x_min =  2.431;
+    double det_1_y_min =  21.17;
+    double det_1_z_min =  -4.149;
+    double det_1_x_max =  5.169;
+    double det_1_y_max =  21.45;
+    double det_1_z_max =  -1.411;
     double det_1_x_center = (det_1_x_min + det_1_x_max ) / 2.0;
     double det_1_y_center = (det_1_y_min + det_1_y_max ) / 2.0;
     double det_1_z_center = (det_1_z_min + det_1_z_max ) / 2.0;
 
-    double det_2_x_min = 61.3132;
-    double det_2_y_min = 106.42;
-    double det_2_z_min = -139.75;
-    double det_2_x_max = 64.3132;
-    double det_2_y_max = 106.56;
-    double det_2_z_max = -136.75;
+    double det_2_x_min =  15.431;
+    double det_2_y_min =  21.17;
+    double det_2_z_min =  -4.149;
+    double det_2_x_max =  18.169;
+    double det_2_y_max =  21.45;
+    double det_2_z_max =  -1.411;
     double det_2_x_center = (det_2_x_min + det_2_x_max ) / 2.0;
     double det_2_y_center = (det_2_y_min + det_2_y_max ) / 2.0;
     double det_2_z_center = (det_2_z_min + det_2_z_max ) / 2.0;
