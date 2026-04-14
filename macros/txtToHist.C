@@ -63,6 +63,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     TH2D* dh2D_yz = new TH2D("dh2D_yz", "; Y [mm]; Z [mm]", 500, -10, 10, 500, -10, 10);
     dh2D_xz[0] = new TH2D("dh2D_xz_det_1", "; X [mm]; Z [mm]", 500, -2, 2, 500, -2, 2);
     dh2D_xz[1] = new TH2D("dh2D_xz_det_2", "; X [mm]; Z [mm]", 500, -2, 2, 500, -2, 2);
+    dh2D_xz[2] = new TH2D("dh2D_xz_det_3", "; X [mm]; Z [mm]", 500, -2, 2, 500, -2, 2); // FIXME beam profiler testing
     TH2D* dh2D_xy = new TH2D("dh2D_xy", "; CCD X [pixel]; Y [pixel]", 480, -11.25/2.0/pixel, 11.25/2.0/pixel, 300, -7.03/2.0/pixel, 7.03/2.0/pixel);
     TH2D* dh2D_xy_ccd_background = new TH2D("dh2D_xy_ccd_background", "; CCD background X [pixel]; Y [pixel]", 480, -11.25/2.0/pixel, 11.25/2.0/pixel, 300, -7.03/2.0/pixel, 7.03/2.0/pixel);
     TH2D* dhR_alpha = new TH2D("dhR_alpha", "#alpha vs R; #alpha [deg] ; R [pixel]", 1000, -1, 180, 1000/pixel, 0, 7.5/pixel);
@@ -131,6 +132,17 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     double det_2_y_center = (det_2_y_min + det_2_y_max ) / 2.0;
     double det_2_z_center = (det_2_z_min + det_2_z_max ) / 2.0;
 
+    // FIXME beam profiler testing
+    double det_3_x_min =  -20.6;
+    double det_3_y_min =  4.4;
+    double det_3_z_min =  -8.7;
+    double det_3_x_max =  -20.4;
+    double det_3_y_max =  17.4;
+    double det_3_z_max =  4.3;
+    double det_3_x_center = (det_3_x_min + det_3_x_max ) / 2.0;
+    double det_3_y_center = (det_3_y_min + det_3_y_max ) / 2.0;
+    double det_3_z_center = (det_3_z_min + det_3_z_max ) / 2.0;
+
     // Define rotation angle (convert to radians)
     //double M_PI = TMath::Pi();
     double theta = 30.0 * M_PI / 180.0; 
@@ -154,6 +166,15 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
       // Read all 6 columns
       if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ >> alpha >> alpha_man >> phi3 >> det_num)) {
         std::cerr << "Error parsing line: " << bkg_line << std::endl;
+        continue;
+      }
+      if(det_num == 3) // Beam profiler, FIXME only for beam profile testing
+      {
+        // Translate to local origin
+        double shiftedX = postX - det_3_x_center;
+        double shiftedY = postY - det_3_y_center;
+        double shiftedZ = postZ - det_3_z_center;
+
         continue;
       }
       if(det_num == 2) //vbpw34s_2
@@ -222,6 +243,15 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
       // Read all 6 columns
       if (!(iss >> theta3 >> genTheta >> R >> postX >> postY >> postZ >> alpha >> alpha_man >> phi3 >> det_num)) {
         std::cerr << "Error parsing line: " << line << std::endl;
+        continue;
+      }
+      if(det_num == 3) // Beam profiler, FIXME only for beam profile testing
+      {
+        // Translate to local origin
+        double shiftedX = postX - det_3_x_center;
+        double shiftedY = postY - det_3_y_center;
+        double shiftedZ = postZ - det_3_z_center;
+
         continue;
       }
       if(det_num == 2) //vbpw34s_2
@@ -340,6 +370,12 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     //dh2D_xz[1]->Draw("COLZ");
     //c1->SaveAs(Form("../figs/%s_dh2D_xy_discrete.pdf", outputprefix.c_str()));
 
+    // FIXME beam profiler testing
+    dh2D_xz[2]->SetTitle(Form("2D scattering, deg=%i, beam profiler", ideg));
+    dh2D_xz[2]->GetXaxis()->SetTitle("X [mm]");
+    dh2D_xz[2]->GetYaxis()->SetTitle("Z [mm]");
+    //dh2D_xz[2]->Draw("COLZ");
+
     // Black & white image of CCD screen (black=min, white=max)
     TCanvas *c2 = new TCanvas("c2", "CCD Image", 800, 600);
     SetGrayscalePalette(c2, dh2D_xy); // Apply grayscale palette
@@ -443,6 +479,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     dhR_alpha_det_1->Write();
     dh2D_xz[0]->Write();
     dh2D_xz[1]->Write();
+    dh2D_xz[2]->Write(); // FIXME beam profiler testing
     dhR_alpha_det_2->Write();
     dhphi_alpha_det_1->Write();
     dhphi_alpha_det_2->Write();
