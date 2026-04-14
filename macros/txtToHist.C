@@ -46,7 +46,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
   {
     std::string background_file =
         "../no_cell_measurement_backgrond_new_model_extended_source.txt";
-    TH2D* dh2D_xz[2];
+    TH2D* dh2D_xz[3];
     //std::string filename =
     //    Form("../fs4_results/outputcrosssection_radians_poli_15_10000.txt7500_990_0_%i.txt", ideg);
     std::string filename = geantoutputname;
@@ -251,6 +251,7 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
         double shiftedX = postX - det_3_x_center;
         double shiftedY = postY - det_3_y_center;
         double shiftedZ = postZ - det_3_z_center;
+        dh2D_xz[2]->Fill(shiftedZ, shiftedY);
 
         continue;
       }
@@ -372,8 +373,8 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
 
     // FIXME beam profiler testing
     dh2D_xz[2]->SetTitle(Form("2D scattering, deg=%i, beam profiler", ideg));
-    dh2D_xz[2]->GetXaxis()->SetTitle("X [mm]");
-    dh2D_xz[2]->GetYaxis()->SetTitle("Z [mm]");
+    dh2D_xz[2]->GetXaxis()->SetTitle("Z [mm]");
+    dh2D_xz[2]->GetYaxis()->SetTitle("Y [mm]");
     //dh2D_xz[2]->Draw("COLZ");
 
     // Black & white image of CCD screen (black=min, white=max)
