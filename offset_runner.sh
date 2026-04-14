@@ -29,16 +29,17 @@ if [ $# -ne 9 ]; then
 fi
 
 # Assign arguments
-start_x=$1
-end_x=$2
-step_x=$3
-start_y=$4
-end_y=$5
-step_y=$6
-z_value=$7
+start_x=${1//,/.}
+end_x=${2//,/.}
+step_x=${3//,/.}
+start_y=${4//,/.}
+end_y=${5//,/.}
+step_y=${6//,/.}
+z_value=${7//,/.}
 num_events=$8
 inputxsection="$9"
-CELLSIZE=$(python3 ../macros/calc_r_effective.py ${inputxsection})
+#CELLSIZE=$(python3 ../macros/calc_r_effective.py ${inputxsection})
+CELLSIZE=10.0 # hardcoded for test xsection, FIXME
 echo "Using cellsize: " $CELLSIZE
 
 # Function to validate floats with range check

@@ -5,7 +5,7 @@ HOME="${PWD}" # should be where this script is located, and where the build and 
 
 BUILD_DIR="$HOME/build"
 MACRO_DIR="$HOME/macros"
-INP_DIR="/opt/cell_crosssections/mon/adda/high_fid"
+INP_DIR="$HOME"
 NUM_TO_SHUF=$1
 OUTPUT_NAME="$2"
 RAND_POS_NUM=$3
@@ -26,14 +26,14 @@ make -j2
 
 
 #FIXME
-for file in intensity_results_MON*.txt; do
+for file in testdhkm*.txt; do
   for i in $(seq 1 $RAND_POS_NUM);
   do
       x=$(seq -15 0.01 15 | shuf | head -n1)
       y=$(seq -15 0.01 15 | shuf | head -n1)
       echo $x,$y
       echo $PWD
-      ./offset_runner.sh $x $x 1 $y $y 1 0 100000000 "$file"
+      ./offset_runner.sh "$x" "$x" 1 "$y" "$y" 1 0 10000000 "$file"
   done
 done
 

@@ -59,8 +59,6 @@ set(Norma_SCRIPTS
     diff_cross_0-180_10000pt.txt
     dhkm_7_1592_1.txt
     crosssection_radians_poli_15_10000.txt
-    testdhkm_0-4.txt
-    testdhkm_6-15.txt
     RayCi8_180mm.csv
     N958260004_10.csv
     I5R_GEANT_20260119_screen_betw_lens_and_beamsplit.obj
