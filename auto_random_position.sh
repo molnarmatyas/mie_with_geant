@@ -5,15 +5,19 @@ HOME="${PWD}" # should be where this script is located, and where the build and 
 
 BUILD_DIR="$HOME/build"
 MACRO_DIR="$HOME/macros"
-INP_DIR="$HOME"
+INP_DIR="/home/molnarmatyas/normawork/testdhkm"
 NUM_TO_SHUF=$1
 OUTPUT_NAME="$2"
 RAND_POS_NUM=$3
+NORMA_THREADS=${NORMA_THREADS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)}
+NORMA_THREADS=$(( NORMA_THREADS - 1 )) # leave one thread free for the system
+export NORMA_THREADS
 
 
 # sanity check
 echo "This is your home directory"
 echo $HOME
+echo "Using NORMA_THREADS=$NORMA_THREADS"
 sleep 5
 
 # copy randomly selected files to the build directory
@@ -26,7 +30,7 @@ make -j2
 
 
 #FIXME
-for file in testdhkm*.txt; do
+for file in testdhkm_*.txt; do
   for i in $(seq 1 $RAND_POS_NUM);
   do
       x=$(seq -15 0.01 15 | shuf | head -n1)

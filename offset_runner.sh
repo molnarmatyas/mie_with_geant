@@ -40,7 +40,14 @@ num_events=$8
 inputxsection="$9"
 #CELLSIZE=$(python3 ../macros/calc_r_effective.py ${inputxsection})
 CELLSIZE=10.0 # hardcoded for test xsection, FIXME
+NORMA_THREADS=${NORMA_THREADS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)}
 echo "Using cellsize: " $CELLSIZE
+echo "Using Norma threads: $NORMA_THREADS"
+
+if ! [[ "$NORMA_THREADS" =~ ^[0-9]+$ ]]; then
+    echo "Error: NORMA_THREADS must be a non-negative integer"
+    exit 1
+fi
 
 # Function to validate floats with range check
 validate_float() {
@@ -168,7 +175,11 @@ for ((i=0; i<=x_steps; i++)); do
         printf "Running %d/%d: X=%-10s Y=%-10s Z=%-10s\n" \
                "$current_iteration" "$total_iterations" "$current_x" "$current_y" "$z_value"
         
-        NUMERIC_MIE_FPATH=${inputxsection} CELL_RADIUS_UM=${CELLSIZE} ./Norma -b ${CELLSIZE} -m "$output_macro" > /dev/null # FIXME use correct cell size!!!
+        norma_args=(-b "${CELLSIZE}" -m "$output_macro")
+        if [ "$NORMA_THREADS" -gt 0 ]; then
+            norma_args=(-b "${CELLSIZE}" -t "$NORMA_THREADS" -m "$output_macro")
+        fi
+        NUMERIC_MIE_FPATH=${inputxsection} CELL_RADIUS_UM=${CELLSIZE} ./Norma "${norma_args[@]}" > /dev/null # FIXME use correct cell size!!!
         
         #if [ $? -ne 0 ]; then
         #    echo "Error: Command failed for X=$current_x, Y=$current_y"
