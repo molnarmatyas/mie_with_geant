@@ -128,4 +128,12 @@ if [[ "$DO_HIST" == true ]]; then
     done
 fi
 
+# Plot beamprofiles
+if [[ "$DO_HIST" == true ]]; then
+    cd "$MACRO_DIR"
+    root -b -q plot_det3_beamprofiler.C
+    echo "Beam profile plots generated."
+fi
+
+
 cd "$SCRIPT_DIR"

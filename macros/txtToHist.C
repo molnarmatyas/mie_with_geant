@@ -102,43 +102,43 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     /*
       complete model sensor location
     */
-    double x_min = -37.7737;
-    double y_min = 7.484;
-    double z_min = 28.7942;
-    double x_max = -27.7809;
-    double y_max = 14.514;
-    double z_max = 34.8522;
+    double x_min = 8.229549;
+    double y_min = 92.734001;
+    double z_min = -106.675804;
+    double x_max = 18.222336;
+    double y_max = 99.764000;
+    double z_max = -100.617790;
     double x_center = (x_min + x_max ) / 2.0;
     double y_center = (y_min + y_max ) / 2.0;
     double z_center = (z_min + z_max ) / 2.0;
 
-    double det_1_x_min =  2.431;
-    double det_1_y_min =  21.17;
-    double det_1_z_min =  -4.149;
-    double det_1_x_max =  5.169;
-    double det_1_y_max =  21.45;
-    double det_1_z_max =  -1.411;
+    double det_1_x_min =  48.444199;
+    double det_1_y_min =  106.419998;
+    double det_1_z_min =  -139.438995;
+    double det_1_x_max =  51.182201;
+    double det_1_y_max =  106.699997;
+    double det_1_z_max =  -136.701004;
     double det_1_x_center = (det_1_x_min + det_1_x_max ) / 2.0;
     double det_1_y_center = (det_1_y_min + det_1_y_max ) / 2.0;
     double det_1_z_center = (det_1_z_min + det_1_z_max ) / 2.0;
 
-    double det_2_x_min =  15.431;
-    double det_2_y_min =  21.17;
-    double det_2_z_min =  -4.149;
-    double det_2_x_max =  18.169;
-    double det_2_y_max =  21.45;
-    double det_2_z_max =  -1.411;
+    double det_2_x_min =  61.444199;
+    double det_2_y_min =  106.419998;
+    double det_2_z_min =  -139.438995;
+    double det_2_x_max =  64.182198;
+    double det_2_y_max =  106.699997;
+    double det_2_z_max =  -136.701004;
     double det_2_x_center = (det_2_x_min + det_2_x_max ) / 2.0;
     double det_2_y_center = (det_2_y_min + det_2_y_max ) / 2.0;
     double det_2_z_center = (det_2_z_min + det_2_z_max ) / 2.0;
 
     // FIXME beam profiler testing
-    double det_3_x_min =  8.22955;
-    double det_3_y_min =  92.734;
-    double det_3_z_min =  -106.676;
-    double det_3_x_max =  18.2223;
-    double det_3_y_max =  99.764;
-    double det_3_z_max =  -100.618;
+    double det_3_x_min =  25.82;
+    double det_3_y_min =  92.73;
+    double det_3_z_min =  -143.02;
+    double det_3_x_max =  26.29;
+    double det_3_y_max =  99.76;
+    double det_3_z_max =  -131.80;
     double det_3_x_center = (det_3_x_min + det_3_x_max ) / 2.0;
     double det_3_y_center = (det_3_y_min + det_3_y_max ) / 2.0;
     double det_3_z_center = (det_3_z_min + det_3_z_max ) / 2.0;
