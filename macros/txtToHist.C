@@ -133,12 +133,12 @@ void txtToHist(std::string geantoutputname = "no_cell_measurement2_backgrond_ext
     double det_2_z_center = (det_2_z_min + det_2_z_max ) / 2.0;
 
     // FIXME beam profiler testing
-    double det_3_x_min =  -20.6;
-    double det_3_y_min =  4.4;
-    double det_3_z_min =  -8.7;
-    double det_3_x_max =  -20.4;
-    double det_3_y_max =  17.4;
-    double det_3_z_max =  4.3;
+    double det_3_x_min =  8.22955;
+    double det_3_y_min =  92.734;
+    double det_3_z_min =  -106.676;
+    double det_3_x_max =  18.2223;
+    double det_3_y_max =  99.764;
+    double det_3_z_max =  -100.618;
     double det_3_x_center = (det_3_x_min + det_3_x_max ) / 2.0;
     double det_3_y_center = (det_3_y_min + det_3_y_max ) / 2.0;
     double det_3_z_center = (det_3_z_min + det_3_z_max ) / 2.0;

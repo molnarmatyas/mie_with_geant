@@ -431,7 +431,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./I5R_GEANT_20260119_screen_betw_lens_and_beamsplit.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2_wBP.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -440,7 +440,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("beam_splitter"));
   solids.push_back(mesh->GetSolid("mirror"));
   solids.push_back(mesh->GetSolid("COHERENT_MINI-701L-660S"));
-  solids.push_back(mesh->GetSolid("Flowcell"));
+  //solids.push_back(mesh->GetSolid("Flowcell"));
+  solids.push_back(mesh->GetSolid("Hellma_flowcell_131-814-40_notube"));
   solids.push_back(mesh->GetSolid("ACL12708U"));
   solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor"));
   solids.push_back(mesh->GetSolid("BST04_BeamSplitter"));
@@ -474,11 +475,11 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("sensor_package_window"));
   solids.push_back(mesh->GetSolid("vbpw34s_1_sensor"));
   solids.push_back(mesh->GetSolid("vbpw34s_2_sensor"));
-  solids.push_back(mesh->GetSolid("injector"));
-  solids.push_back(mesh->GetSolid("catcher_tube"));
-  solids.push_back(mesh->GetSolid("capillary"));
-  solids.push_back(mesh->GetSolid("Flowcellwater-backsheath"));
-  solids.push_back(mesh->GetSolid("Flowcellwater-frontsheath"));
+  //solids.push_back(mesh->GetSolid("injector"));
+  //solids.push_back(mesh->GetSolid("catcher_tube"));
+  //solids.push_back(mesh->GetSolid("capillary"));
+  //solids.push_back(mesh->GetSolid("Flowcellwater-backsheath"));
+  //solids.push_back(mesh->GetSolid("Flowcellwater-frontsheath"));
   solids.push_back(mesh->GetSolid("BeamProfiler")); // FIXME only for beam profile testing
 
   std::vector<G4LogicalVolume*> argosz_log(solids.size());
@@ -548,7 +549,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // COHERENT_MINI-701L-660S
   argosz_mat[2] = mirrorMaterial;
   // Flowcell
-  argosz_mat[3] = PMMA; 
+  //argosz_mat[3] = PMMA; 
+  argosz_mat[3] = flowcellMaterial; 
   // ACL12708U
   argosz_mat[4] = lensMaterial;
   // GS3-U3-23S6M-C_sensor
@@ -600,17 +602,17 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // vbpw34s_2_sensor001
   argosz_mat[27] = sil;
   // injector
-  argosz_mat[28] = PMMA;
+  //argosz_mat[28] = PMMA;
   // catcher_tube
-  argosz_mat[29] = PMMA;
+  //argosz_mat[29] = PMMA;
   // capillary
-  argosz_mat[30] = ruby;
+  //argosz_mat[30] = ruby;
   // Flowcellwater-backsheath
-  argosz_mat[31] = saltwater_frontbacksheat;
+  //argosz_mat[31] = saltwater_frontbacksheat;
   // Flowcellwater-frontsheath
-  argosz_mat[32] = saltwater_frontbacksheat;
+  //argosz_mat[32] = saltwater_frontbacksheat;
   // BeamProfiler (CCD also) FIXME only for beam profile testing - or, Screen_betw_lens_and_beamsplit
-  argosz_mat[33] = air;
+  argosz_mat[28] = air;
 
   int isolid = 0;
   G4double dbshift = -0.050 * mm; // shift direct beam stop to make CCD image symmetrical
@@ -797,17 +799,19 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // Flowcell -----
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
   // If flowcell and cell (bubble) were in air, this would do it:
-  //G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back); // could be flowcellSurface, but we do not want to deal with reflections here
-  //G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+  G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back); // could be flowcellSurface, but we do not want to deal with reflections here
+  G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_saltywater = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_saltywater", argosz_phys[3], argosz_phys[15], splitterSurface_back); // from flowcell to salty water
+  G4LogicalBorderSurface* flowcellBorderSurface_saltywater_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_saltywater_to_flowcell", argosz_phys[15], argosz_phys[3], splitterSurface_back); // from salty water to flowcell 
   // However, now need to deal with the ocmplex system: -- FIXME are 100% transmission right? will it cause discrepancy with the surface border properties (i.e. no Snell--Descartes law applied?)
-  G4LogicalBorderSurface* flowcellBorderSurface_world_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_world_to_flowcell", world_phys, argosz_phys[3], splitterSurface_back); // from world to flowcell
-  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_world = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_world", argosz_phys[3], world_phys, splitterSurface_back); // from flowcell to world
-  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_backsheath", argosz_phys[3], argosz_phys[31], splitterSurface_back); // from flowcell to back sheath
-  G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_flowcell", argosz_phys[31], argosz_phys[3], splitterSurface_back); // from back sheath to flowcell
-  G4LogicalBorderSurface* flowcellBorderSurface_frontsheath_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_frontsheath_to_backsheath", argosz_phys[32], argosz_phys[31], splitterSurface_back); // from front sheath to back sheath - same material, is this needed?
-  G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_frontsheath = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_frontsheath", argosz_phys[31], argosz_phys[32], splitterSurface_back);
-  G4LogicalBorderSurface* flowcellBorderSurface_frontsheath_to_saltywater = new G4LogicalBorderSurface("flowcellBorderSurface_frontsheath_to_saltywater", argosz_phys[32], argosz_phys[15], splitterSurface_back); // from front sheath to salty water
-  G4LogicalBorderSurface* flowcellBorderSurface_saltywater_to_frontsheath = new G4LogicalBorderSurface("flowcellBorderSurface_saltywater_to_frontsheath", argosz_phys[15], argosz_phys[32], splitterSurface_back);
+  //G4LogicalBorderSurface* flowcellBorderSurface_world_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_world_to_flowcell", world_phys, argosz_phys[3], splitterSurface_back); // from world to flowcell
+  //G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_world = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_world", argosz_phys[3], world_phys, splitterSurface_back); // from flowcell to world
+  //G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_backsheath", argosz_phys[3], argosz_phys[31], splitterSurface_back); // from flowcell to back sheath
+  //G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_flowcell", argosz_phys[31], argosz_phys[3], splitterSurface_back); // from back sheath to flowcell
+  //G4LogicalBorderSurface* flowcellBorderSurface_frontsheath_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_frontsheath_to_backsheath", argosz_phys[32], argosz_phys[31], splitterSurface_back); // from front sheath to back sheath - same material, is this needed?
+  //G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_frontsheath = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_frontsheath", argosz_phys[31], argosz_phys[32], splitterSurface_back);
+  //G4LogicalBorderSurface* flowcellBorderSurface_frontsheath_to_saltywater = new G4LogicalBorderSurface("flowcellBorderSurface_frontsheath_to_saltywater", argosz_phys[32], argosz_phys[15], splitterSurface_back); // from front sheath to salty water
+  //G4LogicalBorderSurface* flowcellBorderSurface_saltywater_to_frontsheath = new G4LogicalBorderSurface("flowcellBorderSurface_saltywater_to_frontsheath", argosz_phys[15], argosz_phys[32], splitterSurface_back);
   // probably no need to deal with injector, catcher_tube and capillary, as they are not in the direct path of the beam
   
   // And finally, bubble (cell) - these should be OK with 100% transmission, as here only Mie scattering is relevant, no surface effects
