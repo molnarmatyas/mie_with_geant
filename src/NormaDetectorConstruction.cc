@@ -295,7 +295,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4Material* saltwater = nist->FindOrBuildMaterial("G4_WATER");
   G4MaterialPropertiesTable* saline_MPT = new G4MaterialPropertiesTable();
 
-  std::vector<G4double> rindexSaline = {1.3309, 1.3309, 1.3309, 1.3309}; //new values, more precise
+  std::vector<G4double> rindexSaline = {1.34, 1.34, 1.34, 1.34}; // FIXME more precise!
   saline_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexSaline, nEntries);
 
   std::vector<G4double> absLengthSaline = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
@@ -318,42 +318,9 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   NDglass->SetMaterialPropertiesTable(ND_MPT);
 
-  // PMMA for injector, catcher tube and flowcella
-  G4Material* PMMA = nist->FindOrBuildMaterial("G4_PLEXIGLASS");
 
-  G4MaterialPropertiesTable* PMMA_MPT = new G4MaterialPropertiesTable();
 
-  std::vector<G4double> rindexPMMA = {1.4878, 1.4878, 1.4878, 1.4878};
-  PMMA_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexPMMA, nEntries);
 
-  std::vector<G4double> absLengthPMMA = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
-  PMMA_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthPMMA, false, false);
-
-  PMMA->SetMaterialPropertiesTable(PMMA_MPT);
-
-  // ruby for capillary based on https://en.wikipedia.org/wiki/Corundum and https://en.wikipedia.org/wiki/Ruby
-  auto ruby = new G4Material("Ruby", density = 4.02 * g / cm3, nelements = 2);
-  auto Al = new G4Element("Aluminium", "Al", z = 13, a = 26.98 * g / mole);
-  ruby -> AddElement(Al, 2);
-  ruby -> AddElement(O, 3);
-
-  G4MaterialPropertiesTable* ruby_MPT = new G4MaterialPropertiesTable();
-
-  std::vector<G4double> rindexRUBY = {1.768, 1.768, 1.768, 1.768};
-  ruby_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexRUBY, nEntries);
-
-  ruby->SetMaterialPropertiesTable(ruby_MPT);
-
-  // salty water for flowcell-front- and backsheat
-  G4Material* saltwater_frontbacksheat = nist->FindOrBuildMaterial("G4_WATER");
-  G4MaterialPropertiesTable* saline_frontbacksheat_MPT = new G4MaterialPropertiesTable();
-
-  std::vector<G4double> rindexSaline_frontbacksheat = {1.332, 1.332, 1.332, 1.332};
-  saline_frontbacksheat_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexSaline_frontbacksheat, nEntries);
-
-  saline_frontbacksheat_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthSaline, false, false);
-
-  saltwater_frontbacksheat->SetMaterialPropertiesTable(saline_frontbacksheat_MPT);
 
 
 
@@ -431,7 +398,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
 
   //3D Modell load
-  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./I5R_GEANT_20260119_1.obj");
+  auto mesh = CADMesh::TessellatedMesh::FromOBJ("./Argosz_250311_2_wBP.obj");
   G4cout << " MESH NAME: " << mesh->GetFileName() << G4endl;
   mesh->SetScale(1.0);
   std::vector<G4VSolid*> solids; // = mesh->GetSolids();
@@ -440,7 +407,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("beam_splitter"));
   solids.push_back(mesh->GetSolid("mirror"));
   solids.push_back(mesh->GetSolid("COHERENT_MINI-701L-660S"));
-  solids.push_back(mesh->GetSolid("Flowcell"));
+  solids.push_back(mesh->GetSolid("Hellma_flowcell_131-814-40_notube"));
   solids.push_back(mesh->GetSolid("ACL12708U"));
   solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor"));
   solids.push_back(mesh->GetSolid("BST04_BeamSplitter"));
@@ -465,20 +432,15 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   solids.push_back(mesh->GetSolid("LA_HA_housing"));
   solids.push_back(mesh->GetSolid("LA_HA_holder"));
   solids.push_back(mesh->GetSolid("ND_filter"));
-  //solids.push_back(mesh->GetSolid("LA_HA_separator_underpart"));
-  //solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
-  //solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
-  //solids.push_back(mesh->GetSolid("BST04_BeamSplitter_underpart"));
+  solids.push_back(mesh->GetSolid("LA_HA_separator_underpart"));
+  solids.push_back(mesh->GetSolid("HA_mirror_underpart"));
+  solids.push_back(mesh->GetSolid("LA_mirror_underpart"));
+  solids.push_back(mesh->GetSolid("BST04_BeamSplitter_underpart"));
   solids.push_back(mesh->GetSolid("GS3-U3-23S6M-C_sensor_housing"));
   solids.push_back(mesh->GetSolid("camera_outer_window"));
   solids.push_back(mesh->GetSolid("sensor_package_window"));
   solids.push_back(mesh->GetSolid("vbpw34s_1_sensor"));
   solids.push_back(mesh->GetSolid("vbpw34s_2_sensor"));
-  solids.push_back(mesh->GetSolid("injector"));
-  solids.push_back(mesh->GetSolid("catcher_tube"));
-  solids.push_back(mesh->GetSolid("capillary"));
-  solids.push_back(mesh->GetSolid("Flowcellwater-backsheath"));
-  solids.push_back(mesh->GetSolid("Flowcellwater-frontsheath"));
   //solids.push_back(mesh->GetSolid("BeamProfiler")); // FIXME only for beam profile testing
 
   std::vector<G4LogicalVolume*> argosz_log(solids.size());
@@ -491,7 +453,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
      1  solid name: beam_splitter
      2  solid name: mirror
      3  solid name: COHERENT_MINI-701L-660S
-     4  solid name: Flowcell
+     4  solid name: Hellma_flowcell_131-814-40
      5  solid name: ACL12708U
      6  solid name: GS3-U3-23S6M-C_sensor
      7  solid name: BST04_BeamSplitter
@@ -523,21 +485,19 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
      13  solid name: Direct_beam_stop
      14  solid name: beam_splitter_1
      15  solid name: mirror_1
-     16  solid name: Flowcell
-     17  solid name: HA_mirror
-     18  solid name: LA_mirror
-     19  solid name: vbpw34s_1_sensor
-     20  solid name: vbpw34s_2_sensor
-     21  solid name: Direct_beam_stop_2
-     22  solid name: vbpw34s_1
-     23  solid name: vbpw34s_2
-     24  solid name: GS3-U3-23S6M-C_sensor_housing
-     25  solid name: injector
-     26  solid name: catcher_tube
-     27  solid name: capillary
-     28  solid name: Flowcellwater-backsheath
-     29  solid name: Flowcellwater-frontsheath
-     30  solid name: Saltywater
+     16  solid name: LA_HA_mirror_underpart
+     17  solid name: HA_mirror_underpart
+     18  solid name: LA_mirror_underpart
+     19  solid name: BST04_BeamSplitter_underpart
+     20  solid name: Hellma_flowcell_131-814-40
+     21  solid name: HA_mirror
+     22  solid name: LA_mirror
+     23  solid name: vbpw34s_1_sensor
+     24  solid name: vbpw34s_2_sensor
+     25  solid name: Direct_beam_stop_2
+     26  solid name: vbpw34s_1
+     27  solid name: vbpw34s_2
+     28  solid name: GS3-U3-23S6M-C_sensor_housing
    */
 
 
@@ -547,8 +507,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[1] = mirrorMaterial;
   // COHERENT_MINI-701L-660S
   argosz_mat[2] = mirrorMaterial;
-  // Flowcell
-  argosz_mat[3] = PMMA; 
+  // Hellma_flowcell_131-814-40_notube
+  argosz_mat[3] = flowcellMaterial; 
   // ACL12708U
   argosz_mat[4] = lensMaterial;
   // GS3-U3-23S6M-C_sensor
@@ -574,7 +534,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // Saltywater
   argosz_mat[15] = saltwater;
   // lense_outer_housing
-  argosz_mat[16] = shieldMaterial; // changed from lensMaterial to shieldMaterial to make it opaque, as in reality
+  argosz_mat[16] = lensMaterial;
   // filter_adapter
   argosz_mat[17] = shieldMaterial;
   // ND_filter_housing
@@ -587,30 +547,26 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   argosz_mat[21] = shieldMaterial;
   // ND_filter
   argosz_mat[22] = NDglass;
-  // BST04_BeamSplitter_underpart
-  //argosz_mat[23] = shieldMaterial;
-  // GS3-U3-23S6M-C_sensor_housing
+  // LA_HA_mirror_underpart
   argosz_mat[23] = shieldMaterial;
+  // HA_mirror_underpart
+  argosz_mat[24] = shieldMaterial;
+  // LA_mirror_underpart
+  argosz_mat[25] = shieldMaterial;
+  // BST04_BeamSplitter_underpart
+  argosz_mat[26] = shieldMaterial;
+  // GS3-U3-23S6M-C_sensor_housing
+  argosz_mat[27] = shieldMaterial;
   // camera_outer_window
-  argosz_mat[24] = lensMaterial;
+  argosz_mat[28] = lensMaterial;
   // sensor_package_window
-  argosz_mat[25] = lensMaterial;
+  argosz_mat[29] = lensMaterial;
   // vbpw34s_1_sensor001
-  argosz_mat[26] = sil;
+  argosz_mat[30] = sil;
   // vbpw34s_2_sensor001
-  argosz_mat[27] = sil;
+  argosz_mat[31] = sil;
   // BeamProfiler (CCD also) FIXME only for beam profile testing
   //argosz_mat[32] = air;
-  // injector
-  argosz_mat[28] = PMMA;
-  // catcher_tube
-  argosz_mat[29] = PMMA;
-  // capillary
-  argosz_mat[30] = ruby;
-  // Flowcellwater-backsheath
-  argosz_mat[31] = saltwater_frontbacksheat;
-  // Flowcellwater-frontsheath
-  argosz_mat[32] = saltwater_frontbacksheat;
 
   int isolid = 0;
   G4double dbshift = -0.050 * mm; // shift direct beam stop to make CCD image symmetrical
@@ -629,10 +585,19 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
         , 0, 0, 0
         );
     switch(isolid) {
+    case 3:
+    case 15:
+      argosz_phys[isolid] = new G4PVPlacement( 0
+          , G4ThreeVector(-0.40, 0, 0)
+          , argosz_log[isolid]
+          , solid->GetName()
+          , world_log
+          , false, 0
+          );
+      break;
     case 13: // Direct_beam_stop_0.75
       argosz_phys[isolid] = new G4PVPlacement( 0
-          //, G4ThreeVector(0.8660254038*dbshift, 0, 0.5*dbshift)
-          , G4ThreeVector(0.0, 0.0, 0.0)
+          , G4ThreeVector(0.8660254038*dbshift, 0, 0.5*dbshift)
           , argosz_log[isolid]
           , solid->GetName()
           , world_log
@@ -703,14 +668,9 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   }
   else
   {
-    //old model
-    //fBubble_def_pos = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift);
-    fBubble_def_pos = G4ThreeVector(-33.96995 * mm, 11.0412 * mm, -1.99995 * mm + shift);
+    fBubble_def_pos = G4ThreeVector(14.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift);
     bubble_phys = new G4PVPlacement(nullptr, fBubble_def_pos + fBubble_additional_offset, bubbleW_log,
         "Bubble_dis_bnd_proc", argosz_log[15], false, 0);
-    //fBubble_def_pos = G4ThreeVector(250 * mm, 250 * mm, 250 * mm + shift);
-    //bubble_phys = new G4PVPlacement(nullptr, fBubble_def_pos + fBubble_additional_offset, bubbleW_log,
-    //    "Bubble_dis_bnd_proc", world_log, false, 0);
   }
 
   if (IsVerbose())
@@ -720,11 +680,58 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
     std::cout << "Cell current position: " << fBubble_additional_offset + fBubble_def_pos << std::endl;
   }
 
+  /*
+  //   -----  DETECTOR ARRAY  -----
+  //
+
+  // SENSITIVE DETECTOR MATERIAL PROPERTIES
+  G4Material* detectorMaterial = nist->FindOrBuildMaterial("G4_Si");
+  G4MaterialPropertiesTable* mptDetector = new G4MaterialPropertiesTable();
+
+  // Define absorption length for optical photons
+  const G4int detNumEntries = 2;
+  G4double detPhotonEnergy[detNumEntries] = {1.5*eV, 2.0*eV}; // Photon energies
+  G4double detAbsorptionLength[detNumEntries] = {.00001*mm, .00001*mm}; // Absorption length at those energies
+
+  // Assign the material properties table to the detector material
+  detectorMaterial->SetMaterialPropertiesTable(mptDetector);
+  //mptDetector->AddProperty("ABSLENGTH", detPhotonEnergy, absorptionLength, detNumEntries);
+
+  // SENSITIVE DETECTOR CONSTRUCTION
+  G4double fullDetectorWidth = 1*mm;   // Width of the full detector
+  G4double fullDetectorHeight = 1*mm;  // Height of the full detector
+  G4double fullDetectorThickness = 0.1*mm; // Thickness of the detector
+                                           // Number of pixels in X and Y directions
+                                           G4int nPixelsZ = 10;
+                                           G4int nPixelsY = 10;
+  // Therefore, the pixel dimensions:
+  G4double pixelWidth = fullDetectorWidth / nPixelsZ;
+  G4double pixelHeight = fullDetectorHeight / nPixelsY;
+  G4double pixelThickness = fullDetectorThickness;  // Same thickness for each pixe
+
+  // Single pixel definition
+  G4Box *solidDetector = new G4Box("solidDetector", fullDetectorWidth/(2*nPixelsZ), fullDetectorHeight/(2*nPixelsY), fullDetectorThickness/2);
+  logicDetector = new G4LogicalVolume(solidDetector, detectorMaterial, "logicDetector");
+  // Creating individual physical pixel instances
+  for(G4int iz=0; iz<nPixelsZ; iz++)
+  {
+  for(G4int iy=0; iy<nPixelsY; iy++)
+  {
+  // X, Y, and Z position of the pixel
+  G4double posX = 5*CLHEP::mm; // so far the whole plane at the same Z pos.
+  G4double posY = -fullDetectorHeight/2 + pixelWidth*(iy +0.5);
+  G4double posZ = -fullDetectorWidth/2 + pixelWidth*(iz +0.5);
+  // Pixel placement
+  G4VPhysicalVolume * physDetector = new G4PVPlacement(0, G4ThreeVector(posX, posY, posZ),
+  logicDetector, "physDetector", world_log, false, iz+iy*nPixelsZ, true); // or logicWorld???
+  }
+  }
+   */
   // ------------- Surfaces --------------
-  
-  /* Deprecated, what were these even for?
+
   // Water Tank
-  G4OpticalSurface* opWaterSurface = new G4OpticalSurface("WaterSurface", glisur, polished, x_ray);
+  auto opWaterSurface = new G4OpticalSurface("WaterSurface");
+  opWaterSurface = new G4OpticalSurface("WaterSurface", glisur, polished, x_ray);
 
   //auto waterSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
   auto waterSurface = new G4LogicalBorderSurface("WaterSurface", argosz_phys[17], bubble_phys, opWaterSurface); // in SALINE SOLUTION
@@ -733,9 +740,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
     dynamic_cast<G4OpticalSurface *>(waterSurface->GetSurface(argosz_phys[17], bubble_phys)->GetSurfaceProperty()); // in SALINE SOLUTION
   if (opticalSurface)
     opticalSurface->DumpInfo();
-  */
 
-  // Mirror -----
+  // Mirror
 
   // Create optical surface
   G4OpticalSurface* opticalSurfaceMirror = new G4OpticalSurface("MirrorSurface");
@@ -753,13 +759,12 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   opticalSurfaceMirror->SetMaterialPropertiesTable(SMPT);
 
-  G4LogicalBorderSurface* mirrorSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface_1", world_phys, argosz_phys[0], opticalSurfaceMirror); // prbly enough in one direction: mirror, so it does not go IN the material
+  G4LogicalBorderSurface* mirrorSurface_1 = new G4LogicalBorderSurface("MirrorBorderSurface_1", world_phys, argosz_phys[0], opticalSurfaceMirror);
   G4LogicalBorderSurface* mirrorSurface_2 = new G4LogicalBorderSurface("MirrorBorderSurface_2", world_phys, argosz_phys[1], opticalSurfaceMirror);
-  G4LogicalBorderSurface* mirrorSurface_3 = new G4LogicalBorderSurface("MirrorBorderSurface_3", world_phys, argosz_phys[2], opticalSurfaceMirror);
   G4LogicalBorderSurface* mirrorSurface_11 = new G4LogicalBorderSurface("MirrorBorderSurface_11", world_phys, argosz_phys[11], opticalSurfaceMirror);
   G4LogicalBorderSurface* mirrorSurface_14 = new G4LogicalBorderSurface("MirrorBorderSurface_14", world_phys, argosz_phys[14], opticalSurfaceMirror);
 
-  // Lens ----- 
+  // Lens
   // Create optical surface
   G4OpticalSurface* opticalSurfaceLens = new G4OpticalSurface("LensSurface");
   opticalSurfaceLens = new G4OpticalSurface("LensSurface", unified, polished, dielectric_dielectric);
@@ -772,7 +777,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4LogicalBorderSurface* lensSurface2_in = new G4LogicalBorderSurface("LensBorderSurface2", world_phys, argosz_phys[10], opticalSurfaceLens);
   G4LogicalBorderSurface* lensSurface2_out = new G4LogicalBorderSurface("LensBorderSurface2_1", argosz_phys[10], world_phys, opticalSurfaceLens);
 
-  // Beam splitter -----
+  // Beam splitter
   // BST04_BeamSplitter
   G4OpticalSurface* splitterSurface_front = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
   G4OpticalSurface* splitterSurface_back = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
@@ -790,31 +795,17 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   splitterSurface_front->SetMaterialPropertiesTable(surfaceMPT_front);
   splitterSurface_back->SetMaterialPropertiesTable(surfaceMPT_back);
-  //G4LogicalBorderSurface* splitterSurface1 = new G4LogicalBorderSurface("splitterBorderSurface1", world_phys, argosz_phys[0], opticalSurfaceLens); //this is not used now in the simulation
+  //this is not used now in the simulation
+  //G4LogicalBorderSurface* splitterSurface1 = new G4LogicalBorderSurface("splitterBorderSurface1", world_phys, argosz_phys[0], opticalSurfaceLens);
   G4LogicalBorderSurface* splitterBorderSurface_front = new G4LogicalBorderSurface("splitterBorderSurface_front", world_phys, argosz_phys[6], splitterSurface_front);
   G4LogicalBorderSurface* splitterBorderSurface_back = new G4LogicalBorderSurface("splitterBorderSurface_back", argosz_phys[6], world_phys, splitterSurface_back);
 
-  // Flowcell -----
+  //flowcell - seems to be acceptable?
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
-  // If flowcell and cell (bubble) were in air, this would do it:
-  //G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back); // could be flowcellSurface, but we do not want to deal with reflections here
-  //G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
-  // However, now need to deal with the ocmplex system: -- FIXME are 100% transmission right? will it cause discrepancy with the surface border properties (i.e. no Snell--Descartes law applied?)
-  G4LogicalBorderSurface* flowcellBorderSurface_world_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_world_to_flowcell", world_phys, argosz_phys[3], splitterSurface_back); // from world to flowcell
-  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_world = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_world", argosz_phys[3], world_phys, splitterSurface_back); // from flowcell to world
-  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_backsheath", argosz_phys[3], argosz_phys[31], splitterSurface_back); // from flowcell to back sheath
-  G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_flowcell", argosz_phys[31], argosz_phys[3], splitterSurface_back); // from back sheath to flowcell
-  G4LogicalBorderSurface* flowcellBorderSurface_frontsheath_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_frontsheath_to_backsheath", argosz_phys[32], argosz_phys[31], splitterSurface_back); // from front sheath to back sheath - same material, is this needed?
-  G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_frontsheath = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_frontsheath", argosz_phys[31], argosz_phys[32], splitterSurface_back);
-  G4LogicalBorderSurface* flowcellBorderSurface_frontsheath_to_saltywater = new G4LogicalBorderSurface("flowcellBorderSurface_frontsheath_to_saltywater", argosz_phys[32], argosz_phys[15], splitterSurface_back); // from front sheath to salty water
-  G4LogicalBorderSurface* flowcellBorderSurface_saltywater_to_frontsheath = new G4LogicalBorderSurface("flowcellBorderSurface_saltywater_to_frontsheath", argosz_phys[15], argosz_phys[32], splitterSurface_back);
-  // probably no need to deal with injector, catcher_tube and capillary, as they are not in the direct path of the beam
+  G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
+  G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
   
-  // And finally, bubble (cell) - these should be OK with 100% transmission, as here only Mie scattering is relevant, no surface effects
-  G4LogicalBorderSurface* flowcellBorderSurface_saltywater_to_bubble = new G4LogicalBorderSurface("flowcellBorderSurface_saltywater_to_bubble", argosz_phys[15], bubble_phys, splitterSurface_back); // or maybe the opWaterSurface instead of splitterSurface_back? 
-  G4LogicalBorderSurface* flowcellBorderSurface_bubble_to_saltywater = new G4LogicalBorderSurface("flowcellBorderSurface_bubble_to_saltywater", bubble_phys, argosz_phys[15], splitterSurface_back); 
-  
-  // ND filter -----
+  // ND filter
   G4OpticalSurface* NDFilterSurface = new G4OpticalSurface("NDFilterSurface");
   NDFilterSurface->SetType(dielectric_dielectric);
   NDFilterSurface->SetFinish(polished); // or ground if it’s a diffusing ND filter
