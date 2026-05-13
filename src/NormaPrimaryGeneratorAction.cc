@@ -62,7 +62,7 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
 	//fParticleGun->SetParticlePosition(G4ThreeVector(-17 * CLHEP::um, y, 0*mm));
   //fParticleGun->SetParticlePosition(G4ThreeVector(-29.35 * CLHEP::mm, 96.076 * CLHEP::mm, -157.841 * CLHEP::mm)); //laser
   G4double shift = .0;//0.035 * mm; // to make resulting CCD image symmetrical
-	fParticleGun->SetParticlePosition(G4ThreeVector(4.4999505 * mm, 96.250088 * mm, -137.4700015 * mm + shift)); //14.49 //center of cell
+	fParticleGun->SetParticlePosition(G4ThreeVector(-33.96995 * mm, 11.0412 * mm, -1.99995 * mm + shift)); //14.49 //center of cell
 		
   /*
 	G4double dy = (G4UniformRand() - 0.5) * 0.1;
@@ -79,7 +79,8 @@ NormaPrimaryGeneratorAction::NormaPrimaryGeneratorAction() : G4VUserPrimaryGener
   // Initialize intensity profile
   std::string intensityFile = "RayCi8_180mm.csv"; // You can pass this via a macro later
   G4double leftrightZ = 0.0*mm;
-  profileCenterWorld = G4ThreeVector(14.4999505 * mm + -0.4*mm, 96.250088 * mm - 0.23*mm, -137.4700015 * mm - 0.9*mm + leftrightZ);
+
+  profileCenterWorld = G4ThreeVector(-33.96995 * mm + -0.4*mm, 11.0412 * mm - 0.23*mm, -1.99995 * mm - 0.9*mm + leftrightZ);
 
   InitializeIntensityProfile(intensityFile, pixelSize);
 }
