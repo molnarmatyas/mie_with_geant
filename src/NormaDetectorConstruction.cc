@@ -318,10 +318,42 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   NDglass->SetMaterialPropertiesTable(ND_MPT);
 
+  // PMMA for injector, catcher tube and flowcella
+  G4Material* PMMA = nist->FindOrBuildMaterial("G4_PLEXIGLASS");
 
+  G4MaterialPropertiesTable* PMMA_MPT = new G4MaterialPropertiesTable();
 
+  std::vector<G4double> rindexPMMA = {1.4878, 1.4878, 1.4878, 1.4878};
+  PMMA_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexPMMA, nEntries);
 
+  std::vector<G4double> absLengthPMMA = {100.0*mm, 100.0*mm, 100.0*mm, 100.0*mm};
+  PMMA_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthPMMA, false, false);
 
+  PMMA->SetMaterialPropertiesTable(PMMA_MPT);
+
+  // ruby for capillary based on https://en.wikipedia.org/wiki/Corundum and https://en.wikipedia.org/wiki/Ruby
+  auto ruby = new G4Material("Ruby", density = 4.02 * g / cm3, nelements = 2);
+  auto Al = new G4Element("Aluminium", "Al", z = 13, a = 26.98 * g / mole);
+  ruby -> AddElement(Al, 2);
+  ruby -> AddElement(O, 3);
+
+  G4MaterialPropertiesTable* ruby_MPT = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexRUBY = {1.768, 1.768, 1.768, 1.768};
+  ruby_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexRUBY, nEntries);
+
+  ruby->SetMaterialPropertiesTable(ruby_MPT);
+
+  // salty water for flowcell-front- and backsheat
+  G4Material* saltwater_frontbacksheat = nist->FindOrBuildMaterial("G4_WATER");
+  G4MaterialPropertiesTable* saline_frontbacksheat_MPT = new G4MaterialPropertiesTable();
+
+  std::vector<G4double> rindexSaline_frontbacksheat = {1.332, 1.332, 1.332, 1.332};
+  saline_frontbacksheat_MPT->AddProperty("RINDEX", photonEnergyMirror, rindexSaline_frontbacksheat, nEntries);
+
+  saline_frontbacksheat_MPT->AddProperty("ABSLENGTH", photonEnergyMirror, absLengthSaline, false, false);
+
+  saltwater_frontbacksheat->SetMaterialPropertiesTable(saline_frontbacksheat_MPT);
 
 
   // ------------- Volumes --------------
@@ -529,7 +561,7 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // COHERENT_MINI-701L-660S
   argosz_mat[2] = mirrorMaterial;
   // flowcell
-  argosz_mat[3] = flowcellMaterial; 
+  argosz_mat[3] = PMMA; 
   // ACL12708U
   argosz_mat[4] = lensMaterial;
   // GS3-U3-23S6M-C_sensor
@@ -579,15 +611,15 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // vbpw34s_2_sensor001
   argosz_mat[27] = sil;
   // injector
-  argosz_mat[28] = flowcellMaterial;
+  argosz_mat[28] = PMMA;
   // catcher_tube
-  argosz_mat[29] = flowcellMaterial;
+  argosz_mat[29] = PMMA;
   // capillary
-  argosz_mat[30] = flowcellMaterial;
+  argosz_mat[30] = ruby;
   // Flowcellwater-backsheath
-  argosz_mat[31] = saltwater;
+  argosz_mat[31] = saltwater_frontbacksheat;
   // Flowcellwater-frontsheath
-  argosz_mat[32] = saltwater;
+  argosz_mat[32] = saltwater_frontbacksheat;
   // BeamProfiler (CCD also) FIXME only for beam profile testing
   //argosz_mat[32] = air;
 
@@ -738,6 +770,14 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
   G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
   G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+
+  // However, now need to deal with the ocmplex system: -- FIXME are 100% transmission right? will it cause discrepancy with the surface border properties (i.e. no Snell--Descartes law applied?)
+  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_backsheath", argosz_phys[3], argosz_phys[31], splitterSurface_back); // from flowcell to back sheath
+  G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_flowcell", argosz_phys[31], argosz_phys[3], splitterSurface_back); // from back sheath to flowcell
+  
+  // And finally, bubble (cell) - these should be OK with 100% transmission, as here only Mie scattering is relevant, no surface effects
+  G4LogicalBorderSurface* flowcellBorderSurface_saltywater_to_bubble = new G4LogicalBorderSurface("flowcellBorderSurface_saltywater_to_bubble", argosz_phys[15], bubble_phys, splitterSurface_back); // or maybe the opWaterSurface instead of splitterSurface_back? 
+  G4LogicalBorderSurface* flowcellBorderSurface_bubble_to_saltywater = new G4LogicalBorderSurface("flowcellBorderSurface_bubble_to_saltywater", bubble_phys, argosz_phys[15], splitterSurface_back); 
   
   // ND filter
   G4OpticalSurface* NDFilterSurface = new G4OpticalSurface("NDFilterSurface");
