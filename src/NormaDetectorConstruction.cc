@@ -700,16 +700,16 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // ------------- Surfaces --------------
 
   // Water Tank
-  auto opWaterSurface = new G4OpticalSurface("WaterSurface");
-  opWaterSurface = new G4OpticalSurface("WaterSurface", glisur, polished, x_ray);
+  //auto opWaterSurface = new G4OpticalSurface("WaterSurface");
+  //opWaterSurface = new G4OpticalSurface("WaterSurface", glisur, polished, x_ray);
 
-  //auto waterSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
-  auto waterSurface = new G4LogicalBorderSurface("WaterSurface", argosz_phys[17], bubble_phys, opWaterSurface); // in SALINE SOLUTION
+  ////auto waterSurface = new G4LogicalBorderSurface("WaterSurface", world_phys, bubble_phys, opWaterSurface);
+  //auto waterSurface = new G4LogicalBorderSurface("WaterSurface", argosz_phys[15], bubble_phys, opWaterSurface); // in SALINE SOLUTION
 
-  auto opticalSurface =
-    dynamic_cast<G4OpticalSurface *>(waterSurface->GetSurface(argosz_phys[17], bubble_phys)->GetSurfaceProperty()); // in SALINE SOLUTION
-  if (opticalSurface)
-    opticalSurface->DumpInfo();
+  //auto opticalSurface =
+  //  dynamic_cast<G4OpticalSurface *>(waterSurface->GetSurface(argosz_phys[15], bubble_phys)->GetSurfaceProperty()); // in SALINE SOLUTION
+  //if (opticalSurface)
+  //  opticalSurface->DumpInfo();
 
   // Mirror
 
@@ -747,8 +747,8 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   // Beam splitter
   // BST04_BeamSplitter
-  G4OpticalSurface* splitterSurface_front = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
-  G4OpticalSurface* splitterSurface_back = new G4OpticalSurface("SplitterSurface", unified, polished, dielectric_dielectric);
+  G4OpticalSurface* splitterSurface_front = new G4OpticalSurface("SplitterSurface_front", unified, polished, dielectric_dielectric);
+  G4OpticalSurface* splitterSurface_back = new G4OpticalSurface("SplitterSurface_back", unified, polished, dielectric_dielectric);
 
   G4MaterialPropertiesTable* surfaceMPT_front = new G4MaterialPropertiesTable();
   G4MaterialPropertiesTable* surfaceMPT_back = new G4MaterialPropertiesTable();
@@ -768,12 +768,12 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
 
   //flowcell - seems to be acceptable?
   G4OpticalSurface* flowcellSurface = new G4OpticalSurface("flowcellSurface", unified, polished, dielectric_dielectric);
-  G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, splitterSurface_back);
-  G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], splitterSurface_back);
+  G4LogicalBorderSurface* flowcellBorderSurface_in_out = new G4LogicalBorderSurface("flowcellBorderSurface_in_out", argosz_phys[3], world_phys, flowcellSurface);
+  G4LogicalBorderSurface* flowcellBorderSurface_out_in = new G4LogicalBorderSurface("flowcellBorderSurface_out_in", world_phys, argosz_phys[3], flowcellSurface);
 
   // However, now need to deal with the ocmplex system: -- FIXME are 100% transmission right? will it cause discrepancy with the surface border properties (i.e. no Snell--Descartes law applied?)
-  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_backsheath", argosz_phys[3], argosz_phys[31], splitterSurface_back); // from flowcell to back sheath
-  G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_flowcell", argosz_phys[31], argosz_phys[3], splitterSurface_back); // from back sheath to flowcell
+  G4LogicalBorderSurface* flowcellBorderSurface_flowcell_to_backsheath = new G4LogicalBorderSurface("flowcellBorderSurface_flowcell_to_backsheath", argosz_phys[3], argosz_phys[31], flowcellSurface); // from flowcell to back sheath
+  G4LogicalBorderSurface* flowcellBorderSurface_backsheath_to_flowcell = new G4LogicalBorderSurface("flowcellBorderSurface_backsheath_to_flowcell", argosz_phys[31], argosz_phys[3], flowcellSurface); // from back sheath to flowcell
   
   // And finally, bubble (cell) - these should be OK with 100% transmission, as here only Mie scattering is relevant, no surface effects
   G4LogicalBorderSurface* flowcellBorderSurface_saltywater_to_bubble = new G4LogicalBorderSurface("flowcellBorderSurface_saltywater_to_bubble", argosz_phys[15], bubble_phys, splitterSurface_back); // or maybe the opWaterSurface instead of splitterSurface_back? 
