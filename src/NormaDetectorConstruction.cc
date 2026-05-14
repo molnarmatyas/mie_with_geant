@@ -607,9 +607,9 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
   // sensor_package_window
   argosz_mat[25] = lensMaterial;
   // vbpw34s_1_sensor001
-  argosz_mat[26] = sil;
+  argosz_mat[26] = shieldMaterial;
   // vbpw34s_2_sensor001
-  argosz_mat[27] = sil;
+  argosz_mat[27] = shieldMaterial;
   // injector
   argosz_mat[28] = PMMA;
   // catcher_tube
@@ -639,6 +639,15 @@ G4VPhysicalVolume *NormaDetectorConstruction::Construct()
         , 0, 0, 0
         );
     switch(isolid) {
+    case 7:
+          argosz_phys[isolid] = new G4PVPlacement( 0
+          , G4ThreeVector(0, -0.25*mm, 0)
+          , argosz_log[isolid]
+          , solid->GetName()
+          , world_log
+          , false, 0
+          );
+      break;
     default:
       argosz_phys[isolid] = new G4PVPlacement( 0
           , G4ThreeVector(0, 0, 0)
